@@ -1,0 +1,8 @@
+{
+  "_comment": "Free-form text answer. No options. Use placeholder to hint the expected shape of the answer. Rendered as an open question (the user types their own response).",
+  "questionType": "open-ended",
+  "question": "",
+  "context": "",
+  "header": "",
+  "placeholder": ""
+}

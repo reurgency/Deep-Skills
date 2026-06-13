@@ -1,0 +1,34 @@
+{
+  "_template": "Shape of `.deep-skills/<effort>/04-Code-Review/findings.json` — a JSON object with a `findings` array. Annotations live in `_doc` keys here; real findings.json files omit every key starting with `_`. Numeric `severity` is CANONICAL; `tier` is derived presentation vocabulary (9-10 Blocker, 7-8 Major, 5-6 Minor, 1-4 Nit). Shape is kept compatible with a thin future bridge to an in-app finding importer — no app coupling here, just stable fields.",
+  "effort": "<effort-name>",
+  "scope": "<verbatim stated-scope line>",
+  "reviewed": "<YYYY-MM-DD>",
+  "mode": "<single-agent | multi-agent>",
+  "findings": [
+    {
+      "_doc_id": "CR-NNN, sequential within this review; stable across report.md / findings.json / certificate.md",
+      "id": "CR-001",
+      "_doc_lens": "one of: correctness | last-mile | plan-conformance | coherence | pre-pass",
+      "lens": "last-mile",
+      "_doc_dimension": "null in the default single-agent review; under --multi-agent a finder pass id (diff-scan | removed-behavior | seam-trace | frozen-state-probe | quality; the four lens passes keep null), or an array of ids when synthesis merged a cross-pass root cause",
+      "dimension": null,
+      "_doc_verification": "multi-agent only: confirmed | plausible; unverified when no verifier ran (single-agent mode, or below multi-agent's sev>=5 verification floor). Refuted candidates are never stored as findings — they appear only in report.md's Refuted-candidates appendix.",
+      "verification": "unverified",
+      "_doc_severity": "numeric 1-10, CANONICAL",
+      "severity": 9,
+      "_doc_tier": "derived: Blocker | Major | Minor | Nit",
+      "tier": "Blocker",
+      "title": "Save chain severed: POST target route never registered",
+      "_doc_evidence": "REQUIRED. At least one of path(+line), symbol, observed. `path` is repo-relative; `line` optional; `symbol` a named function/class/member; `observed` a behavior seen by tooling (pre-pass output, browser traffic). Last-mile findings put the hop-by-hop chain summary in `observed` or the recommendation.",
+      "evidence": {
+        "path": "apps/ui/src/app/tracks/track.service.ts",
+        "line": 88,
+        "symbol": "TrackService.saveTrack",
+        "observed": "Chain breaks at hop 4: saveTrack() POSTs /api/tracks; no such route registered (routes/ contains only /api/track-templates)"
+      },
+      "recommendation": "Register the /api/tracks POST route and wire it to the existing handler, or correct the service URL.",
+      "_doc_status": "open (pre-triage) -> accepted | deferred | rejected by user; accepted findings may later become fixed. Blockers are auto-accepted (no triage; user informed).",
+      "status": "accepted"
+    }
+  ]
+}
