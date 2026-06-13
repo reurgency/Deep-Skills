@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code Review — PR #65: Track Pipeline Cutover</title>
+<style>
+  :root {
+    --bg: #f6f8fa;
+    --card: #ffffff;
+    --text: #1f2328;
+    --muted: #59636e;
+    --border: #d1d9e0;
+    --accent: #0969da;
+    --critical: #cf222e;
+    --critical-bg: #ffebe9;
+    --high: #bc4c00;
+    --high-bg: #fff1e5;
+    --medium: #9a6700;
+    --medium-bg: #fff8c5;
+    --low: #1a7f37;
+    --low-bg: #dafbe1;
+    --code-bg: #f0f3f6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+  }
+  .container { max-width: 920px; margin: 0 auto; padding: 32px 24px 64px; }
+  header { margin-bottom: 24px; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  .subtitle { color: var(--muted); font-size: 14px; }
+  .subtitle a { color: var(--accent); text-decoration: none; }
+  .subtitle a:hover { text-decoration: underline; }
+  .meta-row { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; font-size: 13px; color: var(--muted); }
+  .meta-row span strong { color: var(--text); }
+
+  .tldr {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--critical);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin: 24px 0;
+  }
+  .tldr h2 { margin: 0 0 8px; font-size: 17px; }
+  .tldr p { margin: 8px 0; }
+
+  h2.section { font-size: 20px; margin: 36px 0 8px; }
+  .section-note { color: var(--muted); font-size: 14px; margin: 0 0 16px; }
+
+  details.finding {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  details.finding[open] { box-shadow: 0 2px 8px rgba(31,35,40,0.08); }
+  details.finding > summary {
+    cursor: pointer;
+    padding: 14px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    list-style: none;
+    user-select: none;
+  }
+  details.finding > summary::-webkit-details-marker { display: none; }
+  details.finding > summary:hover { background: #f6f8fa; }
+  .chevron {
+    flex: 0 0 auto;
+    margin-top: 4px;
+    width: 10px; height: 10px;
+    border-right: 2px solid var(--muted);
+    border-bottom: 2px solid var(--muted);
+    transform: rotate(-45deg);
+    transition: transform 0.15s ease;
+  }
+  details[open] > summary .chevron { transform: rotate(45deg); }
+  .badge {
+    flex: 0 0 auto;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 2px 9px;
+    border-radius: 999px;
+    margin-top: 2px;
+    white-space: nowrap;
+  }
+  .badge.critical { color: var(--critical); background: var(--critical-bg); }
+  .badge.high     { color: var(--high);     background: var(--high-bg); }
+  .badge.medium   { color: var(--medium);   background: var(--medium-bg); }
+  .badge.low      { color: var(--low);      background: var(--low-bg); }
+  .badge.cleanup  { color: var(--muted);    background: var(--code-bg); }
+  .summary-text { font-weight: 600; font-size: 15px; }
+  .finding-body { padding: 0 18px 18px 40px; }
+  .finding-body h4 {
+    margin: 14px 0 4px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+  }
+  .finding-body p { margin: 4px 0; font-size: 14px; }
+  .loc {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 12.5px;
+    background: var(--code-bg);
+    border-radius: 6px;
+    padding: 2px 8px;
+    display: inline-block;
+    margin: 2px 0;
+  }
+  code {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 12.5px;
+    background: var(--code-bg);
+    border-radius: 4px;
+    padding: 1px 5px;
+  }
+  .verdict { font-size: 12px; color: var(--muted); margin-top: 12px; }
+  .verdict b { color: var(--low); }
+
+  .methodology {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 22px;
+    font-size: 13.5px;
+    color: var(--muted);
+    margin-top: 28px;
+  }
+  .methodology h3 { margin: 0 0 8px; font-size: 14px; color: var(--text); }
+  .methodology ul { margin: 6px 0; padding-left: 20px; }
+
+  .recommendation {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--high);
+    border-radius: 8px;
+    padding: 16px 22px;
+    margin-top: 28px;
+    font-size: 14.5px;
+  }
+  .recommendation h3 { margin: 0 0 8px; font-size: 16px; }
+
+  footer { margin-top: 40px; font-size: 12px; color: var(--muted); text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Code Review — Track Pipeline Cutover</h1>
+  <div class="subtitle"><a href="https://github.com/reurgency/maudel/pull/65">reurgency/maudel — PR #65</a> &nbsp;·&nbsp; Phases 0–6: Track data model, config resolution, track pipeline page</div>
+  <div class="meta-row">
+    <span><strong>Scope:</strong> 82 files, +9,858 / −4,131</span>
+    <span><strong>Base:</strong> <code>d79aa633</code> (develop)</span>
+    <span><strong>Head:</strong> <code>68793991</code></span>
+    <span><strong>Reviewed:</strong> 2026-06-11</span>
+  </div>
+</header>
+
+<div class="tldr">
+  <h2>TL;DR</h2>
+  <p><strong>The feature's central promise — that what you configure on the track page is what runs — is broken in four independent ways.</strong> The UI writes to the track's <em>forked</em> pipeline and to the resolver's override layers, but the runtime still reads pipeline <code>'default'</code> and the raw <code>stage_state</code>/<code>stage_mode</code> columns. Prompt edits, agent assignments, template-inherited mode/include settings, and harness/model overrides all display as "saved / effective" while having zero effect on actual runs.</p>
+  <p>Findings 1, 2, and 5 are facets of the same architectural gap — the UI surface was cut over in Phase 6, but the runtime was never wired to the resolver — and likely want one coordinated fix rather than three patches.</p>
+</div>
+
+<h2 class="section">Findings</h2>
+<p class="section-note">10 findings, ranked most severe first. Each was independently verified against the PR head before inclusion. Click to expand.</p>
+
+<!-- Finding 1 -->
+<details class="finding">
+  <summary>
+    <span class="chevron"></span>
+    <span class="badge critical">Critical</span>
+    <span class="summary-text">1. Stage prompt/agent/gate edits are written to the track's fork, but the runtime always reads pipeline <code>'default'</code> — edits silently never reach execution</span>
+  </summary>
+  <div class="finding-body">
+    <h4>Location</h4>
+    <span class="loc">apps/api/src/services/stage-prompt-assembler.service.ts:132</span>
+    <h4>Detail</h4>
+    <p>The track page's tabs persist stage prompt, agent-binding, and quality-gate edits via <code>PUT /api/pipeline-stages/:id?pipelineId=&lt;track-fork&gt;</code> (prompts tab :416, agents tab :315). Runtime prompt assembly never receives a pipeline id: <code>agentic-step-handler.ts:1255</code> calls <code>assemble()</code> without one, so the assembler falls back to <code>'default'</code> (line 132) for the stage prompt, agent binding, skills, and pipeline prompt. Nothing syncs the fork back to <code>'default'</code>. The PR also deletes the old <code>/pipeline/config</code> page — the only UI that edited the <code>'default'</code> pipeline — so post-merge there is <em>no</em> surface whose stage-content edits reach execution.</p>
+    <h4>Failure scenario</h4>
+    <p>User edits the <code>implement</code> stage's action prompt on the track page and gets a success toast. They run a story. The agent executes with the <em>old</em> prompt, because assembly read the untouched <code>'default'</code> pipeline. There is no remaining UI to edit the pipeline that actually runs.</p>
+    <p class="verdict">Verifier verdict: <b>CONFIRMED</b> — fork write path, default-only read path, absence of any sync, and deletion of the old surface all verified in code.</p>
+  </div>
+</details>
+
+<!-- Finding 2 -->
+<details class="finding">
+  <summary>
+    <span class="chevron"></span>
+    <span class="badge critical">Critical</span>
+    <span class="summary-text">2. Runtime stage gating reads raw columns, the UI shows the layered resolver — and "Save as template" NULLs the columns, so active settings stop gating execution</span>
+  </summary>
+  <div class="finding-body">
+    <h4>Location</h4>
+    <span class="loc">apps/api/src/services/track-stage-config.service.ts:62</span>
+    <h4>Detail</h4>
+    <p><code>isStageActivated</code> (:62) and <code>getStageMode</code> (:76) read only the raw <code>stage_state</code>/<code>stage_mode</code> columns on the workspace's <em>default</em> track. The UI displays the layered resolver (<code>resolveTrackConfig</code>), which adds template inheritance and track-level <code>config_overrides.mode</code> on top. The two disagree whenever: (a) a stage is enabled purely by template inheritance (<code>stage_state</code> NULL); (b) mode is set as a track-level override or inherited from the template's <code>humanInteraction</code>; (c) <strong>saveAsTemplate</strong> bakes values into the template and then NULLs <code>stage_state</code>/<code>stage_mode</code> (<code>track-config-resolution.service.ts:388</code>) — its comment claims <code>enabled</code> is kept in sync "for runtime consumers," but the gate never reads <code>enabled</code>; (d) settings live on a non-default track.</p>
+    <h4>Failure scenario</h4>
+    <p>User enables Review Stories (included, autonomous) on their track and clicks "Save as template." The UI continues to show included/autonomous (now template-sourced), but on the next run <code>executor.ts:1891</code> / <code>story-generation-engine.service.ts:673</code> get <code>false</code> / <code>'collaborative'</code> and silently skip auto-review.</p>
+    <p class="verdict">Verifier verdict: <b>CONFIRMED</b> — all four sub-claims (a)–(d) verified.</p>
+  </div>
+</details>
+
+<!-- Finding 3 -->
+<details class="finding">
+  <summary>
+    <span class="chevron"></span>
+    <span class="badge critical">Critical</span>
+    <span class="summary-text">3. Deleting the old config page orphans any persisted <code>enabled=0</code> on pipeline <code>'default'</code> — review runs throw, with no UI recovery path</span>
+  </summary>
+  <div class="finding-body">
+    <h4>Location</h4>
+    <span class="loc">apps/api/src/services/stage-prompt-assembler.service.ts:144</span>
+    <h4>Detail</h4>
+    <p>The deleted stage-config drawer persisted <code>enabled</code> toggles against pipeline <code>'default'</code> (<code>toggleStageEnabled</code> → <code>PUT ...?pipelineId=default</code>). The assembler still returns <code>null</code> for disabled stages (:144), and <code>review-stage-engine.service.ts:705</code> throws when it does. The new track UI writes only the fork (<code>syncStageEnabledFromTemplate</code> targets the forked pipeline), the migration doesn't touch <code>pipeline_stages.enabled</code>, and the disk-scan upsert explicitly preserves <code>enabled</code> on conflict. Worse, forks <em>copy</em> the default's rows, so the track inherits the disabled flag — and re-enabling via the track UI only fixes the fork the runtime doesn't read.</p>
+    <h4>Failure scenario</h4>
+    <p>A pre-cutover user disabled Review Story via the old drawer. After upgrade, every review session dies with <code>[ReviewStage] StagePromptAssembler returned null for stage "review-story"</code>. Recovery requires manual SQL or a direct API call — no UI can clear the flag.</p>
+    <p class="verdict">Verifier verdict: <b>CONFIRMED</b> — including the aggravating fork-inherits-flag detail.</p>
+  </div>
+</details>
+
+<!-- Finding 4 -->
+<details class="finding">
+  <summary>
+    <span class="chevron"></span>
+    <span class="badge high">High</span>
+    <span class="summary-text">4. Legacy config fallback was removed from runtime gating, but the legacy→track backfill only runs in one GET route — pre-cutover activation is lost for headless runs</span>
+  </summary>
+  <div class="finding-body">
+    <h4>Location</h4>
+    <span class="loc">apps/api/src/services/track-stage-config.service.ts:42</span>
+    <h4>Detail</h4>
+    <p>Before this PR, <code>isStageActivated</code> read <code>workspace_pipeline_config</code> directly. Now it consults only the default track's rows with no legacy fallback (<code>getDefaultTrack</code> → <code>null</code> → <code>return false</code>). The legacy carry-over (<code>carryLegacyStageConfig</code>) runs only inside <code>ensureDefaultTrack</code>, whose <em>sole</em> call site is <code>GET /api/workspaces/:id/tracks</code> — a UI-only endpoint. That route also swallows backfill errors (<code>tracks.ts:161-167</code>, <code>console.warn</code> + 200), making a failed backfill invisible.</p>
+    <h4>Failure scenario</h4>
+    <p>A workspace had review-stories <code>'included'</code> pre-cutover. After deploy, an API-driven or autonomous story-generation run executes before anyone opens the workspace in the UI: <code>isStageActivated</code> returns false and auto-review is silently skipped. Same outcome, permanently-until-retry, if the backfill throws.</p>
+    <p class="verdict">Verifier verdict: <b>CONFIRMED</b> — single backfill call site verified by grep; runtime gates are read-only by design.</p>
+  </div>
+</details>
+
+<!-- Finding 5 -->
+<details class="finding">
+  <summary>
+    <span class="chevron"></span>
+    <span class="badge high">High</span>
+    <span class="summary-text">5. Harness/model/thinking/HITL/retry/stage-specific overrides are display-only — no execution path reads <code>config_overrides</code> or calls the resolver</span>
+  </summary>
+  <div class="finding-body">
+    <h4>Location</h4>
+    <span class="loc">apps/api/src/services/track-config-resolution.service.ts:220</span>
+    <h4>Detail</h4>
+    <p>The resolver computes effective harnessId, tierOrModel, thinkingLevel, hitlLevel, retryPolicy, and stageSpecific values, and the UI shows provenance badges ("✎ overridden here") and effective-value lines. An exhaustive sweep of <code>config_overrides</code> / <code>resolveTrackConfig</code> readers found no runtime consumer: execution resolves harness/model from template steps + request/workspace <code>aiHarness</code> (<code>agentic-step-handler.ts:892-934</code>), and <code>coverageCheckEnabled</code> comes from the HTTP request body (<code>story-generation-engine.service.ts:626</code>, <code>?? true</code>). The one resolver consumer (<code>getBugTrackExecutionPlan</code>) only feeds an activity-log message. Stage-specific values are additionally never baked by save-as-template ("templates cannot represent them"), so they are inert <em>forever</em>, not just until baking.</p>
+    <h4>Failure scenario</h4>
+    <p>User sets the Implement stage's harness to <code>codex-cli</code>, tier <code>fast</code>, and disables Coverage Check; the UI shows everything as overridden and effective. The run executes on the workspace's <code>claude-code</code> harness at the template's tier, and coverage check still runs.</p>
+    <p class="verdict">Verifier verdict: <b>CONFIRMED</b> — may be intentional phasing, but the PR's own planning doc flags the drift, and the UI presents these values as effective today.</p>
+  </div>
+</details>
+
+<!-- Finding 6 -->
+<details class="finding">
+  <summary>
+    <span class="chevron"></span>
+    <span class="badge high">High</span>
+    <span class="summary-text">6. TrackConfigService cache: no out-of-order-response guard, never invalidated by override writes, silent <code>'collaborative'</code> fallback — review-mode reads go stale</span>
+  </summary>
+  <div class="finding-body">
+    <h4>Location</h4>
+    <span class="loc">apps/ui/src/app/features/pipeline/track-config.service.ts:99</span>
+    <h4>Detail</h4>
+    <p>Three related defects, all confirmed: <strong>(a)</strong> <code>loadForWorkspace</code> applies its response unconditionally after the <code>await</code> (:99-106) — switching workspace A→B with both GETs in flight lets A's slower response overwrite B's tracks and stage modes. <strong>(b)</strong> Mode/include edits go through <code>TrackConfigResolutionService.saveOverride</code>, which updates only its own signal; nothing invalidates <code>TrackConfigService</code>'s cached <code>trackStageModes</code> (the two services don't reference each other). <strong>(c)</strong> <code>stageMode()</code> returns the <code>'collaborative'</code> fallback while the GET is in flight, when workspace ids mismatch, and permanently after a failed load — the old <code>PipelineConfigService</code> answered warm-cache reads synchronously from localStorage.</p>
+    <h4>Failure scenario</h4>
+    <p>User flips Review Stories to autonomous on the pipeline page (PUT succeeds, DB updated), navigates to the stories list, clicks "Start Review" — <code>stories-list.component.ts:1567</code> reads the stale cache and launches the review in <em>collaborative</em> mode until a full reload or workspace switch.</p>
+    <p class="verdict">Verifier verdict: <b>CONFIRMED</b> on all three sub-claims.</p>
+  </div>
+</details>
+
+<!-- Finding 7 -->
+<details class="finding">
+  <summary>
+    <span class="chevron"></span>
+    <span class="badge high">High</span>
+    <span class="summary-text">7. saveAsTemplate clears overrides it never baked: stages whose mapped step is absent from the source template are skipped by the snapshot but still wiped by the clearing loop</span>
+  </summary>
+  <div class="finding-body">
+    <h4>Location</h4>
+    <span class="loc">apps/api/src/services/track-config-resolution.service.ts:415</span>
+    <h4>Detail</h4>
+    <p><code>buildSnapshotSteps</code> skips any stage whose mapped template step isn't in the source template (<code>if (!step) continue;</code>, :415-416), while the clearing loop (:380-390) unconditionally NULLs every stage row's <code>stage_mode</code> and non-stageSpecific <code>config_overrides</code>. Subset templates are explicitly legal ("Templates may contain any subset of these steps," <code>template.types.ts:725</code>) and creatable via <code>POST /api/templates</code>, and <code>saveOverride</code> happily writes overrides on such stages — so the skip-then-clear asymmetry deletes user data without error.</p>
+    <h4>Failure scenario</h4>
+    <p>Create a custom template omitting <code>merge-worktree</code>, bind a track to it, set a stage-layer override on the merge stage (mode or harness), click Save as Template: the snapshot skips merge, the clear NULLs its values, and the override vanishes from both the template and the pipeline silently.</p>
+    <p class="verdict">Verifier verdict: <b>CONFIRMED</b> (mechanics). A companion claim that the two stage→step maps had "already drifted" was refuted — they map different id domains and each is correct for its callers, though the duplication remains a maintainability nit.</p>
+  </div>
+</details>
+
+<!-- Finding 8 -->
+<details class="finding">
+  <summary>
+    <span class="chevron"></span>
+    <span class="badge medium">Medium</span>
+    <span class="summary-text">8. <code>rowToStage</code> JSON.parses the new <code>config_overrides</code> column unguarded — one bad row 500s all stage reads <em>and writes</em> for that pipeline</span>
+  </summary>
+  <div class="finding-body">
+    <h4>Location</h4>
+    <span class="loc">apps/api/src/services/pipeline-stage.service.ts:107</span>
+    <h4>Detail</h4>
+    <p><code>configOverrides: row.config_overrides ? JSON.parse(row.config_overrides) : null</code> with no try/catch — while the resolver's <code>parseOverrides</code> (<code>track-config-resolution.service.ts:144-152</code>) deliberately tolerates malformed JSON in the same column, signaling bad data is an anticipated state. The column and both readers are new in this PR, which also adds four writer paths to it. All current writers serialize objects, so corruption needs an interrupted write, manual edit, or future writer bug — but when it happens, <code>GET /api/pipeline-stages</code> 500s and <code>updateStage</code> also fails, so the bad value can't even be overwritten through the API.</p>
+    <h4>Failure scenario</h4>
+    <p>One malformed <code>config_overrides</code> value → the track page's stages area shows "Failed to load pipeline stages" with no in-app recovery; fixing it requires direct DB access. The fix is a one-line guard mirroring <code>parseOverrides</code>.</p>
+    <p class="verdict">Verifier verdict: <b>PLAUSIBLE</b> — unguarded parse and impact path confirmed; requires externally-corrupted data to trigger.</p>
+  </div>
+</details>
+
+<!-- Finding 9 -->
+<details class="finding">
+  <summary>
+    <span class="chevron"></span>
+    <span class="badge low">Low</span>
+    <span class="summary-text">9. A failed resolved-config load leaves the Config tab spinning forever — the loaded-flag is set before the await and never rolled back, and the tab has no error state</span>
+  </summary>
+  <div class="finding-body">
+    <h4>Location</h4>
+    <span class="loc">apps/ui/src/app/features/pipeline/track-pipeline-page.component.ts:1340</span>
+    <h4>Detail</h4>
+    <p><code>loadedResolvedTrackId</code> is assigned before the fire-and-forget <code>loadResolvedConfig()</code> call and appears nowhere else except the guard — no rollback on failure. The service catches errors and returns null without clearing <code>_resolvedConfig</code>; the config tab renders a spinner purely on <code>!resolved()</code>, and the service's <code>error()</code> signal is consumed only by the save-as-template path. Switching to another track and back does retry (the flag holds only the last id), but nothing in the UI suggests that.</p>
+    <h4>Failure scenario</h4>
+    <p><code>GET /api/tracks/:id/resolved-config</code> fails transiently (API restart, network blip): the Config tab shows a progress spinner indefinitely with no error message and no retry while that track stays selected. One-line fix: reset the flag when the load returns null, plus optionally render the error signal.</p>
+    <p class="verdict">Verifier verdict: <b>CONFIRMED</b> — real but low-impact; recoverable via the non-obvious track-switch dance.</p>
+  </div>
+</details>
+
+<!-- Finding 10 -->
+<details class="finding">
+  <summary>
+    <span class="chevron"></span>
+    <span class="badge cleanup">Cleanup</span>
+    <span class="summary-text">10. <code>createTrack</code> discards its complete POST response and awaits a full re-fetch of the N+1 tracks endpoint — doubling create-dialog latency</span>
+  </summary>
+  <div class="finding-body">
+    <h4>Location</h4>
+    <span class="loc">apps/ui/src/app/features/pipeline/track-config.service.ts:128</span>
+    <h4>Detail</h4>
+    <p>The POST response already contains the created track with <code>stageConfig</code> and server-assigned <code>displayOrder</code>, yet <code>createTrack</code> awaits <code>loadForWorkspace(workspaceId, true)</code> before returning. That endpoint (<code>GET /:id/tracks</code>, <code>routes/tracks.ts:169</code>) is itself an N+1: one <code>pipeline_stages</code> query per track via <code>withStageConfig</code>, trivially batchable with <code>WHERE pipeline_id IN (...)</code>. Creating a track touches no other rows, so nothing justifies the refetch — <code>updateTrack</code> (:141-145) already demonstrates the local-merge pattern. (<code>deleteTrack</code>'s reload is justified: server-side default auto-promote.)</p>
+    <h4>Failure scenario</h4>
+    <p>Every "Create track" confirm blocks on two sequential round trips, the second re-running <code>ensureDefaultTrack</code> plus 1+N stage queries for data the client already holds — roughly doubling perceived dialog latency.</p>
+    <p class="verdict">Verifier verdict: <b>CONFIRMED</b> on both halves.</p>
+  </div>
+</details>
+
+<h2 class="section">Verified but cut for the 10-finding cap</h2>
+<p class="section-note">All confirmed by verifiers; lower priority than the findings above.</p>
+
+<details class="finding">
+  <summary>
+    <span class="chevron"></span>
+    <span class="badge cleanup">Cleanup</span>
+    <span class="summary-text">Duplicated ~40-line save scaffold across the agents and prompts tabs; eight hand-unrolled <code>&lt;app-config-field&gt;</code> blocks in the config tab</span>
+  </summary>
+  <div class="finding-body">
+    <p><code>track-stage-agents-tab.component.ts:241-335</code> and <code>track-stage-prompts-tab.component.ts:321-440</code> share a character-identical scaffold: four state signals, a 3000&nbsp;ms success timer, a <code>pipelineId:id</code> sync effect, and the same PUT + emit + error handling — any change to save semantics is now a 3-place edit (the config tab carries a third partial copy). Separately, <code>track-stage-config-tab.component.ts:114-209</code> hand-unrolls eight near-identical field blocks (96 lines) that the same file's stage-specific section already renders with a <code>@for</code> over field defs. Suggested cut: a shared <code>putStagePatch()</code> helper plus a field-defs array.</p>
+  </div>
+</details>
+
+<details class="finding">
+  <summary>
+    <span class="chevron"></span>
+    <span class="badge cleanup">Cleanup</span>
+    <span class="summary-text">Redundant queries in the resolver: discarded existence-check on every config-override save; saveAsTemplate re-resolves templates and stage rows ~3×</span>
+  </summary>
+  <div class="finding-body">
+    <p><code>track-config-resolution.service.ts:236-239</code> runs <code>getStageRows(pipelineId, stageId)</code> purely for its not-found throw, discarding the rows, then fetches all rows anyway — one wasted query per Config-tab field edit. <code>saveAsTemplate</code> (:329-397) executes template resolution and the all-stage-rows query three times each per save click (the template legs are partially cache-mitigated), plus two uncached <code>readFileSync</code> reads of the workspaces config. Small absolute costs, but pure waste on the hottest config-UI paths.</p>
+  </div>
+</details>
+
+<details class="finding">
+  <summary>
+    <span class="chevron"></span>
+    <span class="badge cleanup">Cleanup</span>
+    <span class="summary-text"><code>TRACK_STAGE_REGISTRY</code> hardcodes the 13 stage ids client-side — a scanned-in stage silently degrades to the default descriptor</span>
+  </summary>
+  <div class="finding-body">
+    <p><code>track-stage-registry.ts:73-197</code> hardcodes per-stage details-kind, goto links, and config-field schemas keyed by server-owned stage ids, with <code>DEFAULT_STAGE_DESCRIPTOR</code> as silent fallback. The stage <em>list</em> is server-driven, so a stage added via the disk scan appears in the dock immediately but renders the wrong details tab, a "Goto Execution" link, and no config fields until a UI release. Caveats from verification: the server doesn't currently own any of this metadata (so it's an architecture gap, not dedup), and the apparent route-map duplication with <code>workflow-navigation.service.ts</code> is two intentionally divergent maps. Practical blast radius is capped while the 13-stage set stays fixed.</p>
+  </div>
+</details>
+
+<div class="recommendation">
+  <h3>Recommendation</h3>
+  <p><strong>Do not merge as-is.</strong> Findings 1, 2, and 5 amount to "the runtime was never wired to the resolver": the new configuration surface looks authoritative but is partially or wholly inert, and the old surface that <em>was</em> authoritative has been deleted. The per-phase test coverage pins the resolver's behavior, not the executor's consumption of it — which is exactly the seam where these bugs live. Suggested order: wire runtime gating and prompt assembly to the track/resolver (1, 2, 3), close the legacy-backfill gap (4), then either wire or visibly de-scope the override layers (5).</p>
+</div>
+
+<div class="methodology">
+  <h3>Methodology</h3>
+  <ul>
+    <li>Diff reviewed: <code>d79aa633..68793991</code> (PR head checked out in an isolated worktree).</li>
+    <li>Seven independent finder passes: line-by-line diff scan, removed-behavior audit, cross-file caller/callee trace, reuse, simplification, efficiency, and architectural-altitude review.</li>
+    <li>~40 raw candidates deduplicated to 14; each surviving candidate independently verified against the actual code by a dedicated verification pass with a refute-by-default burden of proof for severity claims.</li>
+    <li>13 candidates survived (CONFIRMED or PLAUSIBLE); 1 was refuted and dropped (a claimed blueprint-routing regression — the new Goto correctly routes to the creator).</li>
+  </ul>
+</div>
+
+<footer>Generated 2026-06-11 · Review of reurgency/maudel PR #65 · Claude Code</footer>
+
+</div>
+</body>
+</html>
