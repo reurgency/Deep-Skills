@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>deep-code-review --multi-agent — Design: the tiered five-stage pipeline (v4-validated)</title>
+<style>
+  :root {
+    --bg: #f6f8fa;
+    --card: #ffffff;
+    --text: #1f2328;
+    --muted: #59636e;
+    --border: #d1d9e0;
+    --accent: #0969da;
+    --accent-bg: #ddf4ff;
+    --deep: #0969da;      /* from fab deep */
+    --deep-bg: #ddf4ff;
+    --solo: #1a7f37;      /* from fab solo */
+    --solo-bg: #dafbe1;
+    --econ: #9a6700;      /* token-discipline */
+    --econ-bg: #fff8c5;
+    --fable: #0969da;     /* main tier */
+    --fable-bg: #ddf4ff;
+    --opus: #bc4c00;      /* mid tier */
+    --opus-bg: #fff1e5;
+    --sonnet: #8250df;    /* cheap tier */
+    --sonnet-bg: #fbefff;
+    --script: #59636e;    /* deterministic, no LLM */
+    --script-bg: #f0f3f6;
+    --critical: #cf222e;
+    --critical-bg: #ffebe9;
+    --code-bg: #f0f3f6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .container { max-width: 1180px; margin: 0 auto; padding: 36px 24px 72px; }
+  h1 { font-size: 26px; margin: 0 0 6px; }
+  .subtitle { color: var(--muted); font-size: 14.5px; max-width: 920px; }
+  h2 { font-size: 20px; margin: 48px 0 6px; }
+  .section-note { color: var(--muted); font-size: 14px; margin: 0 0 18px; max-width: 920px; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 12.5px;
+    background: var(--code-bg);
+    border-radius: 4px;
+    padding: 1px 5px;
+  }
+  .usage-strip {
+    margin-top: 14px; background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 16px; font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px 26px;
+  }
+  .usage-strip .u { white-space: nowrap; }
+  .usage-strip .u .ucost { color: var(--muted); font-size: 12px; }
+
+  .chip { display: inline-block; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+          border-radius: 999px; padding: 1px 8px; vertical-align: 1px; white-space: nowrap; }
+  .chip.deep   { color: var(--deep); background: var(--deep-bg); }
+  .chip.solo   { color: var(--solo); background: var(--solo-bg); }
+  .chip.econ   { color: var(--econ); background: var(--econ-bg); }
+  .chip.fable  { color: var(--fable); background: var(--fable-bg); }
+  .chip.opus   { color: var(--opus); background: var(--opus-bg); }
+  .chip.sonnet { color: var(--sonnet); background: var(--sonnet-bg); }
+  .chip.script { color: var(--script); background: var(--script-bg); }
+
+  /* ---------- at-a-glance diagram ---------- */
+  .glance-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 18px 14px; margin-top: 18px; }
+  .glance { display: flex; align-items: stretch; gap: 0; }
+  .gnode {
+    flex: 1 1 0; min-width: 0; border: 1px solid var(--border); border-radius: 8px; background: #fbfcfd;
+    padding: 9px 10px 10px; font-size: 11.5px; display: flex; flex-direction: column;
+  }
+  .gnode .gt { font-weight: 700; font-size: 11.5px; margin-bottom: 1px; }
+  .gnode .gw { color: var(--muted); font-size: 10.5px; margin-bottom: 7px; }
+  .gnode.t-script { border-top: 3px solid var(--script); }
+  .gnode.t-fleet  { border-top: 3px solid var(--solo); }
+  .gnode.t-orch   { border-top: 3px solid var(--fable); }
+  .gnode.t-verify { border-top: 3px solid var(--econ); }
+  .gnode.t-out    { border-top: 3px solid var(--deep); }
+  .gnode.t-human  { border-top: 3px solid var(--critical); }
+  .mini { border-radius: 5px; padding: 2px 7px; margin: 2px 0; background: var(--script-bg); color: var(--text);
+          font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mini .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: 0; }
+  .dot.fable  { background: var(--fable); }
+  .dot.opus   { background: var(--opus); }
+  .dot.sonnet { background: var(--sonnet); }
+  .dot.script { background: #afb8c1; }
+  .mini.ghost { background: transparent; color: var(--muted); font-family: inherit; }
+  .garrow { align-self: center; color: #afb8c1; font-size: 16px; padding: 0 4px; flex: 0 0 auto; }
+  .gband {
+    margin-top: 10px; border: 1px dashed var(--script); background: var(--script-bg); border-radius: 7px;
+    padding: 5px 12px; font-size: 11.5px; color: var(--muted);
+  }
+  .glegend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); margin-top: 12px; align-items: center; }
+  .glegend .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; }
+
+  .tiertable { margin-top: 14px; font-size: 12.5px; border-collapse: collapse; }
+  .tiertable th, .tiertable td { border: 1px solid var(--border); padding: 4px 12px; text-align: left; }
+  .tiertable th { background: #eff2f5; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+
+  /* ---------- lineage cards ---------- */
+  .lineage { display: grid; grid-template-columns: 1fr 1fr 1.25fr; gap: 14px; margin: 26px 0 10px; }
+  .lin-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 18px 20px; position: relative;
+  }
+  .lin-card.hero { border: 2px solid var(--accent); box-shadow: 0 2px 10px rgba(9,105,218,.10); }
+  .lin-card h3 { margin: 0 0 2px; font-size: 16px; }
+  .lin-card .tag { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+  .lin-card.deepc .tag { color: var(--deep); }
+  .lin-card.soloc .tag { color: var(--solo); }
+  .lin-card.hero .tag { color: var(--accent); }
+  .lin-card ul { margin: 10px 0 0; padding-left: 18px; font-size: 13.5px; }
+  .lin-card li { margin: 4px 0; }
+  .lin-card .verdict { margin-top: 12px; font-size: 12.5px; color: var(--muted); border-top: 1px dashed var(--border); padding-top: 10px; }
+  .lin-card .verdict strong { color: var(--text); }
+
+  /* ---------- pipeline diagram (detailed) ---------- */
+  .pipeline { margin-top: 22px; }
+  .stage {
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px 20px 18px; position: relative;
+  }
+  .flow { padding: 2px 0; display: flex; justify-content: center; }
+  .flow .arrow {
+    display: flex; flex-direction: column; align-items: center; color: var(--muted); font-size: 12px;
+    padding: 4px 0;
+  }
+  .flow .arrow .line { width: 2px; height: 16px; background: #afb8c1; }
+  .flow .arrow .head { font-size: 15px; line-height: 10px; color: #afb8c1; margin-top: -2px; }
+  .flow .arrow .lbl { margin: 3px 0 1px; background: var(--bg); padding: 0 8px; font-weight: 600; }
+  .stage-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+  .stage-head h3 { margin: 0; font-size: 15.5px; }
+  .stage-head .who { font-size: 12px; color: var(--muted); }
+  .stage p.desc { margin: 2px 0 12px; font-size: 13px; color: var(--muted); max-width: 920px; }
+
+  .finder-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .finder {
+    border: 1px solid var(--border); border-left: 4px solid var(--fable); border-radius: 8px;
+    background: #fbfcfd; padding: 9px 10px 10px; font-size: 12px; min-width: 0;
+  }
+  .finder.is-opus { border-left-color: var(--opus); }
+  .finder.is-sonnet { border-left-color: var(--sonnet); background: #fdfaff; }
+  .finder .fname { font-weight: 700; font-size: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .finder .fwhat { color: var(--muted); margin-top: 3px; line-height: 1.35; }
+  .finder .fmodel { margin-top: 7px; }
+  .budget-bar {
+    margin-top: 12px; border: 1px dashed var(--econ); background: var(--econ-bg); border-radius: 8px;
+    padding: 8px 14px; font-size: 12.5px; color: #6f4e00;
+  }
+  .budget-bar strong { color: #6f4e00; }
+
+  .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+  .rulebox { border: 1px solid var(--border); border-radius: 8px; background: #fbfcfd; padding: 10px 14px; font-size: 13px; }
+  .rulebox .rt { font-weight: 700; font-size: 12.5px; margin-bottom: 3px; }
+
+  /* gate split */
+  .gate-wrap { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: stretch; margin-top: 6px; }
+  .gate-path { border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; font-size: 13px; background: #fbfcfd; }
+  .gate-path.main6 { border-left: 4px solid var(--fable); }
+  .gate-path.cheap5 { border-left: 4px solid var(--sonnet); }
+  .gate-path.bypass { border-left: 4px solid var(--econ); background: #fffdf2; }
+  .gate-path .gt { font-weight: 700; margin-bottom: 4px; font-size: 13px; }
+  .gate-path ul { margin: 6px 0 0; padding-left: 18px; }
+  .gate-path li { margin: 3px 0; }
+  .verdict-row { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .verdict-pill { font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 10px; }
+  .v-confirmed { background: var(--solo-bg); color: var(--solo); }
+  .v-plausible { background: var(--econ-bg); color: var(--econ); }
+  .v-refuted { background: var(--critical-bg); color: var(--critical); }
+  .v-unverified { background: var(--code-bg); color: var(--muted); }
+
+  .outputs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+  .outdoc { border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; font-size: 12.5px; background: #fbfcfd; }
+  .outdoc .on { font-weight: 700; font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
+  .outdoc .od { color: var(--muted); margin-top: 2px; }
+
+  .megabox {
+    margin-top: 16px; border: 1px solid var(--border); border-left: 4px solid var(--critical);
+    background: var(--card); border-radius: 8px; padding: 12px 18px; font-size: 13px;
+  }
+
+  /* ---------- best-of-both table ---------- */
+  table.bob {
+    width: 100%; border-collapse: separate; border-spacing: 0; background: var(--card);
+    border: 1px solid var(--border); border-radius: 8px; overflow: hidden; font-size: 13.5px; margin-top: 14px;
+  }
+  table.bob thead th {
+    background: #eff2f5; text-align: left; padding: 9px 12px; font-size: 11.5px; text-transform: uppercase;
+    letter-spacing: .05em; color: var(--muted); border-bottom: 1px solid var(--border);
+  }
+  table.bob td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.bob tbody tr:last-child td { border-bottom: none; }
+  table.bob td.cap { font-weight: 600; width: 26%; }
+  table.bob td.c { text-align: center; white-space: nowrap; width: 13%; }
+  .y { color: var(--solo); font-weight: 700; }
+  .n { color: #c9d1d9; }
+  .p { color: var(--econ); font-weight: 700; }
+
+  /* ---------- economy bars ---------- */
+  .burncards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 18px 0 8px; }
+  .burncard { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .burncard .num { font-size: 24px; font-weight: 700; }
+  .burncard .lbl { font-size: 12.5px; color: var(--muted); }
+  .bar-block { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px 18px; margin-top: 14px; }
+  .bar-row { display: grid; grid-template-columns: 170px 1fr 200px; gap: 12px; align-items: center; margin: 10px 0; font-size: 13px; }
+  .bar-track { background: var(--code-bg); border-radius: 6px; height: 22px; position: relative; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 6px; display: flex; }
+  .seg { height: 100%; }
+  .seg.finders { background: #54aeff; }
+  .seg.verifiers { background: #6fdd8b; }
+  .seg.main { background: #d4a72c; }
+  .seg.gap { background: #afb8c1; }
+  .bar-note { color: var(--muted); font-size: 12px; }
+  .seg-legend { display: flex; gap: 18px; font-size: 12.5px; color: var(--muted); margin-top: 10px; flex-wrap: wrap; }
+  .swatch { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+
+  .levers { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+  .lever { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 13px 16px; font-size: 13px; }
+  .lever .lt { font-weight: 700; margin-bottom: 3px; }
+  .lever .save { float: right; font-size: 11.5px; font-weight: 700; color: var(--solo); background: var(--solo-bg); border-radius: 999px; padding: 1px 9px; }
+  .lever .why { color: var(--muted); }
+
+  .receipts { background: var(--card); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 16px 22px; margin-top: 30px; font-size: 14px; }
+  .receipts h3 { margin: 0 0 8px; font-size: 16px; }
+  .receipts ul { margin: 6px 0; padding-left: 20px; }
+  .receipts li { margin: 5px 0; }
+
+  footer { margin-top: 44px; font-size: 12px; color: var(--muted); text-align: center; }
+  @media (max-width: 900px) {
+    .lineage, .burncards, .outputs { grid-template-columns: 1fr; }
+    .finder-grid { grid-template-columns: repeat(2, 1fr); }
+    .gate-wrap, .twocol, .levers { grid-template-columns: 1fr; }
+    .bar-row { grid-template-columns: 1fr; }
+    .glance { flex-direction: column; }
+    .garrow { transform: rotate(90deg); align-self: flex-start; margin-left: 24px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>How <code>/deep-code-review --multi-agent</code> Works Now</h1>
+  <div class="subtitle">
+    The <strong>8-dial efficiency redesign</strong> (2026-06-12), validated blind on PR #65 ("eco v4"): a five-stage pipeline —
+    scripted setup, eight model-tiered single-lens finders, orchestrator dedup, severity-gated tiered verification, script-assembled
+    synthesis. Measured: <strong>6.51M weighted tokens · 23% of a 5-hour limit (~5% weekly) · 46 minutes</strong> — both catchable
+    Criticals found, 29% cheaper than Eco V2, a third of Combo V1.
+  </div>
+  <div class="usage-strip">
+    <span class="u"><code>/deep-code-review &lt;scope&gt;</code> <span class="ucost">single agent, four lenses — the cheap default</span></span>
+    <span class="u"><code>--multi-agent</code> <span class="ucost">this pipeline · ~23% of a 5-hr limit · ~45 min</span></span>
+    <span class="u"><code>--mega</code> <span class="ucost">same pipeline, dials at max · ~2× cost · release gates</span></span>
+    <span class="u"><code>/multi-agent</code> <span class="ucost">in-session escalation to this pipeline</span></span>
+  </div>
+</header>
+
+<!-- ================= AT A GLANCE ================= -->
+<h2>The operation at a glance</h2>
+<p class="section-note">Who does what, in order. Dot color = model tier; gray = deterministic script (no LLM tokens). Everything that touches code is read-only.</p>
+
+<div class="glance-wrap">
+  <div class="glance">
+    <div class="gnode t-script">
+      <div class="gt">0 · Scripted setup</div>
+      <div class="gw">scripts · ~zero tokens</div>
+      <div class="mini"><span class="dot script"></span>chunk diff → index</div>
+      <div class="mini"><span class="dot script"></span>spawn pre-pass ∥</div>
+      <div class="mini ghost">finders read chunks, never the whole diff</div>
+    </div>
+    <div class="garrow">▶</div>
+    <div class="gnode t-fleet">
+      <div class="gt">A · Finder fleet</div>
+      <div class="gw">8 agents, parallel · 1 lens each · ~25 calls</div>
+      <div class="mini"><span class="dot fable"></span>removed-behavior</div>
+      <div class="mini"><span class="dot fable"></span>seam-trace</div>
+      <div class="mini"><span class="dot fable"></span>last-mile</div>
+      <div class="mini"><span class="dot fable"></span>frozen-state-probe</div>
+      <div class="mini"><span class="dot opus"></span>diff-scan</div>
+      <div class="mini"><span class="dot opus"></span>conformance</div>
+      <div class="mini"><span class="dot opus"></span>coherence</div>
+      <div class="mini"><span class="dot sonnet"></span>quality (sev ≤4)</div>
+    </div>
+    <div class="garrow">▶</div>
+    <div class="gnode t-orch">
+      <div class="gt">B · Orchestrator</div>
+      <div class="gw">main session · no new agents</div>
+      <div class="mini"><span class="dot fable"></span>dedup by root cause</div>
+      <div class="mini"><span class="dot fable"></span>split bundled fixes</div>
+      <div class="mini"><span class="dot fable"></span>severity gate ↓</div>
+    </div>
+    <div class="garrow">▶</div>
+    <div class="gnode t-verify">
+      <div class="gt">C · Adversarial verify</div>
+      <div class="gw">1 fresh verifier / finding · streamed wave</div>
+      <div class="mini"><span class="dot fable"></span>sev ≥6 → main tier</div>
+      <div class="mini"><span class="dot sonnet"></span>sev 5 → cheap tier</div>
+      <div class="mini ghost">sev ≤4 skips: ships unverified</div>
+      <div class="mini ghost">briefed to <em>refute</em> · facts pre-harvested by script</div>
+    </div>
+    <div class="garrow">▶</div>
+    <div class="gnode t-out">
+      <div class="gt">D · Synthesis</div>
+      <div class="gw">script + orchestrator</div>
+      <div class="mini"><span class="dot script"></span>script assembles report / json / cert</div>
+      <div class="mini"><span class="dot fable"></span>model writes judgment only</div>
+    </div>
+    <div class="garrow">▶</div>
+    <div class="gnode t-human">
+      <div class="gt">E · Triage</div>
+      <div class="gw">human in the loop</div>
+      <div class="mini ghost">Blockers auto-route to fix phase</div>
+      <div class="mini ghost">rest: fix / defer / reject</div>
+    </div>
+  </div>
+  <div class="gband">⚙ <strong>Deterministic pre-pass runs in parallel with the fleet</strong> — lint · typecheck · combined test suite · scripted base-vs-head attribution in two worktrees — and joins at Synthesis. Finders never consume its output.</div>
+  <div class="glegend">
+    <span><span class="dot fable"></span><strong>main tier</strong> = orchestrator's model</span>
+    <span><span class="dot opus"></span><strong>mid tier</strong></span>
+    <span><span class="dot sonnet"></span><strong>cheap tier</strong></span>
+    <span><span class="dot script"></span><strong>script</strong> — no LLM</span>
+    <span style="color:var(--critical); font-weight:700;">Haiku is never used — any tier, any stage</span>
+  </div>
+  <table class="tiertable">
+    <thead><tr><th>Orchestrator</th><th>main tier</th><th>mid tier</th><th>cheap tier</th></tr></thead>
+    <tbody>
+      <tr><td>Fable 5</td><td><code>claude-fable-5</code></td><td><code>claude-opus-4-8</code></td><td>Sonnet latest (<code>claude-sonnet-4-6</code>)</td></tr>
+      <tr><td>Opus 4.8</td><td><code>claude-opus-4-8</code></td><td><code>claude-opus-4-8</code></td><td>Sonnet latest (<code>claude-sonnet-4-6</code>)</td></tr>
+    </tbody>
+  </table>
+  <p class="section-note" style="margin-top:10px;">Models are pinned by <strong>full ID, set explicitly on every launch</strong> — never inherited, never a bare alias (an <code>opus</code> alias once resolved to Opus 4.6 mid-run). Below-tier output is invalid: discard and relaunch.</p>
+</div>
+
+<!-- ================= LINEAGE ================= -->
+<h2>The two parents — and what each got right</h2>
+<p class="section-note">Both reviewed the same PR #65 blind. Their strengths turned out to be disjoint, which is why the union beats either.</p>
+
+<div class="lineage">
+  <div class="lin-card deepc">
+    <span class="tag">fab deep — the skill, v1</span>
+    <h3>One agent, four lenses</h3>
+    <ul>
+      <li>Single fresh agent reads the whole diff through Correctness, Last-Mile, Plan Conformance, Coherence</li>
+      <li>Deterministic pre-pass: lint, typecheck, tests before any agent</li>
+      <li>Structured artifacts: report / findings.json / certificate, HITL triage, fix-phase routing</li>
+    </ul>
+    <div class="verdict"><strong>11 findings · 10✓/1◐ on today's matrix.</strong> Broad but shallow: one context means the lenses anchor on each other; it traced writes but not reads ("verified ✓" on a broken seam), and missed every fork-vs-default wiring bug.</div>
+  </div>
+
+  <div class="lin-card soloc">
+    <span class="tag">fab solo — no harness</span>
+    <h3>Seven independent passes + adversarial verify</h3>
+    <ul>
+      <li>Each pass one narrow lens, fresh eyes, no shared context — found the seam bugs fab deep rationalized away</li>
+      <li>Overgeneration, then a refute-by-default verification pass restored precision</li>
+      <li>Caught all 3 Criticals incl. the fork-vs-'default' wiring gap — still the only review to land all three</li>
+    </ul>
+    <div class="verdict"><strong>14✓/1◐ on today's matrix · 100% of a $100 Max-5× plan.</strong> Best recall of its round — but improvised (not repeatable), and it missed last-mile, conformance, coherence, and the combined-suite failure entirely.</div>
+  </div>
+
+  <div class="lin-card hero">
+    <span class="tag">this skill — multi-agent, 8-dial</span>
+    <h3>Union of both, tiered and budgeted</h3>
+    <ul>
+      <li><span class="chip solo">solo</span> Independent single-lens finders + adversarial verification</li>
+      <li><span class="chip deep">deep</span> Last-mile / conformance / coherence lenses + deterministic pre-pass + artifact &amp; triage structure</li>
+      <li><span class="chip econ">discipline</span> Scripted stages, finder budgets, sev ≥5 verify floor, orchestrator-keyed model tiers, script-assembled synthesis</li>
+    </ul>
+    <div class="verdict"><strong>Lineage on the 52-row matrix: Combo V1 (10-pass max) 26✓/4◐ at 52% of a limit → Eco V2 (7-pass economy) 22✓/4◐ at 33% → eco v4 (this design) 22✓/4◐ at 23%, both Criticals, strongest Blocker evidence chain of all nine reviews.</strong></div>
+  </div>
+</div>
+
+<!-- ================= BEST OF BOTH TABLE ================= -->
+<h2>Best of both worlds, capability by capability</h2>
+<table class="bob">
+  <thead><tr><th>Capability</th><th>fab deep</th><th>fab solo</th><th>this skill</th><th>Why it matters</th></tr></thead>
+  <tbody>
+    <tr><td class="cap">Independent single-lens finders</td><td class="c"><span class="n">—</span></td><td class="c"><span class="y">✓</span></td><td class="c"><span class="y">✓ ×8</span></td><td>Fresh agents can't anchor on each other — this is what caught the Blocker fab deep marked "verified ✓".</td></tr>
+    <tr><td class="cap">Seam-hunting lenses (<code>removed-behavior</code>, <code>seam-trace</code>, <code>frozen-state-probe</code>)</td><td class="c"><span class="n">—</span></td><td class="c"><span class="p">implicit</span></td><td class="c"><span class="y">✓</span></td><td>fab solo's hardest finds as named, repeatable briefs — plus a probe lens aimed at the two longest-standing blind spots.</td></tr>
+    <tr><td class="cap">Adversarial verification (refute-by-default)</td><td class="c"><span class="n">—</span></td><td class="c"><span class="y">✓</span></td><td class="c"><span class="y">✓ sev ≥5, tiered</span></td><td>Burden of proof on the finding. v4's verifiers refuted 2 candidates incl. one a prior review had filed as real.</td></tr>
+    <tr><td class="cap">Last-mile / conformance / coherence lenses</td><td class="c"><span class="y">✓</span></td><td class="c"><span class="n">—</span></td><td class="c"><span class="y">✓</span></td><td>Where fab deep's uniques came from — promised-behavior chains, plan drift, one-mind's-work checks.</td></tr>
+    <tr><td class="cap">Deterministic pre-pass, full suite together</td><td class="c"><span class="y">✓</span></td><td class="c"><span class="n">—</span></td><td class="c"><span class="y">✓ scripted, ∥</span></td><td>Runs alongside the fleet; two-worktree base-vs-head attribution proved 3 "new" test failures were flakes — deterministically.</td></tr>
+    <tr><td class="cap">Artifacts, HITL triage, fix-phase routing</td><td class="c"><span class="y">✓</span></td><td class="c"><span class="n">—</span></td><td class="c"><span class="y">✓</span></td><td>Repeatable skill, not a one-off: report/findings.json/certificate, Blockers auto-routed, the rest triaged.</td></tr>
+    <tr><td class="cap">Scripted deterministic stages (chunking, fact harvest, report assembly)</td><td class="c"><span class="n">—</span></td><td class="c"><span class="n">—</span></td><td class="c"><span class="y">✓</span></td><td>Anything a script can do, a script does. Six agents once independently re-derived the same diff split; now it happens once, for free.</td></tr>
+    <tr><td class="cap">Model tiering keyed off the orchestrator (Haiku banned)</td><td class="c"><span class="n">—</span></td><td class="c"><span class="n">—</span></td><td class="c"><span class="y">✓ pinned IDs</span></td><td>Fable 5 boost for mission-critical reviews, Opus 4.8 as the baseline — same pipeline, one dial. A Haiku mis-route once collapsed recall to zero Criticals; hence the ban and the pinned IDs.</td></tr>
+  </tbody>
+</table>
+
+<!-- ================= PIPELINE DIAGRAM ================= -->
+<h2>The pipeline in detail</h2>
+<p class="section-note">Five stages. Read-only agents throughout — the skill never edits source, never reads <code>.env</code>/secrets, never passes the implementation transcript to any agent.</p>
+
+<div class="pipeline">
+
+  <!-- Stage 0 -->
+  <div class="stage" style="border-left: 4px solid var(--script);">
+    <div class="stage-head"><h3>Stage 0 · Scripted setup <span class="chip script">scripts</span></h3><span class="who">deterministic — costs ~zero LLM tokens</span></div>
+    <p class="desc"><strong>Diff pre-chunking:</strong> the resolved diff is split per-file into chunk files plus an index (path, +/− counts) — finders read chunks per-file as their lens requires, never the monolithic diff. <strong>Pre-pass in parallel:</strong> lint · typecheck · the test suite <em>as one combined invocation</em> launch alongside the fleet (finders never consume their output; it joins at synthesis). Base-vs-head test attribution is scripted: two worktrees, both suites concurrently, normalized outputs diffed. <strong>Verifier fact pre-harvest:</strong> before Stage C, a script collects each finding's cited evidence lines, symbol definitions, and caller lists so verifiers don't burn their first calls re-finding what grep finds.</p>
+  </div>
+
+  <div class="flow"><div class="arrow"><div class="line"></div><span class="lbl">chunk index + chunks + scope line + plan (never the implementation transcript)</span><div class="line"></div><div class="head">▼</div></div></div>
+
+  <!-- Stage A -->
+  <div class="stage" style="border-left: 4px solid var(--solo);">
+    <div class="stage-head"><h3>Stage A · Finder fleet — 8 independent single-lens passes <span class="chip solo">from fab solo</span></h3><span class="who">one parallel batch · cap 8 · read-only · model set explicitly per launch</span></div>
+    <p class="desc">Each finder is a fresh agent with exactly <em>one</em> lens — never two. The four Blocker/Major-producing lenses run on the <strong>main tier</strong>; the three structural lenses on the <strong>mid tier</strong>; the pattern-matching <code>quality</code> sweep on the <strong>cheap tier</strong>.</p>
+    <div class="finder-grid">
+      <div class="finder"><div class="fname">removed-behavior</div><div class="fwhat">Audit every deletion: where did the behavior go?</div><div class="fmodel"><span class="chip fable">main</span></div></div>
+      <div class="finder"><div class="fname">seam-trace</div><div class="fwhat">Every write traced to its reader — layer by layer</div><div class="fmodel"><span class="chip fable">main</span></div></div>
+      <div class="finder"><div class="fname">last-mile</div><div class="fwhat">Promised behaviors walked hop-by-hop to the end</div><div class="fmodel"><span class="chip fable">main</span></div></div>
+      <div class="finder"><div class="fname">frozen-state-probe</div><div class="fwhat">Probe surviving readers at the exact values frozen by deleted writers</div><div class="fmodel"><span class="chip fable">main</span> <span class="chip econ">new lens</span></div></div>
+      <div class="finder is-opus"><div class="fname">diff-scan</div><div class="fwhat">Line-by-line correctness read of the diff</div><div class="fmodel"><span class="chip opus">mid</span></div></div>
+      <div class="finder is-opus"><div class="fname">conformance</div><div class="fwhat">Plan / PR-description conformance, dropped scope</div><div class="fmodel"><span class="chip opus">mid</span></div></div>
+      <div class="finder is-opus"><div class="fname">coherence</div><div class="fwhat">Reads as one mind's work? Half-migrations?</div><div class="fmodel"><span class="chip opus">mid</span></div></div>
+      <div class="finder is-sonnet"><div class="fname">quality</div><div class="fwhat">Duplication · simplification · performance · conventions — four facets, one budget, sev capped ≤4</div><div class="fmodel"><span class="chip sonnet">cheap</span></div></div>
+    </div>
+    <div class="budget-bar"><span class="chip econ">discipline</span> &nbsp;<strong>Finders find, verifiers prove.</strong> Read each chunk <strong>once</strong> · targeted reads only · soft cap <strong>~25 tool calls</strong> · one decisive trace per candidate. <strong>Overgenerate above the nit floor:</strong> every evidenced sev ≥4 candidate, no caps; sev ≤3 → top ~10 + a one-line summary; a sev-5 proposal must say why it isn't a 4.</div>
+  </div>
+
+  <div class="flow"><div class="arrow"><div class="line"></div><span class="lbl">raw candidate pool — routed by proposed severity</span><div class="line"></div><div class="head">▼</div></div></div>
+
+  <!-- Stage B -->
+  <div class="stage" style="border-left: 4px solid var(--fable);">
+    <div class="stage-head"><h3>Stage B · Dedup + decomposition</h3><span class="who">orchestrator (main session) — no new agents</span></div>
+    <div class="twocol">
+      <div class="rulebox"><div class="rt">Merge — when one fix resolves both reports</div>One root cause seen by several passes becomes ONE finding carrying multiple dimension tags, keeping the strongest evidence from each.</div>
+      <div class="rulebox"><div class="rt">Split — when one candidate bundles independent fixes</div>N independent fixes → N findings. A defect cited as <em>evidence</em> inside another candidate gets filed separately too. Test: <em>how many independent fixes does this describe?</em></div>
+    </div>
+  </div>
+
+  <div class="flow"><div class="arrow"><div class="line"></div><span class="lbl">deduped findings → severity gate</span><div class="line"></div><div class="head">▼</div></div></div>
+
+  <!-- Stage C -->
+  <div class="stage" style="border-left: 4px solid var(--econ);">
+    <div class="stage-head"><h3>Stage C · Severity-gated, tiered adversarial verification</h3><span class="who">one fresh verifier per finding · single streamed wave · read-only</span></div>
+    <div class="gate-wrap">
+      <div class="gate-path main6">
+        <div class="gt"><span class="chip fable">main tier</span> sev ≥6 — briefed to <em>refute</em></div>
+        <ul>
+          <li>Burden of proof on the finding — the verifier attacks the evidence against the actual code.</li>
+          <li>Sub-claims verified independently; severity recalibrated by counting user-reachable trigger paths.</li>
+          <li>Fixed machine-readable verdict format (VERDICT / SUB-CLAIMS / SEVERITY / RATIONALE).</li>
+        </ul>
+        <div class="verdict-row">
+          <span class="verdict-pill v-confirmed">confirmed → report</span>
+          <span class="verdict-pill v-plausible">plausible → kept, marked</span>
+          <span class="verdict-pill v-refuted">refuted → appendix</span>
+        </div>
+      </div>
+      <div class="gate-path cheap5">
+        <div class="gt"><span class="chip sonnet">cheap tier</span> sev 5 — demotion-checking</div>
+        <ul>
+          <li>Calibration: every sev-5 verification ever run ended in demotion or refutation — a cheap model handles that honestly.</li>
+          <li>If a cheap verifier <em>raises</em> severity to ≥6, a main-tier verifier re-checks before synthesis accepts it.</li>
+        </ul>
+      </div>
+      <div class="gate-path bypass">
+        <div class="gt">sev ≤4 (Nit) → ships <code>unverified</code></div>
+        Verifying the nit tail once consumed ~a quarter of a run for <strong>zero changed verdicts</strong>.
+        <ul>
+          <li>Report states the floor, so "unverified" is interpretable.</li>
+          <li>Synthesis may promote a load-bearing sev-4 into verification (stated why).</li>
+          <li>Never lower the floor mid-run to "be thorough".</li>
+        </ul>
+        <div class="verdict-row"><span class="verdict-pill v-unverified">unverified → nit table</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow"><div class="arrow"><div class="line"></div><span class="lbl">structured verdicts · unverified nit tail · pre-pass results join here</span><div class="line"></div><div class="head">▼</div></div></div>
+
+  <!-- Stage D -->
+  <div class="stage" style="border-left: 4px solid var(--script);">
+    <div class="stage-head"><h3>Stage D · Script-assembled synthesis → ONE report</h3><span class="who">script builds the artifacts · the orchestrator writes only judgment</span></div>
+    <p class="desc">findings.json, severity rollup, verification funnel line, nit table, and certificate scaffold are assembled <strong>by script</strong> from the structured verdicts. The model writes what only a model can: evidence-rule enforcement (no chain, no last-mile finding), severity reconciliation with stated rationale, merge/split calls, and per-finding prose for sev ≥5 — in-session, never delegated to a smaller model.</p>
+    <div class="outputs">
+      <div class="outdoc"><div class="on">report.md</div><div class="od">human triage doc — funnel line, refuted-candidates appendix, nit table</div></div>
+      <div class="outdoc"><div class="on">findings.json</div><div class="od">machine record — numeric severity canonical, <code>verification</code> verdict per finding</div></div>
+      <div class="outdoc"><div class="on">certificate.md</div><div class="od">pass/fail — pass only when no unresolved Blockers</div></div>
+    </div>
+  </div>
+
+  <div class="flow"><div class="arrow"><div class="line"></div><div class="head">▼</div></div></div>
+
+  <!-- Triage -->
+  <div class="stage" style="border-left: 4px solid var(--deep);">
+    <div class="stage-head"><h3>Stage E · Triage + fix-phase routing <span class="chip deep">from fab deep</span></h3><span class="who">human in the loop</span></div>
+    <p class="desc"><strong>Blockers auto-route to the fix-phase</strong> (user informed, not asked). Everything else is triaged finding-by-finding: <strong>fix</strong> → fix-phase appended to the plan for <code>/deep-implement</code> · <strong>defer</strong> → the plan's Deferreds ledger · <strong>reject</strong> → recorded as "rejected by user", never silently dropped.</p>
+  </div>
+
+</div>
+
+<div class="megabox"><strong><code>--mega</code> — the thorough tier.</strong> The same five-stage pipeline with the cost/accuracy dials at maximum: <strong>all eight finders and all verifiers on the main tier</strong>, quality's sev cap lifted, at roughly double the default's wall clock and rate-limit footprint. The scripted stages stay — determinism trades no accuracy. The Haiku ban holds here too. For release gates and large risky merges; the cost is confirmed with the user before launch.</div>
+
+<!-- ================= ECONOMY ================= -->
+<h2>The measured story — three generations of cost discipline</h2>
+<p class="section-note">Every number below is measured from session transcripts (usage deduped by <code>message.id</code>; weighted: input ×1, cache-read ×0.1, cache-write ×1.25, output ×5). Conversion: ~280k weighted ≈ 1 five-hour limit point; 5-hour % ÷ 4.6 ≈ weekly %.</p>
+
+<div class="burncards">
+  <div class="burncard"><div class="num">14.6M → 6.51M</div><div class="lbl">weighted tokens: Combo V1 (10-pass maximum) → eco v4 (this design) — a 55% cut at equal Critical coverage</div></div>
+  <div class="burncard"><div class="num">2 / 2</div><div class="lbl">catchable Criticals found by v4 — incl. the fork-vs-'default' Blocker with the strongest evidence chain of any of the nine benchmark reviews</div></div>
+  <div class="burncard"><div class="num">0</div><div class="lbl">Haiku tokens anywhere in v4 — the tier table, explicit per-launch pinned model IDs, and the Haiku ban held under audit</div></div>
+</div>
+
+<div class="bar-block">
+  <div class="bar-row">
+    <div><strong>Combo V1</strong> (10-pass max)<div class="bar-note">14.6M weighted</div></div>
+    <div class="bar-track"><div class="bar-fill" style="width:100%"><div class="seg finders" style="width:57%"></div><div class="seg verifiers" style="width:26%"></div><div class="seg main" style="width:17%"></div></div></div>
+    <div class="bar-note">52% of a 5-hr limit · 56m · 26✓/4◐</div>
+  </div>
+  <div class="bar-row">
+    <div><strong>Eco V2</strong> (7-pass economy)<div class="bar-note">9.18M weighted</div></div>
+    <div class="bar-track"><div class="bar-fill" style="width:63%"><div class="seg finders" style="width:58%"></div><div class="seg verifiers" style="width:28%"></div><div class="seg main" style="width:14%"></div></div></div>
+    <div class="bar-note">33% (~7% weekly) · 39m 53s · 22✓/4◐</div>
+  </div>
+  <div class="bar-row">
+    <div><strong>eco v4</strong> (8-dial, current default)<div class="bar-note">6.51M weighted</div></div>
+    <div class="bar-track"><div class="bar-fill" style="width:45%"><div class="seg finders" style="width:47%"></div><div class="seg verifiers" style="width:28%"></div><div class="seg gap" style="width:4%"></div><div class="seg main" style="width:21%"></div></div></div>
+    <div class="bar-note">23% (~5% weekly) · 46m · 22✓/4◐</div>
+  </div>
+  <div class="seg-legend">
+    <span><span class="swatch" style="background:#54aeff"></span>Finder fleet</span>
+    <span><span class="swatch" style="background:#6fdd8b"></span>Adversarial verification</span>
+    <span><span class="swatch" style="background:#afb8c1"></span>Gap-fill</span>
+    <span><span class="swatch" style="background:#d4a72c"></span>Main session (dedup + synthesis prose)</span>
+  </div>
+  <p class="section-note" style="margin-top:10px;">Footnote: eco v3 measured 4.55M (16%) but is excluded above — its main-tier lenses silently ran on Haiku and recall collapsed to 0 Criticals. That failure is why the tier table, the explicit-launch rule, and the Haiku ban exist.</p>
+</div>
+
+<div class="levers">
+  <div class="lever"><span class="save">biggest lever</span><div class="lt">Scripted Stage 0</div><div class="why">Diff chunking, parallel pre-pass, verifier fact pre-harvest, report assembly — deterministic work moved out of agents entirely. Finders stopped re-ingesting a 15k-line diff eight times over.</div></div>
+  <div class="lever"><span class="save">recall + cost</span><div class="lt">Orchestrator-keyed model tiers</div><div class="why">Fable 5 / Opus 4.8 / Sonnet by what each lens actually catches, pinned full IDs, set per launch, Haiku banned. The boost-vs-baseline dial (Fable 5 vs Opus 4.8 orchestrator) is the same pipeline.</div></div>
+  <div class="lever"><span class="save">~60–70% of verify</span><div class="lt">Verification floor at sev ≥5, tiered</div><div class="why">Sev-5 verifications only ever demote or refute → cheap tier. Sev ≥6 — where Blockers live — stays on the main tier. One streamed wave, no batching.</div></div>
+  <div class="lever"><span class="save">finder budgets</span><div class="lt">Read chunks once, ~25 calls</div><div class="why">One decisive trace per candidate; Stage C owns proof. The pre-discipline finders made 34–86 calls each doing verification-grade tracing — paying for precision twice.</div></div>
+  <div class="lever"><span class="save">smaller everything</span><div class="lt">Nit caps + nit table</div><div class="why">quality pass capped at sev ≤4 on the cheap tier; sev ≤3 top ~10 + one summary line; full prose for Minor+ only. Shrinks dedup context, verify volume, and synthesis output together.</div></div>
+  <div class="lever"><span class="save">next target</span><div class="lt">Orchestrator output discipline</div><div class="why">v4's main session wrote 118k output tokens — the single largest weighted line item left (output costs 5×). The next dial to turn.</div></div>
+</div>
+
+<!-- ================= RECEIPTS ================= -->
+<div class="receipts">
+  <h3>The receipts — eco v4, run blind on PR #65 (2026-06-12)</h3>
+  <ul>
+    <li><strong>Recall:</strong> both catchable Criticals — the fork-vs-'default' Blocker (all 11 edit surfaces enumerated, zero <code>stepInputs.pipelineId</code> producers, regression proof) and save-as-template gating. 22✓/4◐ on the 52-row matrix, including 6 new rows no prior review had.</li>
+    <li><strong>Cost:</strong> 6.51M weighted · 23% of a 5-hour limit · ~5% weekly · 46 minutes. 29% under Eco V2, a third of Combo V1.</li>
+    <li><strong>Routing audit:</strong> zero Haiku; main tier verified Fable 5; sev-tier verifier split ran exactly as designed. One drift caught (an <code>opus</code> alias resolving to 4.6) — fixed by pinning full model IDs in the skill.</li>
+    <li><strong>Calibration:</strong> refuted a finding a prior review filed as real (bun:sqlite transactions rethrow synchronously — the asserted failure path is unreachable).</li>
+    <li><strong>Known blind spots</strong> (lens-brief problem, not model or budget — they survived a fifth generation with the probe lens on Fable 5): the orphaned <code>enabled=0</code> brick and subset-template override clearing, matrix rows 3 and 7.</li>
+  </ul>
+</div>
+
+<footer>deep-code-review --multi-agent · 8-dial design, validated 2026-06-12 (eco v4) · sources: <code>Maudel/.claude/skills/deep-code-review/</code> (SKILL.md, references/multi-agent.md, references/dimensions.md) · cost data measured from session transcripts · benchmark: <code>_temp-Code-Reviews/3-way-comparison.html</code> (9-way, 52 rows)</footer>
+
+</div>
+</body>
+</html>

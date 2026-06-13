@@ -1,0 +1,569 @@
+{
+  "effort": "pipeline-consolidation",
+  "scope": "Reviewing PR #65 (feat/pipeline-consolidation → develop) at PR head 6879399 via local checkout (app code identical to PR head; post-PR commits touch only skills/docs) — 82 files, +9858/−4131, committed only.",
+  "reviewed": "2026-06-12",
+  "mode": "multi-agent",
+  "findings": [
+    {
+      "id": "CR-001",
+      "lens": "last-mile",
+      "dimension": ["last-mile"],
+      "verification": "confirmed",
+      "severity": 9,
+      "tier": "Blocker",
+      "title": "Every edit on the /pipeline Prompts and Agents & Skills tabs is silently ignored at runtime — tabs write to the track's forked pipeline, all execution paths read hardcoded pipeline 'default'",
+      "evidence": {
+        "path": "apps/api/src/services/stage-prompt-assembler.service.ts",
+        "line": 132,
+        "symbol": "StagePromptAssembler.assemble",
+        "observed": "WRITE: track-pipeline-page.component.ts:399,409 binds [pipelineId]=track.pipelineId (always a fork — track.service.ts:280,421 → pipeline.service.ts:109 forkPipeline) → prompts tab PUT /api/pipeline-stages/:id?pipelineId=<fork> (track-stage-prompts-tab.component.ts:416), pipeline prompt PUT /api/pipelines/<fork> (:396), agents tab PUT same fork row (track-stage-agents-tab.component.ts:315) → pipeline-stage.service.ts:152 UPDATE WHERE pipeline_id=<fork>. READ: agentic-step-handler.ts:1255 assemble() without pipelineId → assembler:132 input.pipelineId ?? 'default' → getStage(stageId,'default')/getPipeline('default') (consumes actionContent, mode instructions, pipelinePrompt, assignedAgents/skills, special instructions); review-stage-engine.service.ts:705 same; orchestrated-step-handler.ts:117 stepInputs.pipelineId ?? 'default' (zero producers of stepInputs.pipelineId repo-wide) feeds gate validation and agent resolution; hardcoded getStage(stageId,'default') at agentic-step-handler.ts:407,1564. Masked: forkPipeline copies all 19 stage content columns + pipeline_prompt at creation, so tabs initially mirror runtime values; saves round-trip the fork and survive reload. Regression: the deleted drawer surface wrote to 'default' (old pipeline-stage-api.service.ts _selectedPipelineId='default'), which runtime reads — prompt/agent editing previously worked."
+      },
+      "recommendation": "Thread the executing workspace's track pipelineId into runtime stage reads: resolve the track (as track-stage-config.service.ts:42-49 already does for stage_state/stage_mode) and pass pipelineId into assemble() at agentic-step-handler.ts:1255 and review-stage-engine.service.ts:705; set stepInputs.pipelineId at workflow launch or resolve track-aware inside orchestrated-step-handler.ts:117; replace hardcoded 'default' at agentic-step-handler.ts:407,1564. Add a regression test asserting a fork-row edit appears in the assembled prompt for a run in that workspace.",
+      "status": "accepted"
+    },
+    {
+      "id": "CR-002",
+      "lens": "last-mile",
+      "dimension": ["seam-trace", "last-mile", "removed-behavior"],
+      "verification": "confirmed",
+      "severity": 7,
+      "tier": "Major",
+      "title": "Config-tab overrides (harness/tier/thinking/hitl/retry) and the save-as-template repoint never reach workflow execution — template selection still resolves from workspace settings; config_overrides have zero runtime readers",
+      "evidence": {
+        "path": "apps/ui/src/app/features/pipeline/story-workflow-page.component.ts",
+        "line": 2659,
+        "symbol": "TrackConfigResolutionService.saveOverride / saveAsTemplate",
+        "observed": "Overrides: PUT /api/tracks/:id/config-override (routes/tracks.ts:90) writes pipelines.config_overrides / pipeline_stages.config_overrides — only readers are the track resolver (serving /api/tracks + save bake) and the informational bug-plan; no execution path consumes them. Repoint: saveAsTemplate updates pipelines.source_template_id (track-config-resolution.service.ts:374) but execution templateId comes from workspace settings: story-workflow-page.component.ts:2659 settings.resolved?.templateId ?? defaultTemplateId (workspaces.ts:690 US-077 chain) → story-workflow.ts:269/877 getTemplate(templateId) → :733 stepConfigs from templateSteps; resolveTemplateForPipeline's only callers are inside the track resolver. Aggravator: execution-config-drawer.component.ts:72 tells users 'Set persistent model config on the Pipeline page'. Not in the plan's Deferreds; Phase 6 AC claims 'single config source of truth'."
+      },
+      "recommendation": "Make the execution path consume the track resolver: resolve the executing track's template via resolveTemplateForPipeline(pipelines.source_template_id) (server-side in story-workflow.ts, or have the execution page read the track binding), and overlay pipelines/pipeline_stages config_overrides at workflow creation; at minimum sync workspace defaultTemplateId on save-as-template and soften the drawer hint until overrides actually flow.",
+      "status": "open"
+    },
+    {
+      "id": "CR-003",
+      "lens": "last-mile",
+      "dimension": ["seam-trace", "diff-scan"],
+      "verification": "confirmed",
+      "severity": 6,
+      "tier": "Minor",
+      "title": "Runtime review-stories gating reads raw stage_state/stage_mode columns, never the resolver — Save-as-template silently de-activates the gate; newly created/backfilled tracks never activate it; track-level mode overrides are invisible",
+      "evidence": {
+        "path": "apps/api/src/services/track-stage-config.service.ts",
+        "line": 62,
+        "symbol": "isStageActivated / getStageMode",
+        "observed": "saveAsTemplate transaction sets stage_state=NULL, stage_mode=NULL on all rows (track-config-resolution.service.ts:388-390) while baking values into the template layer the gate never reads; no re-sync exists. syncStageEnabledFromTemplate (track.service.ts:552) writes only `enabled`, never stage_state, and the system default template 'mvp' DOES enable review-stories — so UI shows included-from-template while the runtime gate (executor.ts:1891, story-generation-engine.service.ts:673,728) stays off. Track-level mode override (pipelines.config_overrides.mode) is accepted and resolved for display but never consulted by getStageMode (API-only; no UI control writes the track layer)."
+      },
+      "recommendation": "Route isStageActivated/getStageMode through TrackConfigResolutionService.resolveTrackConfig (as getBugTrackExecutionPlan already does), or have saveAsTemplate re-sync stage_state/stage_mode to the baked values instead of NULLing them.",
+      "status": "open"
+    },
+    {
+      "id": "CR-004",
+      "lens": "last-mile",
+      "dimension": ["seam-trace"],
+      "verification": "confirmed",
+      "severity": 6,
+      "tier": "Minor",
+      "title": "Blueprint-owned Build Mode write has no runtime reader — story execution resolves explicit override → project config → default, never registry meta.buildMode; bulk story generation is hard-locked to 'mvp'",
+      "evidence": {
+        "path": "apps/api/src/routes/story-workflow.ts",
+        "line": 97,
+        "symbol": "resolveBuildMode / blueprint-registry.service.ts meta.buildMode",
+        "observed": "Write works: track-stage-config-tab.component.ts:794-801 PATCH → routes/blueprint.ts:1377-1390 → blueprint-registry.service.ts:194. Read never happens: story-workflow.ts:97-115 resolves explicit → project.buildMode → default (UI sends only projectId); story-generation-engine.service.ts:483 config.buildMode ?? 'mvp' and its only caller routes/story-generation.ts:45-56 never sets buildMode; registry meta.buildMode has one writer, zero runtime readers. Contradicts plan §6 ('the blueprint is THE source of truth for build mode'); absent from Deferreds."
+      },
+      "recommendation": "Insert the blueprint layer into runtime resolution: in resolveBuildMode consult the executing track's blueprint meta.buildMode before project config, and plumb buildMode into the /generate route's engine config — or explicitly declare the registry field display-only in the plan.",
+      "status": "open"
+    },
+    {
+      "id": "CR-005",
+      "lens": "correctness",
+      "dimension": ["frozen-state-probe"],
+      "verification": "confirmed",
+      "severity": 5,
+      "tier": "Minor",
+      "title": "Backfill carries the legacy full-snapshot stage states as stage-layer overrides on all 13 stages — Save permanently lit, 'Overridden' provenance everywhere, and unit-test/code-review stages force-enabled against the MVP template",
+      "evidence": {
+        "path": "apps/api/src/services/track.service.ts",
+        "line": 330,
+        "symbol": "carryLegacyStageConfig",
+        "observed": "The deleted PipelineConfigService.persist() PUT the FULL merged stageStates object on every user toggle/run (chunk 062), so any workspace that ever interacted with the old page has a complete row; carryLegacyStageConfig (track.service.ts:330-352) writes stage_state for every mapped key unfiltered (LEGACY_STAGE_ID_MAP expands 'execution' to 10 stages) + stage_mode 'collaborative'; resolver treats stage_state!==null as source 'stage' → stageDiverges → divergesFromTemplate=true → Save enabled (track-pipeline-page.component.ts:175,1254) + 'Overridden' badges. Value flip: carried execution:'included' force-ENABLES unit-testing and code-review stages that the system default 'mvp' template disables. Blast radius: workspaces with a legacy row (any old-page interaction), not literally all."
+      },
+      "recommendation": "In carryLegacyStageConfig, compare each carried value against the resolved template value (the map syncStageEnabledFromTemplate already builds) and write stage_state/stage_mode only where the legacy value differs; leave matching values NULL so provenance stays 'template' and Save stays idle.",
+      "status": "open"
+    },
+    {
+      "id": "CR-006",
+      "lens": "last-mile",
+      "dimension": ["seam-trace"],
+      "verification": "confirmed",
+      "severity": 5,
+      "tier": "Minor",
+      "title": "UI TrackConfigService stage state/mode cache is never invalidated by track-page config writes — stories pages read stale review-stories mode/activation for the rest of the session",
+      "evidence": {
+        "path": "apps/ui/src/app/features/pipeline/track-config.service.ts",
+        "line": 93,
+        "symbol": "TrackConfigService.loadForWorkspace",
+        "observed": "Track page saves via TrackConfigResolutionService.saveOverride/saveAsTemplate (track-pipeline-page.component.ts:1537,1587) which update only that service's own resolvedConfig signal; TrackConfigService.trackStageStates/trackStageModes (read by stories-list.component.ts:1567, story-detail.component.ts:2509 at review start) load once per workspace (guard at :93-95), force-reloaded only by track CRUD/reorder — never after a config-override write or save. Manual review starts POST the client-read mode verbatim (routes/review-stage.ts:122); the server auto-start path resolves server-side and is unaffected."
+      },
+      "recommendation": "After saveOverride/saveAsTemplate succeed, call trackConfig.loadForWorkspace(workspaceId, true) (or derive both services' reads from one shared source).",
+      "status": "open"
+    },
+    {
+      "id": "CR-007",
+      "lens": "pre-pass",
+      "dimension": null,
+      "verification": "unverified",
+      "severity": 5,
+      "tier": "Minor",
+      "title": "28 new combined-run test failures at head vs base — pre-existing order-dependent suites flipped from accidentally-passing to failing by the PR's three new test files",
+      "evidence": {
+        "path": "apps/api/src/tests",
+        "line": null,
+        "symbol": "us-061-story-dependency-schema.test.ts, us-124-base-system-prompt.test.ts, phase2-templates-integration.test.ts (US-071 AC1)",
+        "observed": "Scripted base-vs-head attribution (two worktrees, combined `bun test src/tests/` both sides, normalized failure lists diffed): head 218 failures vs base 196 — 28 new, 190 pre-existing, 6 fixed. The newly-failing suites fail identically in ISOLATION at both base and head (us-061: 20/20, us-124: 19 vs 18), so the suites are inherently order-dependent (missing initDatabase, shared DB state) and the PR's 3 new track test files changed combined-run ordering/state. Product code is not shown broken; the combined suite regression is real and attributable to the diff."
+      },
+      "recommendation": "Make the three new track suites hermetic (own DB init/teardown), or fix the brittle suites' missing initialization so combined-run ordering can't flip them; re-run combined suite to confirm head returns to the 196-failure baseline or better.",
+      "status": "open"
+    },
+    {
+      "id": "CR-008",
+      "lens": "plan-conformance",
+      "dimension": ["last-mile"],
+      "verification": "confirmed",
+      "severity": 4,
+      "tier": "Nit",
+      "title": "POST /api/bugs/:id/execute computes the bug track's pipeline plan but nothing executes it — Phase 5 AC 'runs the bug track's pipeline' shipped as an activity-log string; undisclosed deferral (stub behavior is pre-existing)",
+      "evidence": {
+        "path": "apps/api/src/routes/bugs.ts",
+        "line": 120,
+        "symbol": "getBugTrackExecutionPlan",
+        "observed": "Plan feeds only the activity-log string and the JSON response; no hop invokes any executor; status 'queued' has no consumer; UI bugs.service.ts types the response { status: string }, discarding the plan. Pre-PR handler was already a queue-only stub, so no regression — but the Phase 5 AC and PR body say 'runs', and the gap is absent from the Deferreds appendix."
+      },
+      "recommendation": "Wire the handler to actually start execution of plan.stages, or record the deferral in the plan's Deferreds ledger and reword the AC; widen the UI response type so the plan is consumable.",
+      "status": "open"
+    },
+    {
+      "id": "CR-009",
+      "lens": "correctness",
+      "dimension": ["removed-behavior"],
+      "verification": "unverified",
+      "severity": 4,
+      "tier": "Nit",
+      "title": "Manual 'Generate Stories from blueprint' affordance orphaned — only producer of /stories?generate=true (with its duplicate-generation confirm guard) was deleted with the overview",
+      "evidence": {
+        "path": "apps/ui/src/app/features/stories/stories-list.component.ts",
+        "line": 1038,
+        "symbol": "navigateToStories (deleted, pipeline-overview.component.ts:1880-1912)",
+        "observed": "stories-list.component.ts:1038-1041 + 1122-1135 still implement the generate/force path; repo-wide grep finds zero remaining producers of generate:'true'. The new page's Create Stories goto is /stories/create/quick (single-story), not blueprint batch generation."
+      },
+      "recommendation": "Add a 'Generate Stories' action on the new Create Stories stage navigating to /stories?generate=true&blueprintId=<track.blueprintId> (re-establishing the duplicates confirm), or delete the now-dead query-param branch.",
+      "status": "open"
+    },
+    {
+      "id": "CR-010",
+      "lens": "coherence",
+      "dimension": ["coherence", "quality"],
+      "verification": "confirmed",
+      "severity": 4,
+      "tier": "Nit",
+      "title": "TrackDto duplicates shared TrackWithStageConfig — UI hand-rolls the GET /tracks wire shape instead of importing the shared type (latent drift; convention exists in sibling service)",
+      "evidence": {
+        "path": "apps/ui/src/app/features/pipeline/track-config.service.ts",
+        "line": 14,
+        "symbol": "TrackDto vs apps/shared/types/track.types.ts TrackWithStageConfig",
+        "observed": "API always serves withStageConfig() (tracks.ts:51,169,212,244); UI never imports the shared type while the sibling resolution service imports TrackConfigOverrideInput/SaveTrackAsTemplateInput from @shared/types. No current runtime divergence (UI's local type is narrower/more precise); risk is future server-side fields not propagating."
+      },
+      "recommendation": "Import TrackWithStageConfig (alias TrackDto locally if preferred) and unify the stageStates/stageModes typing in the shared type.",
+      "status": "open"
+    },
+    {
+      "id": "CR-011",
+      "lens": "correctness",
+      "dimension": ["seam-trace"],
+      "verification": "unverified",
+      "severity": 4,
+      "tier": "Nit",
+      "title": "Unguarded JSON.parse of config_overrides in pipeline-stage row mapper — one malformed row 500s every stage read for that pipeline",
+      "evidence": {
+        "path": "apps/api/src/services/pipeline-stage.service.ts",
+        "line": 107,
+        "symbol": "rowToStage",
+        "observed": "configOverrides: row.config_overrides ? JSON.parse(row.config_overrides) : null — no try/catch; the resolver reading the same column guards it (parseOverrides returns {} on failure). Needs an out-of-band bad row to trigger."
+      },
+      "recommendation": "Use the same guarded parse as the resolver (shared parseOverrides helper returning null/{} on failure).",
+      "status": "open"
+    },
+    {
+      "id": "CR-012",
+      "lens": "coherence",
+      "dimension": ["coherence", "quality"],
+      "verification": "unverified",
+      "severity": 4,
+      "tier": "Nit",
+      "title": "CreateTrackInput / UpdateTrackInput declared independently on API and UI with divergent shapes",
+      "evidence": {
+        "path": "apps/api/src/services/track.service.ts",
+        "line": 127,
+        "symbol": "CreateTrackInput / UpdateTrackInput (also apps/ui/.../track-config.service.ts:30-43)",
+        "observed": "Structurally similar interfaces maintained independently; sibling config-override input types are shared via track-config.types.ts."
+      },
+      "recommendation": "Move both input types to apps/shared/types/track.types.ts and import in both layers.",
+      "status": "open"
+    },
+    {
+      "id": "CR-013",
+      "lens": "coherence",
+      "dimension": ["coherence"],
+      "verification": "unverified",
+      "severity": 4,
+      "tier": "Nit",
+      "title": "Response wrapper inconsistency: bugs POST /:id/execute returns bare JSON (with the new track plan spread in) while all new track endpoints use the { data: ... } envelope",
+      "evidence": {
+        "path": "apps/api/src/routes/bugs.ts",
+        "line": 135,
+        "symbol": "tracks.ts { data } convention (lines 51-244)",
+        "observed": "Pre-existing bugs-route convention, but the PR's new track field lands in the bare shape, creating two wire shapes for the same track data."
+      },
+      "recommendation": "Note the pattern difference or wrap the bug-execute response in { data: ... } (breaking change for existing callers — coordinate).",
+      "status": "open"
+    },
+    {
+      "id": "CR-014",
+      "lens": "correctness",
+      "dimension": ["diff-scan"],
+      "verification": "unverified",
+      "severity": 4,
+      "tier": "Nit",
+      "title": "deleteTrack auto-promotion tiebreaker (created_at) can disagree with the UI rail's displayOrder-only sort when orders collide",
+      "evidence": {
+        "path": "apps/api/src/services/track.service.ts",
+        "line": 615,
+        "symbol": "successor query vs track-config.service.ts:108 client sort",
+        "observed": "Server picks by type-priority, display_order, created_at; client sorts by displayOrder only — tie renders nondeterministically vs server's stable pick."
+      },
+      "recommendation": "Add a createdAt tiebreaker to the client-side sort.",
+      "status": "open"
+    },
+    {
+      "id": "CR-015",
+      "lens": "correctness",
+      "dimension": ["diff-scan"],
+      "verification": "unverified",
+      "severity": 4,
+      "tier": "Nit",
+      "title": "resolveStageIds silently returns identity for unknown stage ids — a caller's typo yields isStageActivated=false with no signal",
+      "evidence": {
+        "path": "apps/api/src/services/track.service.ts",
+        "line": 118,
+        "symbol": "resolveStageIds",
+        "observed": "Unknown id → [stageId] → SQL matches no rows → false, indistinguishable from a genuinely deactivated stage."
+      },
+      "recommendation": "console.warn when a stage id is neither in LEGACY_STAGE_ID_MAP nor a known pipeline stage id.",
+      "status": "open"
+    },
+    {
+      "id": "CR-016",
+      "lens": "correctness",
+      "dimension": ["removed-behavior", "last-mile", "frozen-state-probe"],
+      "verification": "plausible",
+      "severity": 3,
+      "tier": "Nit",
+      "title": "Un-backfilled workspaces with review-stories enabled in the frozen legacy table lose the gate on non-UI paths — mechanisms confirmed, but realistic reach is API-direct calls and swallowed GET /tracks failures only",
+      "evidence": {
+        "path": "apps/api/src/services/track-stage-config.service.ts",
+        "line": 43,
+        "symbol": "readTrackStageRows / ensureDefaultTrack (sole caller: routes/tracks.ts:160)",
+        "observed": "No legacy fallback in the runtime reader; backfill only via GET /tracks. Verification demoted reach: the executor's review hook is dead code on the only live route (story-workflow.ts:287 force-disables create-story/review-stories), and the story-generation launcher (stories-list) itself triggers the backfill at init. Residual paths: API-direct generation; transient GET /tracks failure (routes/tracks.ts:165-167 continues, UI catch swallows). Service header 'behavior is unchanged for un-backfilled workspaces' is inaccurate for non-default frozen rows."
+      },
+      "recommendation": "In readTrackStageRows, fall back to the legacy getPipelineConfig carry reader (kept for exactly this data) when no track exists, and fix the header comment.",
+      "status": "open"
+    },
+    {
+      "id": "CR-017",
+      "lens": "correctness",
+      "dimension": ["diff-scan", "removed-behavior", "last-mile", "frozen-state-probe", "coherence"],
+      "verification": "confirmed",
+      "severity": 3,
+      "tier": "Nit",
+      "title": "Synchronous TrackConfigService.stageMode() returns 'collaborative' until the async /tracks load lands — a regression vs the deleted synchronous localStorage mirror, but realistic triggers are persistent /tracks failure and the workflow-context workspace mismatch; failure direction is always the conservative mode",
+      "evidence": {
+        "path": "apps/ui/src/app/features/pipeline/track-config.service.ts",
+        "line": 167,
+        "symbol": "stageMode / isStageActivated",
+        "observed": "Constructor warm-load effect fires at component injection, closing the cold-load race to one localhost GET vs a human click; manual review starts trust the client mode (review-stage.ts:122) but auto-start resolves server-side; error path retries per-read and self-heals on transient failures."
+      },
+      "recommendation": "Have startReview/reReviewStory await loadForWorkspace(wsId) before reading stageMode (it already returns a Promise).",
+      "status": "open"
+    },
+    {
+      "id": "CR-018",
+      "lens": "correctness",
+      "dimension": ["diff-scan"],
+      "verification": "confirmed",
+      "severity": 3,
+      "tier": "Nit",
+      "title": "moveTrack swaps displayOrder via two sequential PUTs — a failure between them persists duplicate orders, but the effect is cosmetic and self-heals on the next successful reorder",
+      "evidence": {
+        "path": "apps/ui/src/app/features/pipeline/track-pipeline-page.component.ts",
+        "line": 1517,
+        "symbol": "moveTrack",
+        "observed": "Nothing keys on displayOrder for identity; getBugTrack and auto-promotion tie-break stably on created_at; catch reloads server state so UI stays consistent."
+      },
+      "recommendation": "Add a server-side batch reorder endpoint performing the swap in one transaction, or restore the first track's order when the second PUT fails.",
+      "status": "open"
+    },
+    {
+      "id": "CR-019",
+      "lens": "coherence",
+      "dimension": ["coherence"],
+      "verification": "plausible",
+      "severity": 3,
+      "tier": "Nit",
+      "title": "Duplicate execution-mode type: new track-stage-config.service.ts imports PipelineStageMode from the legacy module instead of shared StageExecutionMode (byte-identical types; legacy module stays for backfill regardless)",
+      "evidence": {
+        "path": "apps/api/src/services/track-stage-config.service.ts",
+        "line": 23,
+        "symbol": "PipelineStageMode vs apps/shared/types/stage.types.ts:25 StageExecutionMode",
+        "observed": "Resolver uses the shared type; runtime gating service uses the legacy one; one-way import, no cycle."
+      },
+      "recommendation": "Import StageExecutionMode from shared and alias for existing callers; clean up when the legacy module is retired.",
+      "status": "open"
+    },
+    {
+      "id": "CR-020",
+      "lens": "last-mile",
+      "dimension": ["removed-behavior"],
+      "verification": "unverified",
+      "severity": 3,
+      "tier": "Nit",
+      "title": "Stage 'Knowledge Base' panel (knowledgeBasePath display) dropped with stage-config-drawer — no new home on any track tab",
+      "evidence": {
+        "path": "apps/ui/src/app/features/pipeline",
+        "line": null,
+        "symbol": "stage-config-drawer.component.ts:259-277 (deleted)",
+        "observed": "grep knowledgeBasePath over the new track components returns zero hits."
+      },
+      "recommendation": "Add a read-only Knowledge Base row to the Details tab when stage.knowledgeBasePath is set.",
+      "status": "open"
+    },
+    {
+      "id": "CR-021",
+      "lens": "plan-conformance",
+      "dimension": null,
+      "verification": "unverified",
+      "severity": 3,
+      "tier": "Nit",
+      "title": "22 undeclared .claude/skills and .claude/commands files ride in the PR with no plan or PR-description coverage",
+      "evidence": {
+        "path": ".claude",
+        "line": null,
+        "symbol": "chunks 001-027: commands/{breakout,constraints,drill,gaps,risks}.md + skills/deep-{implement,plan,review}/**",
+        "observed": "+1377 lines of developer tooling, intentional-looking but undeclared."
+      },
+      "recommendation": "Add one line to the PR description declaring the co-committed tooling.",
+      "status": "open"
+    },
+    {
+      "id": "CR-022",
+      "lens": "pre-pass",
+      "dimension": null,
+      "verification": "unverified",
+      "severity": 3,
+      "tier": "Nit",
+      "title": "API typecheck lands at 302 errors vs base's 300 — the +2 are new shared type files hitting the pre-existing TS6059 rootDir config issue; PR claims 'exact pre-existing baseline'",
+      "evidence": {
+        "path": "apps/shared/types/track.types.ts",
+        "line": null,
+        "symbol": "TS6059 rootDir (pre-existing class, ~300 instances at base)",
+        "observed": "Scripted base-vs-head tsc diff; UI typecheck and ng build clean at head."
+      },
+      "recommendation": "No action within this PR beyond correcting the claim; the rootDir config debt is repo-wide and pre-existing.",
+      "status": "open"
+    },
+    {
+      "id": "CR-023",
+      "lens": "coherence",
+      "dimension": ["coherence"],
+      "verification": "unverified",
+      "severity": 3,
+      "tier": "Nit",
+      "title": "Stage-id translation maps fragmented: STAGE_TO_TEMPLATE_STEP_ID (api service), its deleted inverse, and the UI's STAGE_ICON_ID map cover one 13-entry concern across layers",
+      "evidence": {
+        "path": "apps/api/src/services/track.service.ts",
+        "line": 57,
+        "symbol": "STAGE_TO_TEMPLATE_STEP_ID / track-pipeline-page.component.ts:71-85 STAGE_ICON_ID",
+        "observed": "Forward map re-exported from track-config-resolution.service.ts:91-92 via an unusual export+import pair."
+      },
+      "recommendation": "Consolidate stage-id translation into one shared constants module exporting both directions.",
+      "status": "open"
+    },
+    {
+      "id": "CR-024",
+      "lens": "coherence",
+      "dimension": ["coherence"],
+      "verification": "unverified",
+      "severity": 3,
+      "tier": "Nit",
+      "title": "UI track-config.service.ts redefines StageMode locally instead of importing shared StageExecutionMode (sibling service imports the shared type)",
+      "evidence": {
+        "path": "apps/ui/src/app/features/pipeline/track-config.service.ts",
+        "line": 7,
+        "symbol": "StageMode",
+        "observed": "Identical union to apps/shared/types/stage.types.ts:25."
+      },
+      "recommendation": "Import the shared type.",
+      "status": "open"
+    },
+    {
+      "id": "CR-025",
+      "lens": "coherence",
+      "dimension": ["quality"],
+      "verification": "unverified",
+      "severity": 3,
+      "tier": "Nit",
+      "title": "generateCustomTemplateId() re-implements TemplateLoaderService.generateCloneId() byte-for-byte",
+      "evidence": {
+        "path": "apps/api/src/services/track-config-resolution.service.ts",
+        "line": 175,
+        "symbol": "template-loader.service.ts:1028 generateCloneId",
+        "observed": "Both produce custom-${Date.now().toString(36)}-${random}."
+      },
+      "recommendation": "Expose one helper and call it from both sites.",
+      "status": "open"
+    },
+    {
+      "id": "CR-026",
+      "lens": "coherence",
+      "dimension": ["quality"],
+      "verification": "unverified",
+      "severity": 3,
+      "tier": "Nit",
+      "title": "resolveTrackConfig double-fetches pipeline_stages when stageId is supplied (existence check discarded, then full fetch)",
+      "evidence": {
+        "path": "apps/api/src/services/track-config-resolution.service.ts",
+        "line": 236,
+        "symbol": "resolveTrackConfig / getStageRows",
+        "observed": "Two DB round-trips per stageId-filtered call."
+      },
+      "recommendation": "Fetch all stages once and check membership for the 404.",
+      "status": "open"
+    },
+    {
+      "id": "CR-027",
+      "lens": "coherence",
+      "dimension": ["quality"],
+      "verification": "unverified",
+      "severity": 3,
+      "tier": "Nit",
+      "title": "Blueprint list fetched and cached independently in track-pipeline-page, track-stage-config-tab, and blueprint-session.service — three private caches of one endpoint",
+      "evidence": {
+        "path": "apps/ui/src/app/features/pipeline/track-pipeline-page.component.ts",
+        "line": 1393,
+        "symbol": "loadBlueprints / track-stage-config-tab.component.ts:781 loadWorkspaceBlueprints",
+        "observed": "Each maintains its own per-workspace dedup guard."
+      },
+      "recommendation": "Extract a BlueprintCatalogService holding the list signal; inject in both components.",
+      "status": "open"
+    },
+    {
+      "id": "CR-028",
+      "lens": "correctness",
+      "dimension": ["diff-scan"],
+      "verification": "plausible",
+      "severity": 2,
+      "tier": "Nit",
+      "title": "Destroy-time flushSpecificSave: the save DOES reach the server (cancellation claim refuted) but an error on that final save is unsurfaceable",
+      "evidence": {
+        "path": "apps/ui/src/app/features/pipeline/track-stage-config-tab.component.ts",
+        "line": 714,
+        "symbol": "flushSpecificSave / saveSpecific",
+        "observed": "firstValueFrom holds its own subscription so HttpClient completes after destroy; flush clears the debounce timer and sends immediately with the edit-time-captured target; only the catch's saveError signal lands on a destroyed component."
+      },
+      "recommendation": "Surface destroy-time save failures via a global toast service rather than a component signal.",
+      "status": "open"
+    },
+    {
+      "id": "CR-029",
+      "lens": "correctness",
+      "dimension": ["seam-trace"],
+      "verification": "unverified",
+      "severity": 2,
+      "tier": "Nit",
+      "title": "resolveStage labels the stage row's own enabled-column fallback as source:'system' — provenance lie when a template lacks the mapped step, and such a stage can never register as diverged",
+      "evidence": {
+        "path": "apps/api/src/services/track-config-resolution.service.ts",
+        "line": null,
+        "symbol": "resolveStage stageEnabled fallback",
+        "observed": "{ value: row.enabled === 1, source: 'system' } for unmapped steps; stageDiverges only counts stage/track-pipeline sources."
+      },
+      "recommendation": "Introduce an honest source label (e.g. 'stage-row') or document the approximation.",
+      "status": "open"
+    },
+    {
+      "id": "CR-030",
+      "lens": "coherence",
+      "dimension": ["removed-behavior", "frozen-state-probe"],
+      "verification": "unverified",
+      "severity": 2,
+      "tier": "Nit",
+      "title": "Orphaned localStorage maudel_pipeline_<workspaceId> blobs (incl. runStatus frozen at 'running') — writer deleted, no reader, no cleanup",
+      "evidence": {
+        "path": "apps/ui/src/app/features/pipeline",
+        "line": null,
+        "symbol": "STORAGE_PREFIX 'maudel_pipeline_' (deleted pipeline-config.service.ts:27,149)",
+        "observed": "Repo-wide grep finds no surviving reference."
+      },
+      "recommendation": "One-time removeItem sweep of the prefix on new pipeline page init.",
+      "status": "open"
+    },
+    {
+      "id": "CR-031",
+      "lens": "coherence",
+      "dimension": ["frozen-state-probe"],
+      "verification": "unverified",
+      "severity": 2,
+      "tier": "Nit",
+      "title": "Stale comments: migration 046 claims 'consumers fall back to the legacy workspace_pipeline_config layer' (they fall back to system defaults post-Phase-6), and track-stage-config.service.ts:10-12 claims un-backfilled behavior is unchanged (false for non-default frozen rows)",
+      "evidence": {
+        "path": "apps/api/src/db/migrations.ts",
+        "line": null,
+        "symbol": "migration 046 comment; track-stage-config.service.ts header",
+        "observed": "Both contradicted by the shipped read paths (see CR-016)."
+      },
+      "recommendation": "Correct both comments (or implement the legacy fallback per CR-016, making the migration comment true).",
+      "status": "open"
+    },
+    {
+      "id": "CR-032",
+      "lens": "plan-conformance",
+      "dimension": null,
+      "verification": "unverified",
+      "severity": 2,
+      "tier": "Nit",
+      "title": "stage-config-drawer disposition changed from REUSE (plan §3a/§9) to extract-and-DELETE — declared in Phase 3/6 summaries, but §3a/§9 left stale as a historical record",
+      "evidence": {
+        "path": ".maudel/docs/_JB/_Config/Pipeline-Redesign-Plan.md",
+        "line": null,
+        "symbol": "§3a 'REUSE (already a standalone component)'",
+        "observed": "Functional content verified present in track-stage-prompts-tab / track-stage-agents-tab; deviation declared in summaries per plan convention."
+      },
+      "recommendation": "Optionally update §3a/§9 to the final disposition.",
+      "status": "open"
+    }
+  ],
+  "nit_overflow_summary": [
+    "moveTrack double-PUT also flagged independently by two passes (folded into CR-018)",
+    "track.service.ts console.log in ensureDefaultTrack/createTrack success paths (neighbors use console.warn or nothing)",
+    "execution-config-drawer onSave creates unused destructure var _runOnly",
+    "track-stage-config-tab savingSpecific spinner shows on the NEW stage after a switch, not the saved stage's",
+    "UI track-config-resolution mergeResolved always replaces on full-stage responses (micro-perf)",
+    "loadResolvedConfig has no in-flight-supersession guard (rapid track switch can flash stale loading state)",
+    "stageGroupLabel()/stageGroupColor() plain template methods where siblings use computed()",
+    "isStageIncluded() hides a signal read inside a method body consumed by the dockItems computed",
+    "track-stage-registry smart-quote vs ASCII inconsistency; ConfigFieldOption/StageSpecificFieldOption identical shapes unshared",
+    "environment.ts retains dead featureFlags property after Phase 2 flag removal",
+    "routes/tracks.ts PUT forwards body.displayOrder without number validation",
+    "ensureDefaultTrack backfill does not sync enabled from the resolved template (createTrack does) — day-one enabled/template disagreement possible",
+    "getBugTrack/getBugTrackExecutionPlan pick the first bug track by display_order — with multiple bug tracks the rest are unreachable from /bugs",
+    "executor/story-gen review gating always reads the workspace's DEFAULT track — feature-track stories gated by the app track's setting (Phase 0 design, surprising later)",
+    "pre-cutover aiHarness residue in maudel_execution_config_* self-heals only on next save (declared session-only by design)"
+  ]
+}

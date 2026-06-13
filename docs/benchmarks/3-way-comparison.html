@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>9-Way Code Review Comparison — PR #65: Track Pipeline Cutover</title>
+<style>
+  :root {
+    --bg: #f6f8fa;
+    --card: #ffffff;
+    --text: #1f2328;
+    --muted: #59636e;
+    --border: #d1d9e0;
+    --accent: #0969da;
+    --critical: #cf222e;
+    --critical-bg: #ffebe9;
+    --high: #bc4c00;
+    --high-bg: #fff1e5;
+    --medium: #9a6700;
+    --medium-bg: #fff8c5;
+    --low: #1a7f37;
+    --low-bg: #dafbe1;
+    --cleanup: #59636e;
+    --cleanup-bg: #f0f3f6;
+    --found: #1a7f37;
+    --found-bg: #dafbe1;
+    --partial: #9a6700;
+    --partial-bg: #fff8c5;
+    --code-bg: #f0f3f6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .container { max-width: 1280px; margin: 0 auto; padding: 32px 24px 64px; }
+  header { margin-bottom: 20px; }
+  h1 { font-size: 25px; margin: 0 0 4px; }
+  .subtitle { color: var(--muted); font-size: 14px; }
+  .meta-row { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 10px; font-size: 13px; color: var(--muted); }
+  .meta-row span strong { color: var(--text); }
+
+  .cards { display: flex; flex-wrap: wrap; gap: 12px; margin: 20px 0 28px; }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 18px;
+    flex: 1 1 180px;
+    min-width: 160px;
+  }
+  .stat-card .num { font-size: 26px; font-weight: 700; }
+  .stat-card .lbl { font-size: 12.5px; color: var(--muted); }
+
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 18px;
+    font-size: 13px; color: var(--muted);
+    margin: 0 0 14px;
+    align-items: center;
+  }
+  .legend .mark { font-weight: 700; }
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 13.5px;
+  }
+  thead th {
+    background: #eff2f5;
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+  }
+  thead th.check { text-align: center; width: 86px; }
+  tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: #fafbfc; }
+  td.name { font-weight: 600; width: 24%; min-width: 200px; }
+  td.desc { color: #3d444d; width: 40%; }
+  td.desc .note { display: block; margin-top: 4px; font-size: 12px; color: var(--muted); font-style: italic; }
+  td.sev { white-space: nowrap; width: 92px; }
+  td.check { text-align: center; white-space: nowrap; }
+  td.check .id { display: block; font-size: 11px; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .yes { color: var(--found); font-weight: 700; font-size: 16px; }
+  .part { color: var(--partial); font-weight: 700; font-size: 15px; }
+  .no { color: #c9d1d9; font-size: 14px; }
+  td.check.hit { background: var(--found-bg); }
+  td.check.semi { background: var(--partial-bg); }
+
+  .badge {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 2px 9px;
+    border-radius: 999px;
+    white-space: nowrap;
+    display: inline-block;
+  }
+  .badge.critical { color: var(--critical); background: var(--critical-bg); }
+  .badge.high     { color: var(--high);     background: var(--high-bg); }
+  .badge.medium   { color: var(--medium);   background: var(--medium-bg); }
+  .badge.low      { color: var(--low);      background: var(--low-bg); }
+  .badge.cleanup  { color: var(--cleanup);  background: var(--cleanup-bg); }
+
+  tr.group-row td {
+    background: #f0f3f6;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    padding: 6px 12px;
+  }
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 12px;
+    background: var(--code-bg);
+    border-radius: 4px;
+    padding: 1px 5px;
+  }
+
+  h2.section { font-size: 19px; margin: 36px 0 8px; }
+  .section-note { color: var(--muted); font-size: 14px; margin: 0 0 14px; }
+
+  .takeaways {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 8px;
+    padding: 16px 22px;
+    margin-top: 28px;
+    font-size: 14px;
+  }
+  .takeaways h3 { margin: 0 0 8px; font-size: 16px; }
+  .takeaways ul { margin: 6px 0; padding-left: 20px; }
+  .takeaways li { margin: 5px 0; }
+
+  footer { margin-top: 40px; font-size: 12px; color: var(--muted); text-align: center; }
+
+  th.num, td.num { width: 38px; text-align: right; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px; }
+  tr.f { cursor: pointer; }
+  tr.f td { padding: 7px 12px; }
+  tr.f .dwrap { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  tr.f.expanded .dwrap { display: block; -webkit-line-clamp: unset; overflow: visible; }
+  tr.metrics-row td { background: #f6f8fa; }
+  tr.metrics-row td.metric-label { font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; color: var(--muted); vertical-align: middle; text-align: right; }
+  tr.metrics-row td.metric { text-align: center; white-space: nowrap; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px; color: var(--text); padding: 6px 4px; }
+  tr.metrics-row td.metric .m1 { font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>9-Way Code Review Comparison — Track Pipeline Cutover</h1>
+  <div class="subtitle">reurgency/maudel — PR #65 · feat/pipeline-consolidation → develop · head <code>6879399</code> · reviews dated 2026-06-11/12</div>
+  <div class="meta-row">
+    <span><strong>48 deep:</strong> multi-agent, 4 specialist dims, 52 pipeline files · 6 findings</span>
+    <span><strong>fab deep:</strong> single-agent, four lenses, full 82-file PR · 11 findings</span>
+    <span><strong>fab&nbsp;solo:</strong> 7 finder passes + adversarial verify · 10 findings + 3 cleanup</span>
+    <span><strong>55 deep:</strong> single-agent, four lenses, via gh pr diff · 3 findings (1 Blocker, 2 Major)</span>
+    <span><strong>55-solo:</strong> no review harness — git diff inspection, targeted reads, typecheck + per-file tests · 3 findings (2 P1, 1 P2)</span>
+    <span><strong>Combo V1:</strong> upgraded multi-agent skill — 10 finder passes + adversarial verification, blind · 85 findings (1 Blocker, 4 Major, 11 Minor, 69 Nit; 2 candidates refuted)</span>
+    <span><strong>Eco V2:</strong> economy multi-agent — 7 budgeted finder passes (quality pass on Sonnet) + sev ≥5 verification floor, blind · 37 findings (1 Blocker, 3 Major, 6 Minor, 27 Nit; 3 candidates refuted)</span>
+    <span><strong>eco&nbsp;v3:</strong> 8-dial efficiency redesign — scripted pre-pass/chunking/assembly, 8 model-tiered finders incl. new frozen-state-probe, Sonnet sev-5 verifiers, blind · 20 findings (0 Blocker, 0 Major, 3 Minor, 17 Nit; 5 refuted) · <em>caveat: the four main-tier lenses mis-ran on Haiku</em></span>
+    <span><strong>eco&nbsp;v4:</strong> routing-hardened rerun of the 8-dial redesign — explicit per-launch models (never-Haiku rule), main tier verified on Fable 5, blind · 32 findings (1 Blocker, 1 Major, 5 Minor, 25 Nit; 2 refuted) · mid tier drifted to Opus 4.6 (alias resolution)</span>
+  </div>
+</header>
+
+<div class="cards">
+  <div class="stat-card"><div class="num">52</div><div class="lbl">Unique items across all nine reviews (6 added by eco v4)</div></div>
+  <div class="stat-card"><div class="num">3</div><div class="lbl">Found by 6 reviews (stage gating · legacy backfill · combined-test failure — all joined by eco v4)</div>
+  <div class="stat-card"><div class="num">3</div><div class="lbl">Found by 5 reviews (config-overrides display-only and bug-execute, both joined by eco v4 · PUT validation)</div></div></div>
+  <div class="stat-card"><div class="num">6</div><div class="lbl">Found by 4 reviews (incl. the fork-vs-'default' Critical, joined by eco v4)</div></div>
+  <div class="stat-card"><div class="num">4</div><div class="lbl">Found by exactly 3 reviews</div></div>
+  <div class="stat-card"><div class="num">14</div><div class="lbl">Found by exactly 2 reviews</div></div>
+  <div class="stat-card"><div class="num">22</div><div class="lbl">Found by only 1 review (1 in 48 deep · 1 in fab deep · 4 in fab solo · 0 in 55 deep · 0 in 55-solo · 2 in Combo V1 · 4 in Eco V2 · 4 in eco v3 · 6 in eco v4)</div></div>
+</div>
+
+<div class="legend">
+  <span><span class="mark yes">✓</span> reported as a finding</span>
+  <span><span class="mark part">◐</span> partially covered / mentioned but not raised as its own finding</span>
+  <span><span class="mark no">—</span> not found</span>
+  <span>Severity = highest rating any review gave the item, normalized (Blocker/9-10 → Critical, Major/7-8 → High, Minor/5-6 → Medium, Nit/1-4 → Low)</span>
+<span>· click a row to expand its full description</span></div>
+
+<table>
+  <thead>
+    <tr>
+      <th class="num">#</th>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Severity</th>
+      <th class="check">48 deep</th>
+      <th class="check">fab deep</th>
+      <th class="check">fab solo</th>
+      <th class="check">55 deep</th>
+      <th class="check">55-solo</th>
+      <th class="check">Combo V1</th>
+      <th class="check">Eco V2</th>
+      <th class="check">eco v3</th>
+      <th class="check">eco v4</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="metrics-row">
+      <td class="metric-label" colspan="4">Tokens</td>
+      <td class="metric">—</td>
+      <td class="metric">—</td>
+      <td class="metric"><div class="m1">$100 Max-5×: 100%</div><div>Wkly/~25% est</div><div>5hr/—</div></td>
+      <td class="metric">—</td>
+      <td class="metric">—</td>
+      <td class="metric"><div class="m1">14.6M wtd</div><div>Wkly/~11%</div><div>5hr/52%</div></td>
+      <td class="metric"><div class="m1">9.18M wtd</div><div>Wkly/~7%</div><div>5hr/33%</div></td>
+      <td class="metric"><div class="m1">4.55M wtd</div><div>Wkly/2%</div><div>5hr/16%</div></td>
+      <td class="metric"><div class="m1">6.51M wtd</div><div>Wkly/5%</div><div>5hr/23%</div></td>
+    </tr>
+    <tr class="metrics-row">
+      <td class="metric-label" colspan="4">Time</td>
+      <td class="metric">—</td>
+      <td class="metric">—</td>
+      <td class="metric">—</td>
+      <td class="metric">—</td>
+      <td class="metric">—</td>
+      <td class="metric">56m</td>
+      <td class="metric">39m 53s</td>
+      <td class="metric">32m 27s</td>
+      <td class="metric">46m</td>
+    </tr>
+
+
+    <tr class="group-row"><td colspan="13">Critical</td></tr>
+
+    <tr class="f">
+      <td class="num">1</td>
+      <td class="name"><div class="dwrap">Save-as-template breaks runtime stage gating</div></td>
+      <td class="desc"><div class="dwrap">Runtime gating (<code>isStageActivated</code>/<code>getStageMode</code>) reads raw <code>stage_state</code>/<code>stage_mode</code> columns while the UI shows the layered resolver; <code>saveAsTemplate</code> bakes values into the template then NULLs the columns, so after any Save the UI shows "included/autonomous" while execution gets false/"collaborative" and silently skips auto-review.
+        <span class="note">fab solo additionally confirmed template-inheritance, override-mode, and non-default-track disagreement cases. 55 deep's sole Blocker hits the same gating gap from the template-inheritance / non-default-track angle (plus Goto dropping track context), without the Save trigger. Eco V2 found it at Major 8 (CR-002) with the widest verified trigger — saving for <em>any unrelated divergence</em> clears stage_state on all stages, including backfill-carried review activations — and filed the non-default-track gating angle separately (CR-011, nit 4: executions carry no track identity to scope to). Eco v3 missed this row entirely — the first run in four multi-agent generations to drop it; its seam lenses were mis-routed to Haiku (see takeaways).</span> <span class="note">Eco v4/CR-003 (Major 6) adds a narrowing fact: the 'mvp' default-template path <em>does</em> enable review-stories, so the regression bites non-mvp/custom templates.</span></div></td>
+      <td class="sev"><span class="badge critical">Critical</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-001 (7)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">F2 (Critical)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-001 (9)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-003 (8)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-002 (8)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-003 (6)</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">2</td>
+      <td class="name"><div class="dwrap">Stage prompt/agent/gate edits never reach execution (fork vs 'default')</div></td>
+      <td class="desc"><div class="dwrap">Track-page tabs persist prompt, agent-binding, and quality-gate edits to the track's <em>forked</em> pipeline, but runtime prompt assembly always reads pipeline <code>'default'</code> (<code>stage-prompt-assembler.service.ts:132</code>). The PR also deletes the only UI that edited 'default' — post-merge no surface's stage-content edits reach execution.
+        <span class="note">fab deep's appendix marked this write path "verified ✓" — it traced the write but not the runtime read. Combo V1's sole Blocker: found blind by its new seam-trace and last-mile passes, with 4 independent trigger paths verified. Eco V2's sole Blocker as well (CR-001, 9): three runtime consumers traced plus git-show proof that the deleted page wrote to 'default' — the strongest evidence chain on this row yet. Eco v3 also missed the row Eco V2 made its Blocker — in that run seam-trace (the lens that caught this at 9) executed on Haiku 4.5 instead of Fable 5 due to a model-routing failure.</span> <span class="note">Eco v4's sole Blocker, with the strongest evidence chain of any of the nine reviews: all 11 edit surfaces enumerated, zero producers of stepInputs.pipelineId, and a regression proof against the pre-PR drawer. Surfaced by the gap-fill finder, confirmed by a second sev-8 verifier.</span></div></td>
+      <td class="sev"><span class="badge critical">Critical</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">F1 (Critical)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-001 (9)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-001 (9)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-001 (9)</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">3</td>
+      <td class="name"><div class="dwrap">Orphaned <code>enabled=0</code> on pipeline 'default' bricks review runs</div></td>
+      <td class="desc"><div class="dwrap">The deleted stage-config drawer persisted <code>enabled</code> toggles against pipeline 'default'; the assembler still returns null for disabled stages and the review engine throws. No migration clears the flag, the new UI only writes the fork, and forks copy the disabled flag — pre-cutover users with a disabled stage hit a hard error with no UI recovery path.
+        <span class="note">Still missed by Combo V1 <em>and</em> Eco V2 — the persistent multi-agent blind spot: no finder lens probes what surviving code does at values frozen by deleted writers. Eco v3 debuted the frozen-state-probe lens built for exactly this row — but the probe ran mis-routed on Haiku (its first attempt died and was retried) and still missed.</span></div></td>
+      <td class="sev"><span class="badge critical">Critical</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">F3 (Critical)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="group-row"><td colspan="13">High</td></tr>
+
+    <tr class="f">
+      <td class="num">4</td>
+      <td class="name"><div class="dwrap">Config overrides (harness/model/thinking/HITL/retry) are display-only</div></td>
+      <td class="desc"><div class="dwrap">The resolver computes effective values and the UI shows provenance badges, but no execution path reads <code>config_overrides</code> or calls the resolver — runs follow the execution-page dropdown / workspace default. The track page's configuration has zero effect on actual runs; stage-specific values are never baked by save-as-template, so they're inert forever.
+        <span class="note">55 deep/CR-002 (Major 8) covers the stage-specific subset only — createTestCases, coverage check, testFramework have no runtime reader — not the harness/model/thinking/HITL/retry layers.</span></div></td>
+      <td class="sev"><span class="badge high">High</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-002 (7)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">F5 (High)</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">CR-002 (8)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-002 (8)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-003 (7)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-002 (7)</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">5</td>
+      <td class="name"><div class="dwrap">Legacy→track backfill runs only in one UI GET route</div></td>
+      <td class="desc"><div class="dwrap">Runtime gating dropped its legacy <code>workspace_pipeline_config</code> fallback, but <code>carryLegacyStageConfig</code> runs only inside <code>ensureDefaultTrack</code>, whose sole call site is <code>GET /api/workspaces/:id/tracks</code>. A headless/API-driven run before anyone opens the UI loses pre-cutover activation; the route also swallows backfill errors silently.
+        <span class="note">55-solo independently found the same cutover regression (its first P1) with the same fix options — previously a fab-solo-only item. Combo V1 confirmed it but downgraded severity 7→4: its verifier traced that every UI flow forces GET /tracks first, so only API-first/error paths reach gating cold — a calibration disagreement with fab solo High / 55-solo P1. Eco V2 independently landed at nit 4 too (CR-012: "one-shot per workspace, self-heals") — two verifier generations now agree. Eco v3: ✓ CR-001 (5), co-found by the new frozen-state-probe lens with removed-behavior — adversarially confirmed with the executor/story-engine consumer trace, and its Fable verifier independently re-derived a path-count downgrade (7→5) much like Combo V1 first argued.</span> <span class="note">Eco v4/CR-016 filed at 3 after its verifier demoted reach: the executor hook is dead code on the live route and the stories launcher self-backfills — found and judged plausible, but scoped down.</span></div></td>
+      <td class="sev"><span class="badge high">High</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">F4 (High)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">P1-1</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-017 (4)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-012 (4)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-001 (5)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-016 (3)</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">6</td>
+      <td class="name"><div class="dwrap">TrackConfigService stale/racy cached mode reads</div></td>
+      <td class="desc"><div class="dwrap">Review-mode reads at click time (<code>stories-list.component.ts:1567</code>, <code>story-detail.component.ts:2509</code>) hit a cache that (a) has no out-of-order-response guard on workspace switch, (b) is never invalidated by override writes, and (c) silently falls back to <code>'collaborative'</code> while loading or after a failed load — where the deleted localStorage mirror was synchronous.
+        <span class="note">fab deep/CR-008 (Nit 3) covers only sub-claim (c), the async fallback timing; fab solo confirmed all three defects. 55-solo's second P1 independently nails sub-claim (b) — the invalidation gap — with the same same-session repro (flip mode on /pipeline, start a manual review, stale mode is sent). Combo V1 confirmed (a) the workspace-switch race (CR-013) and (c) the collaborative fallback (inside CR-003), but missed (b) invalidation-on-write. Eco V2 inverted that: it filed (b) as its own verified Minor (CR-006, matching 55-solo's repro — worst direction: autonomous→collaborative edits not taking, so reviews auto-accept without the oversight just configured) plus (a) as CR-023, with (c) relegated to its sev ≤2 rollup — the first review since fab solo to touch all three sub-claims.</span></div></td>
+      <td class="sev"><span class="badge high">High</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">CR-008 (3)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">F6 (High)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">P1-2</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">CR-013 (5)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-006 (6)</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">CR-015 (3)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-006 (5)</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">7</td>
+      <td class="name"><div class="dwrap">saveAsTemplate clears overrides it never baked (subset templates)</div></td>
+      <td class="desc"><div class="dwrap"><code>buildSnapshotSteps</code> skips stages whose mapped step is absent from the source template, but the clearing loop unconditionally NULLs every stage row's <code>stage_mode</code> and overrides. Subset templates are legal, so a Save silently deletes user overrides on the skipped stages from both template and pipeline.
+        <span class="note">Still missed by Combo V1 <em>and</em> Eco V2: each found the stage_state/mode clearing (Combo V1 CR-003, Eco V2 CR-002) but not the subset-template override loss — needs write-loop vs bake-loop set-difference checking. Eco v3's frozen-state-probe (mis-routed onto Haiku) didn't reach it either — the row stays fab-solo-only after a fourth generation.</span></div></td>
+      <td class="sev"><span class="badge high">High</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">F7 (High)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">8</td>
+      <td class="name"><div class="dwrap">PUT track endpoint skips track-type/blueprint validation</div></td>
+      <td class="desc"><div class="dwrap"><code>PUT /api/workspaces/:id/tracks/:trackId</code> passes <code>blueprintId</code> straight through — POST enforces track-type invariants (bug = no blueprint, app/feature = blueprint required), PUT does not, and neither verb validates the slug against the blueprint registry. 55 deep adds that the edit dialog makes this user-reachable: it exposes Clear for non-bug tracks and sends null for app/feature when cleared.
+        <span class="note">Largest severity disagreement in the set: fab deep rated it Nit 4 (server-side hygiene, guarded client-side); 55 deep rated it Major 7 (the UI itself can drive the violation); 55-solo rated it P2, also citing the edit-dialog clear path; Combo V1 rated it Minor 5; Eco V2 nit 4 (unverified, below its floor). Now found by 5 of 7 reviews.</span></div></td>
+      <td class="sev"><span class="badge high">High</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-005 (4)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-003 (7)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">P2</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-012 (5)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-015 (4)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">9</td>
+      <td class="name"><div class="dwrap">Stage-specific config settings are write-only — Coverage Check / Create Test Cases regress</div></td>
+      <td class="desc"><div class="dwrap">The Config tab persists stage-specific settings (<code>createTestCases</code>, <code>coverageCheck</code>, <code>testCasePrompt</code>, <code>storyTemplate</code>, <code>startingIndex</code>) into <code>config_overrides.stageSpecific</code>, but nothing in the API or runtime ever reads <code>stageSpecific</code> — story generation takes these values exclusively from the request body. Concretely regressive: the deleted overview's Coverage Check toggle wrote the shared tracker signal that stories-list passes at trigger time; the replacement writes a key nothing consumes. <span class="note">Eco v4/CR-002 establishes the config_overrides zero-readers mechanism but never names the stage-specific fields or the Coverage-Check/Create-Test-Cases regression — semi only.</span></div></td>
+      <td class="sev"><span class="badge high">High</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-004 (7)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-005 (6)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">CR-002</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">10</td>
+      <td class="name"><div class="dwrap">Bulk 'Generate Stories' flow deleted with no replacement</div></td>
+      <td class="desc"><div class="dwrap">The deleted pipeline-overview page held the app's only UI trigger for bulk story generation from a blueprint (<code>generate=true</code>, plus the force-regenerate confirm dialog). At PR head no code anywhere sets <code>generate=true</code> or <code>force=true</code> — blueprint-driven bulk generation and forced regeneration are unreachable from the UI.</div></td>
+      <td class="sev"><span class="badge high">High</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-005 (7)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-009 (4)</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">11</td>
+      <td class="name"><div class="dwrap">Track test suites fail when run together (closed-database)</div></td>
+      <td class="desc"><div class="dwrap">Each new suite passes alone, but a combined run fails 3 with <code>RangeError: Cannot use a closed database</code> at <code>pipeline.service.ts:204</code> — suites call <code>closeDatabase()</code> in <code>afterAll</code> while process-global service singletons retain the closed handle. The standard <code>bun test src/tests/</code> invocation breaks on a fresh checkout.
+        <span class="note">fab deep additionally caught a FOREIGN KEY cleanup-order failure in track-management.test.ts. 55 deep observed the combined-run failure in its pre-pass but did not file it as a finding; 55-solo likewise noted it ("test isolation gap worth cleaning up") without filing. Combo V1 caught it deterministically via its new run-the-suite-together pre-pass rule, filed with base-vs-head attribution. Eco V2 filed it at Major 7 (CR-004) with the fullest attribution yet — +27 net-new failures vs a merge-base baseline measured in a temp worktree, including collateral damage to previously-green us-061/us-124 suites and the FK cleanup-order failure — promoting this row from Medium to High. Eco v3 reproduced it deterministically via the redesign's scripted two-worktree base-vs-head attribution (CR-003, 5, confirmed) — which also proved 3 other head-only failures to be flakes via identical isolated reruns at base and head.</span></div></td>
+      <td class="sev"><span class="badge high">High</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-002 (6)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-003 (6)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">pre-pass</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">note</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-006 (6)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-004 (7)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-003 (5)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-007 (5)</span></td>
+    </tr>
+
+    <tr class="group-row"><td colspan="13">Medium</td></tr>
+
+    <tr class="f">
+      <td class="num">12</td>
+      <td class="name"><div class="dwrap">Bug-execute resolves the pipeline but never executes it</div></td>
+      <td class="desc"><div class="dwrap"><code>POST /api/bugs/:id/execute</code> → <code>getBugTrackExecutionPlan</code> resolves the bug track's pipeline, then only stamps it into the activity log and echoes it in the JSON response — no executor hop. Phase 5 AC "executing a bug runs the bug track's pipeline" is only informationally met, and the gap isn't in the Deferreds ledger.
+        <span class="note">fab solo notes the same fact inside F5 ("the one resolver consumer only feeds an activity-log message") but did not raise it as its own finding. Eco V2's verifier (CR-013, 4) added that <code>BugsService.execute</code> has no UI caller at all — dead code, pre-existing — which deepens the AC gap while lowering the severity.</span></div></td>
+      <td class="sev"><span class="badge medium">Medium</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-001 (6)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-004 (5)</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">in F5</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-007 (6)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-013 (4)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-008 (4)</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">13</td>
+      <td class="name"><div class="dwrap">Unguarded <code>JSON.parse</code> of <code>config_overrides</code> in rowToStage</div></td>
+      <td class="desc"><div class="dwrap"><code>pipeline-stage.service.ts:107</code> parses the new column with no try/catch (the resolver's own <code>parseOverrides</code> deliberately tolerates malformed JSON). One bad row 500s all stage reads <em>and writes</em> for that pipeline, so the bad value can't be overwritten through the API.
+        <span class="note">Eco V2's verifier recalibrated this to sev 2 (CR-032, "plausible"): real fragility, but a manual-corruption-only trigger and six pre-existing unguarded parses in the same function — harden all seven together if at all. A calibration disagreement with fab solo's Medium.</span></div></td>
+      <td class="sev"><span class="badge medium">Medium</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">F8 (Medium)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-027 (3)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-032 (2)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-011 (4)</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">14</td>
+      <td class="name"><div class="dwrap">Backfill copies coarse card run-states verbatim — flips MVP-disabled stages on</div></td>
+      <td class="desc"><div class="dwrap"><code>carryLegacyStageConfig</code> fans the legacy 'execution' card state out to 10 stages as <code>stage_state='included'</code>/<code>enabled=1</code>, overriding template-level MVP disables (unit-testing, code-review). Post-backfill those stages resolve enabled with source 'stage', contradicting the user's prior effective pipeline; 'locked' also counts as enabled, and the copied overrides read as permanent divergence (Save-as-template lights up).
+        <span class="note">Eco V2 ◐ (CR-010, 5): found the verbatim carry, the spurious Save-lit divergence (clicking it triggers the save-as-template wipe above), and transient run-states fossilizing as permanent overrides — but not the MVP-disabled-stages-flip-on consequence. Its verifier narrowed the affected population to workspaces whose user ever acted on the old pipeline page.</span></div></td>
+      <td class="sev"><span class="badge medium">Medium</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-008 (6)</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">CR-010 (5)</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">CR-006 (4)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-005 (5)</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">15</td>
+      <td class="name"><div class="dwrap">Details tab hand-rolls <code>CertificateSummary</code> with the wrong shape</div></td>
+      <td class="desc"><div class="dwrap"><code>track-stage-details</code> declares a local <code>CertificateSummary</code> typing <code>severitySummary</code> as <code>Record&lt;string, number&gt;</code>, but the API returns <code>{ total, bySeverity }</code> — the severity breakdown renders incorrectly. <code>CertificationStatusService.getLatest()</code> already wraps exactly this endpoint with the correct type.</div></td>
+      <td class="sev"><span class="badge medium">Medium</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-009 (6)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">16</td>
+      <td class="name"><div class="dwrap">Blueprint-owned Build Mode is editable/persisted but never read at runtime</div></td>
+      <td class="desc"><div class="dwrap">The Blueprint stage edits <code>buildMode</code> via PATCH and the PR declares the blueprint the source of truth, but no session/execution path reads it back: story workflows resolve explicit override → <code>project.buildMode</code> → 'mvp', the step handler reads <code>stepInputs.buildMode</code>, and new sessions take it from the creator form.</div></td>
+      <td class="sev"><span class="badge medium">Medium</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-010 (6)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-008 (5)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-004 (6)</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">17</td>
+      <td class="name"><div class="dwrap"><code>testFramework</code> editing severed while the executor still reads it</div></td>
+      <td class="desc"><div class="dwrap">The deleted configure-steps drawer was the only UI that persisted <code>testFramework</code> onto workflow-template steps — which the executor still reads at run time, freezing existing templates at their last value. The new 'Testing Framework' select writes to <code>config_overrides.stageSpecific.testFramework</code>, which nothing consults.</div></td>
+      <td class="sev"><span class="badge medium">Medium</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-011 (6)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-007 (5)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">18</td>
+      <td class="name"><div class="dwrap">Template-layer mode derivation inverts <code>'review'</code> → <code>'autonomous'</code></div></td>
+      <td class="desc"><div class="dwrap"><code>resolveStage</code> derives the template-layer mode as collaborative only for <code>humanInteraction</code> 'collaborative'|'iterative', so 'review' resolves to 'autonomous'. Built-in templates define review-stories with <code>humanInteraction:'review'</code> and the legacy default was collaborative/human-review — fresh tracks show Review Stories as "Autonomous (inherited from template)", the opposite of both.
+        <span class="note">Eco v3 is the second review to catch it (CR-007, 4), adding that buildSnapshotSteps compensates on the save path, so the defect is display-side.</span></div></td>
+      <td class="sev"><span class="badge medium">Medium</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-014 (5)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-007 (4)</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">19</td>
+      <td class="name"><div class="dwrap">Startup stage scanner re-seeds only 'default' — forked pipelines go permanently stale</div></td>
+      <td class="desc"><div class="dwrap">Server startup scans <code>.maudel/pipeline_stages</code> and seeds/updates rows only for pipeline 'default'. Track forks are row-copies never re-synced, so stage-definition updates reach the rows execution reads but not the rows the new UI displays and edits. With the backfill giving every workspace a fork, the drift is systematic rather than opt-in.</div></td>
+      <td class="sev"><span class="badge medium">Medium</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-016 (5)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">20</td>
+      <td class="name"><div class="dwrap">Resolution chain's 'project' layer is unreachable — undeclared deviation with dead provenance code</div></td>
+      <td class="desc"><div class="dwrap">Every resolver call site passes no <code>projectId</code>, so the plan-promised <code>template ▸ project ▸ workspace ▸ system</code> tail never engages — yet <code>track-config.types.ts</code> actively documents the six-layer chain as implemented, and <code>'project'</code> in <code>ConfigSource</code> plus the "project default" badge label are doubly dead. Unlike the PR's other deviations, this one is recorded nowhere in the Deferreds ledger.
+        <span class="note">Eco V2's verifier added the nuance that Phase 0's schema gave tracks no project FK — plan §6 was structurally unsatisfiable as specced, so it's partly a plan defect.</span></div></td>
+      <td class="sev"><span class="badge medium">Medium</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-009 (5)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="group-row"><td colspan="13">Low</td></tr>
+
+    <tr class="f">
+      <td class="num">21</td>
+      <td class="name"><div class="dwrap">Permanent spinner on resolved-config load failure</div></td>
+      <td class="desc"><div class="dwrap"><code>loadedResolvedTrackId</code> is set before the await and never rolled back on failure; the Config tab spins forever on <code>!resolved()</code> with no error message and no retry. Failed include-toggle writes are also silent.
+        <span class="note">Combo V1 ◐: the same service's error-message dropping was filed (CR-020) but the never-cleared spinner state itself was not. Eco V2 ◐ likewise: the silent include-toggle failure (CR-014) and the dropped error messages (CR-024, with the corrected mechanism — HttpErrorResponse is not <code>instanceof Error</code>) — the spinner state itself still unfiled.</span></div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-007 (3)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">F9 (Low)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">CR-020 (4)</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">CR-014/24</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">CR-002 (5)</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">22</td>
+      <td class="name"><div class="dwrap">N+1 query on the workspace tracks-list endpoint</div></td>
+      <td class="desc"><div class="dwrap"><code>GET /api/workspaces/:id/tracks</code> runs one <code>pipeline_stages</code> query per track via <code>withStageConfig</code> after <code>listTracks</code> already returned all rows — trivially batchable with <code>WHERE pipeline_id IN (...)</code>.
+        <span class="note">Eco V2 ◐: its quality pass proposed this at sev 5, but the verifier <em>refuted</em> it — the 1+N shape is real, yet Bun caches compiled statements per-Database and indexed in-process SQLite over single-digit track counts costs microseconds; batching recorded as opportunistic cleanup only. The first deliberate non-file of an item three other reviews filed. Eco v3's quality pass (Sonnet, now capped at sev ≤4) did not re-propose it — consistent with Eco V2's refutation.</span></div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-005 (3)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">in F10</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-049 (2)</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">refuted</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">23</td>
+      <td class="name"><div class="dwrap">Details-tab "execution history" is the unfiltered global list</div></td>
+      <td class="desc"><div class="dwrap"><code>track-stage-details.component.ts:781</code> fetches <code>GET /api/executions?limit=20</code> with no workspace, track, or stage filter; the plan promises per-stage history per track.</div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-006 (4)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-023 (4)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-017 (4)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-004 (4)</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">24</td>
+      <td class="name"><div class="dwrap">Runs-dropdown items degraded to "not yet available" without ledger entry</div></td>
+      <td class="desc"><div class="dwrap">Plan §8's Details runs dropdowns (Blueprint, Create Stories, Review Stories) render as placeholders without ✱ marking in the plan or a Deferreds-ledger entry; self-learn stage also lacks its ✱ learning-history affordance.
+        <span class="note">Thematically related to 48 deep/CR-006 (placeholder config fields) but flags different, undocumented items.</span></div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-009 (3)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">CR-046/54</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">25</td>
+      <td class="name"><div class="dwrap">Unrelated deep-* skills work bundled in the PR</div></td>
+      <td class="desc"><div class="dwrap">~27-29 files of <code>.claude/skills/deep-*</code> and <code>.claude/commands/*.md</code> content ride along undeclared in the PR description.
+        <span class="note">48 deep recorded this as a header scope note (excluded from review by user decision), not a numbered finding.</span></div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">scope note</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-010 (3)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-026 (3)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-018 (2)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-021 (3)</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">26</td>
+      <td class="name"><div class="dwrap"><code>tierOrModelOptions</code> builder duplicated</div></td>
+      <td class="desc"><div class="dwrap">Track-stage-config-tab re-implements the templates step-config-editor's tier/model option builder — identical literals and mapping off the same harness catalog, differing only in a "Default" entry.</div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-003 (4)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-028 (3)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">27</td>
+      <td class="name"><div class="dwrap"><code>THINKING_OPTIONS</code> array — 4th hand-copy added</div></td>
+      <td class="desc"><div class="dwrap">Byte-identical copies now live in four components; canonical source is <code>VALID_THINKING_LEVELS</code> in shared types. Pre-existing pattern — this PR added the 4th copy.</div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-004 (3)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-028 (3)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">28</td>
+      <td class="name"><div class="dwrap">Placeholder-only config fields shipped as disabled affordances</div></td>
+      <td class="desc"><div class="dwrap"><code>storyScope</code> and <code>bulkReviewLimit</code> ship as <code>placeholderOnly</code> field defs with edits no-op'd — intentional, plan-documented (§8 ✱) scaffolding; flagged-and-cleared by the quality lens.
+        <span class="note">Combo V1 ◐: a finder filed it, then adversarial verification produced counter-evidence (declared in the linked plan, 'not yet built' badges) — deliberately unfiled, recorded in the refuted-candidates appendix.</span></div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-006 (2)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">refuted</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">29</td>
+      <td class="name"><div class="dwrap">Provenance-badge UI duplicated in Build Mode</div></td>
+      <td class="desc"><div class="dwrap">Build Mode hand-rolls badge markup/styles identical to <code>ConfigFieldComponent</code>'s <code>.provenance-badge</code> — copy-pasted because Build Mode deliberately bypasses the resolver.</div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-011 (2)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-038 (3)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">30</td>
+      <td class="name"><div class="dwrap">Agents/Prompts tabs silently discard unsaved edits on stage/track switch</div></td>
+      <td class="desc"><div class="dwrap">The Config tab flushes pending edits before switching stages, but the Agents and Prompts tabs re-sync local form state whenever the synced stage changes without flushing or warning — clicking another dock icon or track while dirty discards the edits; the pipeline prompt is likewise overwritten on track switch even when dirty.</div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-024 (4)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-019 (4)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">31</td>
+      <td class="name"><div class="dwrap">Re-created default track resurrects stale pre-cutover legacy config</div></td>
+      <td class="desc"><div class="dwrap">After a user deletes all tracks, the next <code>GET /tracks</code> lazily re-runs <code>ensureDefaultTrack</code>, which unconditionally re-reads the retired <code>workspace_pipeline_config</code> table and re-carries pre-cutover stage states/modes onto the brand-new pipeline — a clean-slate delete silently restores months-old legacy config.</div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-032 (3)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-026 (3)</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">CR-016 (3)</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">32</td>
+      <td class="name"><div class="dwrap">Goto links drop promised navigation context</div></td>
+      <td class="desc"><div class="dwrap">Registry Goto links lose plan-§8 context vs the old overview: execution stages lose the "filtered to &lt;stage&gt;" view, <code>/pipeline/execution</code> loses templateId, and the quick-create and blueprint links lose workspaceId.
+        <span class="note">55 deep's Blocker separately flagged Goto dropping <em>track</em> context in passing — adjacent, but different parameters.</span></div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-022 (4)</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">CR-011 (3)</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">33</td>
+      <td class="name"><div class="dwrap">Rapid Config-tab edits race — out-of-order PUT clobbers the resolved cache</div></td>
+      <td class="desc"><div class="dwrap">Number-spinner edits issue unsequenced PUTs; <code>saveOverride</code> merges each response into the client's resolved-config cache, so a late out-of-order response clobbers newer state until reload.</div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-016 (4)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">34</td>
+      <td class="name"><div class="dwrap">moveTrack reorder is two non-atomic PUTs</div></td>
+      <td class="desc"><div class="dwrap">A failure between the paired <code>displayOrder</code> updates persists duplicate order values, and future swaps of the affected pair become silent no-ops.</div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-025 (3)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-012 (3)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-018 (3)</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">35</td>
+      <td class="name"><div class="dwrap">Blade "Bugs" entry deep-links a stage id that doesn't exist</div></td>
+      <td class="desc"><div class="dwrap">The blade tree links <code>?stage=bugs</code>, which is not one of the 13 stage ids — the page lands silently on the first stage. Five of six blade entries were migrated to real stage ids; this one was missed.</div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-028 (3)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-010 (2)</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">36</td>
+      <td class="name"><div class="dwrap">Bug execution silently pinned to the first bug track</div></td>
+      <td class="desc"><div class="dwrap"><code>getBugTrack</code> picks the first bug track by <code>displayOrder</code> when a workspace has several; /bugs execution gives no indication which track's pipeline applies. <span class="note">Eco v4 surfaced this only as a nit-overflow one-liner — never filed as a finding.</span></div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-030 (3)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">overflow</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">37</td>
+      <td class="name"><div class="dwrap">Shared-type/naming duplication cluster (TrackDto, triple mode union, twin service names)</div></td>
+      <td class="desc"><div class="dwrap">The UI re-declares <code>TrackDto</code>/<code>CreateTrackInput</code>/<code>UpdateTrackInput</code> instead of the shared <code>Track</code> types this PR created; one two-value mode union lives under three names, with a new permanent file importing from a module slated for deletion; and two unrelated classes are both named <code>TrackConfigResolutionService</code> in identically-named API/UI files, each with a <code>saveOverride</code> of different semantics.</div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-020/21/29</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-005 (4)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-010 (4)</span></td>
+    </tr>
+
+    
+    <tr class="f">
+      <td class="num">38</td>
+      <td class="name"><div class="dwrap">Forked pipeline orphaned when createTrack fails mid-create</div></td>
+      <td class="desc"><div class="dwrap"><code>forkPipeline</code> commits outside the track INSERT transaction; pipeline cleanup only runs on track delete (<code>track.service.ts:421,603</code>), so a failed INSERT strands an unreachable non-builtin pipeline row.
+        <span class="note">Eco v3 only (CR-008, last-mile finder, sev 4, unverified).</span></div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-008 (4)</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">39</td>
+      <td class="name"><div class="dwrap">ensureDefaultTrack catch-all masks non-race insert errors</div></td>
+      <td class="desc"><div class="dwrap">The catch block (<code>track.service.ts:313-319</code>) treats ANY insert error as the default-track race when a concurrent default exists — a different constraint violation returns "success" with fork side-effects already committed.
+        <span class="note">Eco v3 only (CR-009, diff-scan finder, sev 4, unverified).</span></div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-009 (4)</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">40</td>
+      <td class="name"><div class="dwrap">saveAsTemplate non-null assertion depends on synchronous transactions</div></td>
+      <td class="desc"><div class="dwrap"><code>savedTemplate!</code> is consumed outside <code>this.db.transaction(...)()</code> — correct only while Bun SQLite transactions stay synchronous; latent breakage if that contract ever changes.
+        <span class="note">Eco v3 only (CR-013, sev 4, unverified).</span> <span class="note">Eco v4's diff-scan proposed this at sev 6; its verifier refuted it — bun:sqlite transaction() rethrows synchronously, so the assertion is unreachable. A direct calibration disagreement with eco v3's sev-4 filing.</span></div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-013 (4)</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">refuted</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">41</td>
+      <td class="name"><div class="dwrap">tierOrModel override baked unvalidated into template snapshots</div></td>
+      <td class="desc"><div class="dwrap"><code>buildSnapshotSteps</code> (<code>track-config-resolution.service.ts:442</code>) coerces <code>stage.tierOrModel.value</code> from JSON-parsed overrides with no check against the harness catalog — malformed strings are rejected only at executor runtime.
+        <span class="note">Eco v3 only (CR-014, seam-trace finder, sev 4, unverified).</span></div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-014 (4)</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">42</td>
+      <td class="name"><div class="dwrap">Plan text contradiction: REUSE drawer vs extract-and-delete</div></td>
+      <td class="desc"><div class="dwrap">Plan §3a/§9 still command REUSE of the stage-config drawer while the same document's Phase 3/6 summaries declare extraction into inline tabs + deletion. All 10 drawer settings verified re-homed — doc-internal inconsistency only.
+        <span class="note">Eco v3 only (CR-019, conformance finder, sev 2) — the residue of its refuted sev-8 drawer-deletion candidate, killed by a field-by-field audit.</span></div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-019 (2)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-032 (2)</span></td>
+    </tr>
+
+        <tr class="f">
+      <td class="num">43</td>
+      <td class="name"><div class="dwrap">deleteTrack auto-promotion tiebreaker disagrees with the UI sort</div></td>
+      <td class="desc"><div class="dwrap">Server promotion picks the successor by type-priority → <code>display_order</code> → <code>created_at</code> (<code>track.service.ts:615</code>); the UI rail sorts by displayOrder only — colliding orders can render a different active track than the server promoted.
+        <span class="note">Eco v4 only (CR-014, diff-scan, sev 4, unverified).</span></div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-014 (4)</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">44</td>
+      <td class="name"><div class="dwrap">resolveStageIds silently returns identity for unknown stage ids</div></td>
+      <td class="desc"><div class="dwrap">A typo&#8217;d stage id passes through untranslated (<code>track.service.ts:118</code>), matches no rows, and reads as &quot;not activated&quot; — indistinguishable from a deliberately disabled stage, with no warning.
+        <span class="note">Eco v4 only (CR-015, diff-scan, sev 4, unverified).</span></div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-015 (4)</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">45</td>
+      <td class="name"><div class="dwrap">Stage &quot;Knowledge Base&quot; panel dropped with the drawer</div></td>
+      <td class="desc"><div class="dwrap">The deleted <code>stage-config-drawer.component.ts:259-277</code> displayed <code>stage.knowledgeBasePath</code>; grep over the new track tabs finds no new home for it.
+        <span class="note">Eco v4 only (CR-020, removed-behavior, sev 3, unverified).</span></div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-020 (3)</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">46</td>
+      <td class="name"><div class="dwrap">API typecheck +2 errors vs base despite &quot;exact baseline&quot; claim</div></td>
+      <td class="desc"><div class="dwrap">Scripted base-vs-head tsc diff: 302 vs 300 — the +2 are the new shared type files hitting the pre-existing TS6059 rootDir class; the PR body claims the exact pre-existing baseline.
+        <span class="note">Eco v4 only (CR-022, scripted pre-pass, sev 3).</span></div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-022 (3)</span></td>
+    </tr>
+
+<tr class="group-row"><td colspan="13">Cleanup</td></tr>
+
+    <tr class="f">
+      <td class="num">47</td>
+      <td class="name"><div class="dwrap">createTrack discards POST response, awaits full refetch</div></td>
+      <td class="desc"><div class="dwrap">The POST response already contains the created track with stageConfig, yet <code>createTrack</code> awaits a full <code>loadForWorkspace</code> refetch (the N+1 endpoint above) — roughly doubling create-dialog latency; <code>updateTrack</code> already shows the local-merge pattern.</div></td>
+      <td class="sev"><span class="badge cleanup">Cleanup</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">F10</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">48</td>
+      <td class="name"><div class="dwrap">Duplicated save scaffold across agents/prompts tabs; hand-unrolled config fields</div></td>
+      <td class="desc"><div class="dwrap">A character-identical ~40-line save scaffold (signals, success timer, sync effect, PUT + error handling) is copied across the agents and prompts tabs with a third partial copy in the config tab; plus eight hand-unrolled <code>&lt;app-config-field&gt;</code> blocks the same file already renders via <code>@for</code>.
+        <span class="note">Same duplication theme as 48 deep/CR-003-004 and fab deep/CR-011, but different concrete code — no overlap in specifics.</span></div></td>
+      <td class="sev"><span class="badge cleanup">Cleanup</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">cut-1</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-041 (3)</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">CR-020</span></td>
+      <td class="check"><span class="no">—</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">49</td>
+      <td class="name"><div class="dwrap">Redundant queries in the resolver / saveAsTemplate</div></td>
+      <td class="desc"><div class="dwrap">Discarded existence-check query on every config-override save; <code>saveAsTemplate</code> re-runs template resolution and the all-stage-rows query ~3× per save, plus two uncached <code>readFileSync</code> reads.
+        <span class="note">Eco V2 ◐ (CR-031, 3): caught the discarded existence-check query; the saveAsTemplate re-resolution and readFileSync halves went unfound.</span></div></td>
+      <td class="sev"><span class="badge cleanup">Cleanup</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">cut-2</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-064/69/70</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">CR-031 (3)</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-020</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-026 (3)</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">50</td>
+      <td class="name"><div class="dwrap"><code>TRACK_STAGE_REGISTRY</code> hardcodes 13 stage ids client-side</div></td>
+      <td class="desc"><div class="dwrap">Per-stage details-kind, goto links, and config schemas are keyed client-side by server-owned stage ids with a silent default fallback — a scanned-in new stage renders the wrong details tab and no config fields until a UI release. <span class="note">Eco v4/CR-023 files the fragmented stage-id maps (including STAGE_ICON_ID) but not the registry-hardcode/silent-fallback claim itself.</span></div></td>
+      <td class="sev"><span class="badge cleanup">Cleanup</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">cut-3</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check semi"><span class="part">◐</span><span class="id">CR-023</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">51</td>
+      <td class="name"><div class="dwrap"><code>generateCustomTemplateId</code> re-implements <code>generateCloneId</code> byte-for-byte</div></td>
+      <td class="desc"><div class="dwrap">Duplicate of <code>TemplateLoaderService.generateCloneId</code> (<code>template-loader.service.ts:1028</code>) — both emit <code>custom-${Date.now().toString(36)}-${random}</code>.
+        <span class="note">Eco v4 only (CR-025, quality pass, sev 3, unverified).</span></div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-025 (3)</span></td>
+    </tr>
+
+    <tr class="f">
+      <td class="num">52</td>
+      <td class="name"><div class="dwrap">Blueprint list fetched and cached independently in three places</div></td>
+      <td class="desc"><div class="dwrap"><code>track-pipeline-page</code>, <code>track-stage-config-tab</code>, and <code>blueprint-session.service</code> each maintain a private per-workspace cache of the same endpoint, each with its own dedup guard.
+        <span class="note">Eco v4 only (CR-027, quality pass, sev 3, unverified).</span></div></td>
+      <td class="sev"><span class="badge low">Low</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check"><span class="no">—</span></td>
+      <td class="check hit"><span class="yes">✓</span><span class="id">CR-027 (3)</span></td>
+    </tr>
+
+  </tbody>
+</table>
+
+<div class="takeaways">
+  <h3>Takeaways</h3>
+  <ul>
+    <li><strong>Combo V1 (upgraded multi-agent skill, run blind) is the new coverage leader:</strong> 16✓/4◐ of the 24 prior rows vs fab solo's 14✓/1◐, it retained fab deep's uniques (5.5/6 — exactly what the last-mile/conformance passes and the full-suite pre-pass were added for), and it contributed 10 adversarially-confirmed items no prior review found, including two High (the Coverage Check/Create Test Cases regression and the deleted bulk Generate Stories flow).</li>
+    <li><strong>Eco V2 (the economy redesign — 7 budgeted passes, Sonnet quality pass, sev ≥5 verification floor — run blind) held the line where it matters:</strong> both catchable Criticals including the fork-vs-'default' Blocker at 9 with the strongest evidence chain yet, 6 of the 8 High rows, and the combined-test-suite failure at Major 7 with full merge-base attribution. On the prior-24 core it scored 10✓/3◐ vs Combo V1's 16✓/4◐ — and the gap sits almost exactly where the design predicted: eight of its eleven lost rows are nit/cleanup tier (tierOrModelOptions, THINKING_OPTIONS, provenance badges, deep-skills bundling, runs-dropdown, placeholder fields, createTrack refetch, registry hardcode).</li>
+    <li><strong>The real coverage casualties of 10→7 passes are four Combo V1-only finds Eco V2 didn't reproduce:</strong> the bulk-Generate-Stories deletion (High) and three Mediums (the CertificateSummary shape mismatch, the review→'autonomous' mode inversion, and the stage-scanner re-seeds-only-'default' gap). That's the measurable price of the economy cut — and the measured savings: Eco V2 cost 9.18M weighted tokens (~33% of the 5-hour limit, 39m53s) vs Combo V1's ~14.6M (~52%), a ~37% cut. Eco v3 later reproduced only one of the four casualties (the review→'autonomous' mode inversion).</li>
+    <li><strong>Eco V2 still grew the union — 7 new rows, 41 total:</strong> headlined by the unreachable 'project' resolution layer (verified, with the plan-defect nuance), plus the Goto context loss, the blade "Bugs" dead deep-link, the config-PUT race, the non-atomic reorder, silent first-bug-track pinning, and a shared-type duplication cluster. Seven of its 37 findings became new rows; eight more eco-only nits (disabled Run Pipeline CTA, localStorage key cleanup, §7 last-active-track, HITL-clear override deletion, export/import shim, type naming, TS6059 noise) stayed below the matrix threshold. A third straight generation adding uniques says the PR's long tail still isn't exhausted.</li>
+    <li><strong>Eco V2 is the strictest calibrator in the set:</strong> it independently replicated Combo V1's contested 7→4 backfill downgrade, knocked the unguarded JSON.parse down to sev 2 as a pre-existing local pattern (fab solo said Medium), and refuted outright the N+1 finding that 48 deep, fab solo, and Combo V1 all filed — by checking Bun's per-Database statement cache. And the sev ≥5 verification floor cost nothing visible: all three refutations and every material recalibration happened above the floor, exactly as the economy design predicted.</li>
+    <li><strong>eco v3 (the 8-dial efficiency redesign, run blind) hit its cost target:</strong> 4.55M weighted tokens (~16.3 limit-points — half of Eco V2's 9.18M, a third of Combo V1) in 32m27s wall. The verifier phase took 3 minutes and 10.6% of spend (vs Eco V2's 28%), and the scripted two-worktree base-vs-head pre-pass deterministically attributed all 3 head-only test failures to flakes.</li>
+    <li><strong>But its recall collapsed: 0 Blockers, 0 Majors.</strong> eco v3 missed both catchable Criticals (save-as-template gating; fork-vs-'default') and 6 of the 8 High rows Eco V2 held. Its column reads 14✓/6◐/26— across 46 rows, ceilinged by three sev-5 Minors (the legacy backfill gate, a stuck toggle, the combined-run closed-database failure).</li>
+    <li><strong>The collapse is confounded by a model-routing failure:</strong> transcript forensics show the four main-tier lenses (seam-trace, last-mile, removed-behavior, frozen-state-probe) actually ran on Haiku 4.5, and the mid tier on Opus 4.6 — not the Fable 5 / Opus 4.8 the design specifies. eco v3 is therefore not a clean verdict on the 8-dial architecture; it needs a rerun with routing fixed (and the skill's model language hardened) before the design can be judged — eco v4, below, is that rerun.</li>
+    <li><strong>Even mis-routed, eco v3 grew the union — 5 new rows, 46 total</strong> (the orphaned forked pipeline, a catch-all that masks errors, the <code>savedTemplate!</code> assertion, unvalidated tierOrModel template snapshots, and a plan/REUSE contradiction), and its 5 refutations shipped with field-by-field audits. A fourth straight generation adding uniques — the PR's long tail still isn't exhausted.</li>
+    <li><strong>eco v4 (the routing-hardened rerun, blind) validates the 8-dial architecture:</strong> with the four main lenses verified on Fable 5, recall came back — the fork-vs-'default' Blocker at 9 with the strongest evidence chain of any review (all 11 edit surfaces, the zero-producer <code>stepInputs.pipelineId</code> proof, and verifier-established regression status), the save-as-template gating gap, the config-overrides Major, and 5 of the 8 High rows — at 6.51M weighted tokens ≈ 23 limit-points (~5% of the weekly budget) in ~46 minutes: 29% cheaper than Eco V2 with a stronger Blocker writeup, a third of Combo V1's cost.</li>
+    <li><strong>The routing audit came back clean — zero Haiku anywhere:</strong> all four main-tier lenses and all nine sev ≥6 verifiers ran verified on Fable 5; all six sev-5 verifiers on Sonnet; the orchestrator even launched an unplanned gap-fill finder plus a second sev-8 verifier to nail the Blocker's chain. One residual drift: the "opus" alias resolved to Opus 4.6 rather than the specified 4.8 on the three mid-tier finders — pin full model IDs to close it.</li>
+    <li><strong>What the discipline costs vs Eco V2:</strong> eco v4 reads 16✓/4◐ on the pre-existing 46 rows vs Eco V2's 22✓/4◐ — the losses are concentrated in the mid/nit tail (CertificateSummary, testFramework, scanner reseed, Goto links, blade deep-link, THINKING_OPTIONS-class cleanup) plus two High misses (subset-template clearing, PUT validation). It also re-judged eco v3's <code>savedTemplate!</code> row: proposed at sev 6, then refuted by its own verifier (bun:sqlite transactions rethrow synchronously) — a direct calibration disagreement recorded in both runs' appendices.</li>
+    <li><strong>eco v4 still grew the union — 6 new rows, 52 total</strong> (the deleteTrack promotion/UI-sort tiebreaker disagreement, silent identity for unknown stage ids, the orphaned Knowledge Base panel, the +2-typecheck-errors-vs-claimed-baseline catch from the scripted pre-pass, the clone-id re-implementation, and the triple-cached blueprint list), with 5 more v4-only nits below the matrix threshold. A fifth straight generation adding uniques.</li>
+    <li><strong>The two fab-solo-only blind spots survived a FIFTH multi-agent generation unchanged</strong> (the orphaned <code>enabled=0</code> brick and the subset-template override clearing). Eco v4 removes the last excuse: its frozen-state-probe lens ran properly on Fable 5 this time and was productive (it landed the backfill snapshot-carry finding, CR-005, and co-tagged two others) — and still missed both. The blind spot is now demonstrably in the lens brief or the candidate-enumeration step, not the model or the budget.</li>
+    <li><strong>Three items now have six-review consensus</strong> — the runtime stage-gating gap (fab deep · fab solo · 55 deep · Combo V1 · Eco V2 · eco v4), the legacy-backfill-one-route gap, and the combined-test-suite failure. Three more sit at five: config-overrides display-only, bug-execute (both joined by eco v4), and the PUT blueprint-validation gap — which eco v4 missed, leaving it the only five-consensus row a current-generation harness run can still drop. 48 deep missed all of the top tier except the test failure.</li>
+    <li><strong>Adversarial verification earned its keep:</strong> 2 of 86 verified candidates were refuted (97.7% survival) — including 48 deep's "placeholder fields" item, counter-evidenced as plan-declared — and the verifier downgraded the backfill-one-route finding 7→4 by tracing trigger paths (every UI flow hits <code>GET /tracks</code> first), an explicit calibration disagreement with fab solo High / 55-solo P1.</li>
+    <li><strong>55-solo — a plain no-harness diff review — punched well above its weight:</strong> all 3 of its findings are real and corroborated, and two of them (the legacy-backfill cutover regression and the stale-cache mode reads) had previously been fab-solo-only items, validating two of the harnessed review's hardest finds independently. Like 55 deep, it noted the cross-suite test failure but deliberately didn't file it.</li>
+    <li><strong>55 deep and 55-solo both acted as precision filters:</strong> six findings between them, zero new items, zero false positives, all on high-impact wiring/invariant issues — but each saw only a slice of the runtime-wiring story (55 deep: gating + stage-specific; 55-solo: backfill + cache), and neither caught the prompt-edits-to-fork gap (F1) or the orphaned <code>enabled=0</code> error (F3), which remain fab-solo-only.</li>
+    <li><strong>55 deep forced the biggest severity re-rank:</strong> the PUT blueprint-validation gap, rated Nit 4 by fab deep, becomes Major 7 in 55 deep because it traced the UI edit dialog actually offering the invalid state — 55-solo's P2 agrees it's mid-tier-or-higher. Promoted from Low to High in this table.</li>
+    <li><strong>The big runtime-wiring story was found by every review except 48 deep.</strong> fab deep raised it as two Majors; fab solo decomposed it into five verified findings (F1–F5), three rated Critical; 55 deep converged on the gating half as its sole Blocker; 55-solo converged on the backfill and cache halves as its two P1s — notable since 48 deep's correctness lens reported "clean."</li>
+    <li><strong>48 deep's unique value was small and stylistic:</strong> its three unique items are two UI duplications and an intentional-placeholder note. Its strongest contribution shared with fab deep was the cross-suite test failure — which fab solo missed entirely and 55 deep/55-solo left as unfiled notes.</li>
+    <li><strong>fab deep was the broadest single pass:</strong> it touched 9 of the 12 non-cleanup rows at some level, and uniquely caught the unscoped execution history and the ledger/process findings (runs-dropdown, deep-skills bundling).</li>
+    <li><strong>fab solo's unique count drops from 8 to 4 after Combo V1</strong> (the fork-vs-'default' Critical, unguarded JSON.parse, and two cleanup items were independently re-found) — but its 4 survivors include two Critical/High items Combo V1 still can't see: the orphaned <code>enabled=0</code> brick and the subset-template override clearing. Both need a "what does surviving code do at values frozen by deleted writers" probe that neither new finder lens (removed-behavior, seam-trace) performs. Eco V2 re-found none of the 4 survivors either — fab solo's uniques hold at 4 across two follow-up generations.</li>
+  </ul>
+</div>
+
+<footer>Updated 2026-06-12 · Comparison of nine reviews of reurgency/maudel PR #65 — 48 deep = track-pipeline-redesign-48 · fab deep = track-pipeline-redesign-55 · fab solo = track-pipeline-redesign-fab5-solo · 55 deep = feat-pipeline-consolidation-cdx · 55-solo = Maudel/docs/code-reviews · Combo V1 = track-pipeline-redesign-rematch (upgraded --multi-agent skill, blind run) · Eco V2 = pipeline-consolidation (economy --multi-agent skill: 7 budgeted passes, Sonnet quality pass, sev ≥5 verification floor, blind run) · eco v3 = pipeline-consolidation-v3 (8-dial efficiency redesign, blind run; main-tier lenses mis-ran on Haiku) · eco v4 = pipeline-consolidation-v4 (routing-hardened 8-dial redesign, explicit per-launch models, blind run)</footer>
+
+</div>
+<script>
+document.querySelectorAll('tr.f').forEach(function (tr) {
+  tr.addEventListener('click', function () {
+    if (window.getSelection && String(window.getSelection())) return;
+    tr.classList.toggle('expanded');
+  });
+});
+</script>
+</body>
+</html>
