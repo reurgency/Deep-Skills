@@ -33,13 +33,13 @@
 
 ### Blockers
 
-> Blockers are auto-routed to the fix-phase — no triage needed; listed here so the user is informed.
+> A fresh review leaves Blockers at status `open` like everything else; they auto-accept (no decision) when `/deep-code-review --triage` is run. Flagged here, and in the certificate verdict, so the user knows a fix-phase is owed.
 
 - **[CR-NNN · <lens>] <title>** — severity N/10
   - Evidence: <path:line / symbol / observed behavior; last-mile findings include the hop-by-hop chain>
   - Impact: <why it matters>
   - Recommendation: <concrete fix>
-  - Status: accepted (auto — Blocker) → fix-phase
+  - Status: open (auto-accepts at `--triage`)
 
 ### Major
 
@@ -47,7 +47,7 @@
   - Evidence: <…>
   - Impact: <…>
   - Recommendation: <…>
-  - Status: <open | accepted → fix-phase | deferred → Deferreds ledger | rejected by user>
+  - Status: open  <!-- review run writes `open`; --triage changes it to accepted → fix-phase | deferred → Deferreds ledger | rejected by user -->
 
 ### Minor
 

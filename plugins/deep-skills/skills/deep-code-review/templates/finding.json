@@ -27,8 +27,8 @@
         "observed": "Chain breaks at hop 4: saveTrack() POSTs /api/tracks; no such route registered (routes/ contains only /api/track-templates)"
       },
       "recommendation": "Register the /api/tracks POST route and wire it to the existing handler, or correct the service URL.",
-      "_doc_status": "open (pre-triage) -> accepted | deferred | rejected by user; accepted findings may later become fixed. Blockers are auto-accepted (no triage; user informed).",
-      "status": "accepted"
+      "_doc_status": "The review run writes every finding as 'open'. The separate --triage step changes it: accepted | deferred | rejected by user (accepted may later become 'fixed'). Blockers auto-accept at --triage (no decision; user informed).",
+      "status": "open"
     }
   ]
 }

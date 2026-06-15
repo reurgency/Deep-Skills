@@ -1,7 +1,8 @@
 <!-- Code review certificate — pass/fail + severity rollup, written to
-     `.deep-skills/<effort>/04-Code-Review/certificate.md` after triage completes.
-     Verdict rule: PASS only when no Blockers remain unresolved (every severity-9–10
-     finding is fixed, or none existed). Scope line reproduced verbatim. -->
+     `.deep-skills/<effort>/04-Code-Review/certificate.md` by the REVIEW RUN, with the
+     Triage outcomes table left pending. The separate `--triage` step fills that table.
+     Verdict rule: PASS only when no Blockers exist (a fresh review with any Blocker is
+     FAIL until --triage routes it and /deep-implement fixes it). Scope line verbatim. -->
 
 # Code Review Certificate — <effort-name>
 
@@ -24,6 +25,9 @@
 <one line per check: lint / typecheck / tests — pass, fail (→ finding CR-NNN), or not found in host project; pre-existing failures noted as not attributable to this diff>
 
 ## Triage outcomes
+
+<!-- Left as "Triage pending — run /deep-code-review --triage" by the review run.
+     The --triage step replaces this block with the filled table below. -->
 
 | Outcome | Count |
 |---|---|

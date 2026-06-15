@@ -125,7 +125,7 @@ Synthesis is split in two: **mechanical assembly is scripted; the model writes o
 4. **Write the prose that needs writing:** per-finding writeups for sev ≥5 (impact + recommendation), the per-lens verdict lines ("Coherence: clean"), and the report's top summary — into the script-assembled skeleton. Full writeups for sev ≥5 only; the nit tier stays a table (the first baseline's prose-for-everything report was 161KB, mostly nit writeups nobody triages individually).
 5. **Merge into ONE report.** `report.md` / `findings.json` / `certificate.md` as usual, `mode: multi-agent`, findings carrying their dimension tags and verification verdicts, refuted candidates in the appendix. **Never per-dimension reports** — that splits triage across documents and was explicitly rejected in the plan; one aggregated, deduped, verified report is the contract. Per-agent raw output stays behind the curtain.
 
-Triage and fix-phase routing then proceed exactly as in the default flow — verified findings get no special handling.
+The multi-agent run ends at the assembled report, exactly like the default flow — all findings `open`, nothing written to the plan. Triage and fix-phase routing are the separate `--triage` step (SKILL.md § 6); verified findings get no special handling there.
 
 ## `--mega` — the thorough tier
 

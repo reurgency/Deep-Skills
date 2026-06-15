@@ -46,9 +46,11 @@ Conventional starting points for **deterministic pre-pass** results (must match 
 
 ## Policy actions — what happens per tier
 
+**These actions belong to the separate `--triage` step, not the review run.** A finished review leaves *every* finding at status `open` and writes nothing to the plan; the table below describes what `/deep-code-review --triage` does later, once the user invokes it.
+
 | Tier | Action |
 |---|---|
-| **Blocker** (9–10) | **Auto fix-phase — no triage needed.** A Blocker is by definition not optional. It is routed straight into the fix-phase appended to the plan (or the no-plan plan stub), status set to `accepted`, and the **user is informed** in the triage summary that this happened. |
+| **Blocker** (9–10) | **Auto-accept at triage — no decision needed.** A Blocker is by definition not optional. When `--triage` runs, it is routed straight into the fix-phase appended to the plan (or the no-plan plan stub), status set to `accepted`, and the **user is informed** that this happened. (The review run itself only flags it as a Blocker in the certificate verdict — it does not route or write the plan.) |
 | **Major / Minor / Nit** (1–8) | **HITL triage**, finding by finding, with exactly three outcomes (below). |
 
 Triage outcomes for non-Blockers:
