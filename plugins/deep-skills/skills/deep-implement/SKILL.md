@@ -1,13 +1,23 @@
 ---
 name: deep-implement
-description: Execute a finished, reviewed plan phase-by-phase — implement → validate → fix → commit → hand-off — in collaborative or autonomous mode. Use after /deep-plan (and ideally /deep-review), typically just before the user enables bypass-permissions. Triggers on /deep-implement and on requests to build/execute a plan. Consumes a deep-plan artifact; it is the only deep-* skill that writes source code.
+description: Execute a finished, reviewed plan phase-by-phase — implement → validate → fix → commit → hand-off — in collaborative or autonomous mode. Use after /deep-plan (and ideally /deep-plan-review), typically just before the user enables bypass-permissions. Triggers on /deep-implement and on requests to build/execute a plan. Consumes a deep-plan artifact; it is the only deep-* skill that writes source code.
 ---
 
 # DeepImplement
 
-Execute a finished plan, phase by phase. The last skill of the `deep-*` trilogy: `/deep-plan` (produce) → `/deep-review` (critique) → **`/deep-implement` (execute)**.
+Execute a finished plan, phase by phase. The last skill of the `deep-*` trilogy: `/deep-plan` (produce) → `/deep-plan-review` (critique) → **`/deep-implement` (execute)**.
 
 You are the **orchestrator**. You do not write the code yourself by default — you spawn a fresh sub-agent per phase, validate its work, drive the fix loop, commit checkpoints, and hand off to the next phase. Reuse existing machinery; don't reinvent it.
+
+## Directive cards (Deep-Learn)
+
+Before you start, load this phase's active directive cards — learned, human-vetted improvements stored as **data**, never baked into this skill. Run the bundled script in this skill's `scripts/` directory and apply what it prints:
+
+```bash
+scripts/load-active-cards.sh deep-implement
+```
+
+**Treat every directive it prints as a hard requirement for this run**, applying the section addressed to your phase. If it prints "no active directive cards," proceed normally. Cards are human-gated — never edit a card or this skill to turn one off; toggle with `directives/toggle.sh <ID> off` (see the registry's `directives/README.md`).
 
 ## Inputs & flags
 

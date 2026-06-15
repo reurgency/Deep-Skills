@@ -3,8 +3,8 @@
 A Claude Code plugin marketplace for the **Deep-\*** series — a steerable, fresh-agent-resumable workflow that takes a feature from idea to verified code:
 
 ```
-/deep-plan  ──▶  /deep-review  ──▶  /deep-implement  ──▶  /deep-code-review
-  produce         critique            execute               verify
+/deep-plan  ──▶  /deep-plan-review  ──▶  /deep-implement  ──▶  /deep-code-review
+  produce         critique                execute               verify
 ```
 
 Plus a self-improving **directive loop** (in design): every `/deep-code-review` distills recurring issue classes into toggleable directive *cards* that the upstream skills load at runtime — so the same bug gets prevented earlier next time, without ever editing a skill by hand. See [`docs/roadmap/`](docs/roadmap/).
@@ -16,7 +16,7 @@ One plugin, **`deep-skills`**, bundling four skills:
 | Skill | Role |
 |---|---|
 | `/deep-plan` | Interactive feature planning → a self-contained, resumable plan artifact. Plan only. |
-| `/deep-review` | Independent, codebase-aware critique of a finished plan. Review only. |
+| `/deep-plan-review` | Independent, codebase-aware critique of a finished plan. Review only. |
 | `/deep-implement` | Phase-by-phase execution: implement → validate → fix → commit → hand-off. |
 | `/deep-code-review` | Multi-agent code review with severity-gated adversarial verification. |
 
@@ -44,7 +44,7 @@ Deep-Skills/
 │       │   └── plugin.json         # plugin manifest
 │       └── skills/                 # auto-discovered
 │           ├── deep-plan/          # SKILL.md + references/ + templates/
-│           ├── deep-review/
+│           ├── deep-plan-review/
 │           ├── deep-implement/
 │           └── deep-code-review/
 ├── docs/

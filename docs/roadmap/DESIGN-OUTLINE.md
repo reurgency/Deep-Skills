@@ -38,8 +38,8 @@ Instead, every learned improvement is a structured **directive card** in a regis
                           │  test-hygiene, reuse-dup…  │
                           └───┬─────────┬─────────┬────┘   many-to-many: one class → multiple spokes
                               ▼         ▼         ▼
-                        deep-plan   deep-review  deep-implement   ← SPOKE UTILITIES
-                          util        util          util          (draft cards for classes they own)
+                     deep-plan   deep-plan-review  deep-implement   ← SPOKE UTILITIES
+                       util           util             util          (draft cards for classes they own)
                               │         │         │
                               └─────────┴─────────┘
                                         ▼
@@ -50,7 +50,7 @@ Instead, every learned improvement is a structured **directive card** in a regis
                           └──────────┬───────────────┘
                                      │ skills load ACTIVE cards at runtime
                                      ▼
-                  deep-plan / deep-review / deep-implement apply them
+                  deep-plan / deep-plan-review / deep-implement apply them
                                      │
                                      ▼
                           next /deep-code-review run
@@ -80,7 +80,7 @@ The loop closes: review → distill → propose → (human gate) → apply → r
 
 ### 4.4 Spoke utilities (one per upstream skill)
 - For newly-actionable classes they own, each drafts a **candidate** directive card. They do **not** apply anything and do **not** touch SKILL.md.
-- Each spoke knows its own leverage: deep-plan adds plan-artifact requirements; deep-review adds checks; deep-implement adds exit invariants + validation probes.
+- Each spoke knows its own leverage: deep-plan adds plan-artifact requirements; deep-plan-review adds checks; deep-implement adds exit invariants + validation probes.
 
 ### 4.5 Directives Registry (the "central directive")
 - Structured store of cards (file-per-card or a single JSON — decide in planning). Skills load **active** cards at runtime.

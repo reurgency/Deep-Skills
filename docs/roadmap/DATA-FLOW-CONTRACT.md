@@ -1,7 +1,7 @@
 # DLC-001 — State / Data-Flow Contract (seed directive card)
 
 > The first and highest-leverage directive in the Deep-Learn loop. Hand-authored from PR#65; would have surfaced ~100% of that review's severity at **plan** time.
-> Category: `write-no-reader` · Owners: deep-plan (primary), deep-review (check), deep-implement (validate).
+> Category: `write-no-reader` · Owners: deep-plan (primary), deep-plan-review (check), deep-implement (validate).
 
 ## The artifact (added to the plan document)
 
@@ -32,7 +32,7 @@ The row cannot be filled in honestly without discovering the bug: the writer col
 ## Insertion points (3 skill files)
 
 - `deep-plan/SKILL.md` §6 *Design & write the plan* — contract is a required section of the artifact; §7 *Review* gate asserts every row resolved.
-- `deep-review/SKILL.md` §3 dispatch — add a check: contract present, every row resolved, AC sources singular.
+- `deep-plan-review/SKILL.md` §3 dispatch — add a check: contract present, every row resolved, AC sources singular.
 - `deep-implement/SKILL.md` §4 *Validate* — exit invariant: each "runtime" row's reader is wired in code, plus a **contract probe** (write → execute → assert read) for it. Note: current `references/validation.md` is typecheck + scoped unit tests + prompt snapshot — it would have caught **none** of CR-001–006 (they typecheck clean and pass unit tests; the bug is cross-layer). The contract probe is the missing net.
 
 ## Coverage (PR#65)

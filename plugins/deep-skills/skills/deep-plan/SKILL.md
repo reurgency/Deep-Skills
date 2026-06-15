@@ -5,16 +5,26 @@ description: Run an interactive, steerable feature-planning session that produce
 
 # DeepPlan
 
-Run a guided feature-planning session and produce a plan document. **Plan only — never implement.** Execution belongs to the sibling skill `/deep-implement`. Reviewing the plan belongs to `/deep-review`.
+Run a guided feature-planning session and produce a plan document. **Plan only — never implement.** Execution belongs to the sibling skill `/deep-implement`. Reviewing the plan belongs to `/deep-plan-review`.
 
 You are the session host. The user steers with in-session commands at any time. Stay calm, ask sharp questions, reuse before inventing, and write a plan a fresh agent could execute cold.
+
+## Directive cards (Deep-Learn)
+
+Before you start, load this phase's active directive cards — learned, human-vetted improvements stored as **data**, never baked into this skill. Run the bundled script in this skill's `scripts/` directory and apply what it prints:
+
+```bash
+scripts/load-active-cards.sh deep-plan
+```
+
+**Treat every directive it prints as a hard requirement for this run**, applying the section addressed to your phase. If it prints "no active directive cards," proceed normally. Cards are human-gated — never edit a card or this skill to turn one off; toggle with `directives/toggle.sh <ID> off` (see the registry's `directives/README.md`).
 
 ## The deep-* trilogy (separation of concerns)
 
 | Skill | Job | This skill's boundary |
 |---|---|---|
 | `/deep-plan` (you) | Frame → explore → question → write the plan (resumable phases + deferreds). | Stop after the plan + optional `/columbo`. **No code edits.** |
-| `/deep-review` | Review the finished plan. | Out of scope here. |
+| `/deep-plan-review` | Review the finished plan. | Out of scope here. |
 | `/deep-implement` | implement → validate → fix → commit → hand-off; collaborative/autonomous orchestration. | Out of scope here — you only *structure* phases for it. |
 
 ## In-session commands — watch for these at EVERY step
@@ -67,7 +77,7 @@ Write to `.deep-skills/<effort-name>/01-Plan/plan.md` (or the explicit path over
 Present the plan, fold in feedback, update the doc.
 
 ### 8. Columbo (offered last)
-Offer `/columbo` as the final completeness check. Fix anything it surfaces. This is the hand-off point to `/deep-review` / `/deep-implement`.
+Offer `/columbo` as the final completeness check. Fix anything it surfaces. This is the hand-off point to `/deep-plan-review` / `/deep-implement`.
 
 ## Deferreds — nothing gets forgotten by phase 4
 

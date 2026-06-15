@@ -10,7 +10,7 @@
     {
       "name": "deep-skills",
       "source": "./plugins/deep-skills",
-      "description": "Bundles /deep-plan, /deep-review, /deep-implement, and /deep-code-review — the full Deep-* workflow as one coherent install.",
+      "description": "Bundles /deep-plan, /deep-plan-review, /deep-implement, and /deep-code-review — the full Deep-* workflow as one coherent install.",
       "category": "workflow",
       "keywords": ["planning", "code-review", "implementation", "multi-agent", "workflow"]
     }

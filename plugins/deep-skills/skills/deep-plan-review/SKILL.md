@@ -1,13 +1,23 @@
 ---
-name: deep-review
-description: Independently review a finished plan with fresh, codebase-aware agents — catching misalignment with the user's taste/preferences/decisions and with codebase best-practices, patterns, duplicate or overlapping behavior, and conflicts. Use after /deep-plan and before /deep-implement, or whenever the user wants a plan reviewed. Triggers on /deep-review and on requests to review/critique a plan. Replaces the long manual review pass after planning. Reviews the plan only — it does not implement.
+name: deep-plan-review
+description: Independently review a finished plan with fresh, codebase-aware agents — catching misalignment with the user's taste/preferences/decisions and with codebase best-practices, patterns, duplicate or overlapping behavior, and conflicts. Use after /deep-plan and before /deep-implement, or whenever the user wants a plan reviewed. Triggers on /deep-plan-review and on requests to review/critique a plan. Replaces the long manual review pass after planning. Reviews the plan only — it does not implement.
 ---
 
-# DeepReview
+# DeepPlanReview
 
 Independently review a **finished plan** and surface where it misaligns — with the user, or with the codebase — then record findings back into the plan. **Review only — never implement, never edit source.** You may edit the *plan document* (findings, accepted fixes, deferrals).
 
-This is the middle skill of the `deep-*` trilogy: `/deep-plan` (produce) → **`/deep-review` (critique)** → `/deep-implement` (execute). It exists to replace the slow manual review that normally follows planning.
+This is the middle skill of the `deep-*` trilogy: `/deep-plan` (produce) → **`/deep-plan-review` (critique)** → `/deep-implement` (execute). It exists to replace the slow manual review that normally follows planning.
+
+## Directive cards (Deep-Learn)
+
+Before you start, load this phase's active directive cards — learned, human-vetted improvements stored as **data**, never baked into this skill. Run the bundled script in this skill's `scripts/` directory and apply what it prints:
+
+```bash
+scripts/load-active-cards.sh deep-plan-review
+```
+
+**Treat every directive it prints as a hard requirement for this run**, applying the section addressed to your phase. If it prints "no active directive cards," proceed normally. Cards are human-gated — never edit a card or this skill to turn one off; toggle with `directives/toggle.sh <ID> off` (see the registry's `directives/README.md`).
 
 ## Core principle: independence through fresh agents
 

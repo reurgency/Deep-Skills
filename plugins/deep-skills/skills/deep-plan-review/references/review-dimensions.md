@@ -1,6 +1,6 @@
 # Review dimensions (the two lenses)
 
-Every `/deep-review` pass examines the plan through these lenses. In single-agent mode one agent covers both; in `--multi-agent` mode each numbered dimension below becomes its own fresh agent.
+Every `/deep-plan-review` pass examines the plan through these lenses. In single-agent mode one agent covers both; in `--multi-agent` mode each numbered dimension below becomes its own fresh agent.
 
 ## Lens A — User alignment
 

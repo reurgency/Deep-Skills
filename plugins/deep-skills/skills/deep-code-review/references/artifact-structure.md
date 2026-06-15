@@ -10,7 +10,7 @@ All deep-* skills read and write their **artifacts** under the host project's `.
 .deep-skills/<effort-name>/
   00-Manifest/        manifest + summary + status for the effort
   01-Plan/            deep-plan output
-  02-Plan-Review/     deep-review output
+  02-Plan-Review/     deep-plan-review output
   03-Implementation/  deep-implement work summary + acceptance check-off
   04-Code-Review/     deep-code-review report, findings.json, certificate
   05-Security/        deep-security artifacts (future effort)
@@ -20,7 +20,7 @@ All deep-* skills read and write their **artifacts** under the host project's `.
 Canonical file names per stage:
 
 - `01-Plan/plan.md` — the plan document (deep-plan).
-- `02-Plan-Review/review.md` — the full review report (deep-review).
+- `02-Plan-Review/review.md` — the full review report (deep-plan-review).
 - `03-Implementation/summary.md` — work summary + acceptance check-off (deep-implement).
 - `04-Code-Review/report.md`, `findings.json`, `certificate.md` — code review artifacts (deep-code-review).
 
