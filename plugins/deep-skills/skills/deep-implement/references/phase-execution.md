@@ -29,3 +29,10 @@ Concurrency is bounded (a small handful, never a swarm) per the user's standing 
 > You are implementing **one phase** of an approved plan. Plan: <path/inline>. Your phase: <phase block>. Already done: <Phase Summaries>. Implement only this phase, following the plan's Approach and Constraints. Reuse the named existing functions/utilities. Do not exceed this phase's scope. Return: files created/modified + a 3–5 line summary + any blocker. Do not commit.
 
 The orchestrator handles validation, commits, summaries, and hand-offs — not the phase agent.
+
+## Construction rules for the phase agent (external shapes & tests)
+
+Append these to the briefing whenever the phase produces a payload an **external consumer** reads, or writes a test that asserts a contract/external shape. They prevent two AI failure modes that pass typecheck and tests while the feature is broken:
+
+- **Verify external shapes before coding to them.** Before serializing to an external consumer — a CLI/binary, third-party API, SDK, or an AI harness/model endpoint — confirm the shape it *actually accepts* against ground truth: a sibling client that already targets the same consumer, the consumer's schema/docs, or a real probe. **Never code to an assumed external payload shape.** Neither repo code nor a repo test is ground truth for what an out-of-repo consumer accepts; an in-repo green check can sit on top of a shape the consumer rejects.
+- **Don't write tautological contract tests.** A test that asserts the shape you just authored — built from the same assumption as the code — passes regardless of whether the external consumer accepts it. When a test encodes an external/contract shape, validate that shape against ground truth (the same sources above), not against the code under test. If ground truth isn't reachable in this phase, say so in the summary and flag the assertion as unverified rather than letting a green test imply confirmation.

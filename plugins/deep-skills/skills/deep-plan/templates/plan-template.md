@@ -42,6 +42,15 @@ Files to create/modify. For a pattern repeated across many files, describe the p
 
 How to prove the change works end-to-end: run the app, MCP tools, tests, observable behavior. State what "done" looks like.
 
+### Interaction & re-entry  <!-- include ONLY if the feature adds a user-triggered action/submit/navigation or a stateful/resumable flow; omit otherwise -->
+
+For features that add a user-triggered action (button/submit/navigation) or a stateful flow a user can abandon and restart, the plan must **specify**, not leave implicit:
+
+- **Double-submit / in-flight handling** — what suppresses a second click (or a click while the first is in flight); name the guard. An action with no in-flight state can fire twice — and if it kicks off a backend run, each click spawns a duplicate run.
+- **Processing feedback** — what the user sees during the async handoff (spinner / disabled / "Launching…"). A handler that does real work but renders nothing reads as "the button does nothing," driving the repeat-click.
+- **Navigation fallback** — every introduced route resolves, and a `**`/wildcard fallback exists so an unmatched URL degrades gracefully instead of hard-crashing.
+- **Re-entry story** — start → abandon → restart: are stale artifacts from a prior run detected and reconciled, does re-entry signal "a prior run exists" (resume/overwrite/fresh), and is a re-run idempotent (no duplicated side effects)?
+
 ## Risks
 
 Material risks and their mitigations/fallbacks. (Populated by `/risks`; omit if none.)

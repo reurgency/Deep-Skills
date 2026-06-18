@@ -30,3 +30,5 @@ Use `test-runner`'s `node -e execSync` wrapper with `CI=true` — bun's TTY outp
 ## Verdict
 
 A phase passes when: typecheck of changed apps is clean (no new errors), relevant tests are green, and (if applicable) the snapshot test passes. Behavioral validation (run the app / Playwright) only when the phase's acceptance criteria call for it. Record the verdict in the phase summary.
+
+**Green ≠ verified for external shapes.** If the phase produces a payload an external consumer reads (CLI/binary, third-party API, SDK, AI harness/model endpoint), a clean typecheck and green tests do **not** confirm the consumer accepts that shape — repo checks aren't ground truth for an out-of-repo contract (see the construction rules in `references/phase-execution.md`). When the phase's shape was verified against ground truth (sibling client, schema/docs, real probe), note it in the summary; when it wasn't reachable, record the shape as **unverified** rather than letting green imply confirmation.

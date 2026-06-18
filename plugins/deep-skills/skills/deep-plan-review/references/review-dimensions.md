@@ -20,6 +20,7 @@ Does the plan fit *this codebase*? Sources: the repo itself (explore it), `CLAUD
 3. **Duplicate behavior** — does it rebuild something that already exists? Name the existing implementation with its path.
 4. **Overlapping behavior** — does it partially overlap an existing feature/utility in a way that should be consolidated rather than added alongside?
 5. **Conflicts** — does it contradict, break, or fight existing behavior, contracts, or assumptions elsewhere in the codebase?
+6. **Behavioral completeness** — for the user-triggered actions and stateful flows this plan adds, does it *specify* the interaction-edge and re-entry requirements, or are they silently absent? Treat a missing specification as a finding when the plan adds a submit/action/navigation or an abandon-and-restart flow: no double-submit/in-flight guard, no processing feedback, no navigation fallback, or no re-entry story (stale-artifact reconcile / "prior run exists" signal / idempotent re-run). These omissions ship as real bugs (duplicate backend runs on repeat clicks, stale leftovers from an abandoned run); the plan is the cheapest place to require them. A plan with no such surface is clean on this dimension — say so.
 
 ## What a good finding looks like
 

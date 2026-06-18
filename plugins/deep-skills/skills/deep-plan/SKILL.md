@@ -71,6 +71,7 @@ Write to `.deep-skills/<effort-name>/01-Plan/plan.md` (or the explicit path over
 - Reference reused functions/utilities with their paths.
 - A **Deferreds** ledger (see `templates/plan-template.md` and below).
 - If **multi-phase**: structure each phase per `references/phase-structuring.md` so a fresh agent can execute it cold, and leave an empty **Phase Summaries** appendix for `/deep-implement` to append to.
+- If the feature adds a **user-triggered action/submit/navigation or a stateful/resumable flow**, fill the template's **Interaction & re-entry** section — specify the double-submit guard, processing feedback, navigation fallback, and re-entry story rather than leaving them implicit. Omit the section for pure refactors/migrations with no such surface.
 - **Do not implement.** No source edits — only the plan document.
 
 ### 7. Review
