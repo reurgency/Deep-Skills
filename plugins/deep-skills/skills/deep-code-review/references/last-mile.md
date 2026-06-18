@@ -42,9 +42,25 @@ These are the recurring ways AI-built features fail the last mile. Check each on
 1. **Optimistic UI with no real call** — the component updates local state as if the operation succeeded, but the service call is missing, commented out, or never awaited. The demo looks perfect; nothing persists.
 2. **Leftover mocks/stubs** — a hardcoded return, in-memory array, `// TODO: real implementation`, or fixture data still standing in for the real thing on one hop of the chain.
 3. **Response ignored or errors swallowed** — the call fires but the result is discarded: no `.subscribe`/`await` consumer, `catch` that only logs, error states that never reach the UI.
-4. **Contract drift vs shared types** — UI and API built to different payload shapes; a shared type updated on one side only; fields renamed in one layer; serialization mismatches that "work" because the field is silently `undefined`.
+4. **Contract drift vs shared types — *and vs external consumers*** — UI and API built to different payload shapes; a shared type updated on one side only; fields renamed in one layer; serialization mismatches that "work" because the field is silently `undefined`. **Extends past the repo's own seams:** a payload serialized to an external consumer (a CLI/binary, third-party API, SDK) can drift from what that consumer actually accepts while every in-repo check stays green — neither repo code nor a repo contract test is ground truth for an external shape. Verify against a sibling client that targets the same consumer, the consumer's schema, or flag it unverified (full procedure: `references/dimensions.md` § `seam-trace`, external-consumer hunt).
 5. **Unregistered routes / unwired handlers** — handler written but route never added to the router; component written but never routed/rendered; event emitted with no listener.
 6. **Two halves built to different understandings** — frontend and backend (or two phases/sessions) each implement *their* reading of the behavior; each looks complete alone, the seam doesn't carry the behavior across. Coherence-lens style discontinuities often mark where to look.
+
+## Interaction-edge checks
+
+The last mile of a user-triggered action is not just "the call fires" — it's how the action behaves when the user does something other than click once and wait. These are statically checkable from the diff; run them against every new submit/action button, form, or navigation the diff adds:
+
+- **Double-submit / in-flight guard** — does a second click (or a click while the first is still running) get suppressed? An action button with no in-flight/disabled state and no idempotency guard can fire twice — and if the handler kicks off a backend run, each click **spawns a duplicate run**. Hunt for handlers that set no "launching"/pending flag before the async call. (Benchmark miss: a "Use This Intake" button with no guard spawned a fresh background blueprint run on every one of four clicks.)
+- **Visible processing feedback** — during an async handoff, does the user see *anything* (spinner, disabled state, "Launching…" copy)? A handler that does real work but renders no transient state reads as "the button does nothing," driving the repeat-click that the missing guard above then punishes.
+- **Navigation-target robustness** — does every `navigate([...])` / route the diff introduces actually resolve, and is there a `**` wildcard/fallback route so an *unmatched* URL degrades gracefully instead of hard-crashing? A navigation to a route that isn't registered (or isn't in the served bundle) throws an unhandled router error and the page appears frozen. The fallback route is the safety net that turns a crash into a redirect-home.
+
+## Re-entry & idempotency checks
+
+Plans describe the first, clean pass through a flow; users abandon and restart. Probe the **start → abandon → restart** path of any stateful flow the diff adds:
+
+- **Stale artifacts from a prior run** — if a flow writes files/rows/state and the user abandons partway, does restarting detect and reconcile the prior run's leftovers, or does it silently proceed alongside stale documents from the abandoned attempt? (Benchmark miss: an abandoned blueprint left its documents on disk; the restart gave no indication a prior run existed and never cleaned them up.)
+- **No "a prior run exists" signal** — re-entering a flow that already has state should tell the user (resume? overwrite? start fresh?), not pretend it's a blank slate.
+- **Duplicated side effects on re-run** — re-running an operation that already partially completed should be idempotent (skip/overwrite), not append a second set of effects.
 
 ## Static-first; `--browser` escalation
 
@@ -52,4 +68,4 @@ This methodology is **static-first**: trace chains by reading code, and most las
 
 ## The synthesis rule (non-negotiable)
 
-**A last-mile finding without a cited hop-by-hop chain is rejected at synthesis.** "Save might not work" is not a finding. "The chain breaks at hop 4: `track.service.ts:88` POSTs to `/api/tracks` but no such route is registered (`routes/` grep shows only `/api/track-templates`)" is a finding. This rule exists to prevent the shallow-checkbox failure mode — a reviewer ticking "traced it" without producing the trace. The same applies to *clean* verdicts: a behavior reported as verified must have its trace available on request, summarized or in full in the report's evidence.
+**A last-mile finding without a cited hop-by-hop chain is rejected at synthesis.** "Save might not work" is not a finding. "The chain breaks at hop 4: `track.service.ts:88` POSTs to `/api/tracks` but no such route is registered (`routes/` grep shows only `/api/track-templates`)" is a finding. This rule exists to prevent the shallow-checkbox failure mode — a reviewer ticking "traced it" without producing the trace. **Interaction-edge and re-entry findings satisfy this rule in their own shape:** cite the action/entry site (path:line), the missing guard/reconcile, and the derived consequence — e.g. "`onIntakeReady()` (`intake.component.ts:142`) sets no in-flight flag before `startBlueprintAutopilot()` POSTs → each re-click spawns another background run." A cited action-site + missing-mechanism + consequence is a chain; "the button might double-submit" without the cite is not. The same applies to *clean* verdicts: a behavior reported as verified must have its trace available on request, summarized or in full in the report's evidence.

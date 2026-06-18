@@ -33,10 +33,11 @@ Deletions are where reviews that only read the diff forward go blind: removed co
 
 ### `seam-trace`
 
-**Asks:** for every value this diff *writes*, who *reads* it — and does the read path actually consume the layer the write targets?
+**Asks:** for every value this diff *writes*, who *reads* it — and does the read path actually consume the layer the write targets? **When the reader is *external* (a CLI/binary, third-party API, SDK, another service), does the serialized shape actually match what that consumer expects** — not just what the repo's own code and tests agree on?
 
 This is cross-file caller/callee tracing in both directions, hunting integration-seam bugs invisible to per-file reading: each side looks complete alone; the seam doesn't carry the value across. Record the trace like a last-mile chain — path:line per hop. Hunt for:
 
+- **Payloads serialized to an external consumer that no in-repo code can confirm** — when the read side is outside the repo, reading repo code (and repo tests) cannot prove the contract; both can be confidently, mutually wrong. Establish ground truth, in this order: (1) a **sibling implementation in-repo** that targets the same consumer — compare the serialized shape field-by-field; a lone divergence is the bug (the Ollama client sends `image_url: { url }`, the new Codex client sends bare `image_url: url` → the Codex shape is wrong). (2) The consumer's **documented or protocol schema** (docs, type stubs, the binary's own strings). (3) If neither is available, do **not** pass silently — file an **unverified external contract** finding naming the seam and the unproven shape, so the gap is visible at triage instead of shipping green. A passing contract test for this seam is *not* ground truth (see `references/review-lenses.md` § Reading tests adversarially).
 - **Writes with no reader** — config, overrides, or state the diff persists that no runtime path ever consumes; settings that are display-only without anyone deciding they should be.
 - **Reader/writer layer mismatch** — in layered or fork/override resolution systems, the UI writes to one layer (the fork, the override, the new column) while the runtime still resolves from another (the default, the base, the legacy column). Trace the *exact* layer each side touches, not just the entity.
 - **Readers left on the old source** — a write path moved in this diff, but some consumer still reads from where the data used to land.

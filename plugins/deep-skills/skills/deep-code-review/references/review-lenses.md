@@ -15,6 +15,7 @@ Hunt for:
 - **Off-by-one** — boundary indices, slice/substring ends, `<` vs `<=` on loops and ranges, pagination math, fence-post counts.
 - **Resource leaks** — subscriptions/listeners/intervals never torn down, file handles or child processes not closed on the error path, abort controllers created but never signaled.
 - **Wrong async handling** — missing `await` (especially in `try` blocks, where the rejection escapes the catch); fire-and-forget promises whose result mattered; sequential awaits that race in the UI; `Promise.all` where one rejection should not kill the batch (or vice versa); async work after a response was already sent.
+- **Tests that codify the bug** — a new/changed test whose assertion encodes the code's *current* output rather than the *intended* contract, so a green suite certifies the defect. Especially: a test asserting a payload shape sent to an external consumer (the assertion and the producing code were authored together, both wrong, mutually confirming). Read changed test files; treat their assertions as claims to check, not as evidence of correctness — full discipline in **Reading tests adversarially** below.
 
 ## 2. Functional Completeness (Last-Mile)
 
@@ -49,8 +50,21 @@ Multi-session and multi-agent implementations drift; this lens catches the seams
 - **Same problem, different solutions** — the same need (e.g. debouncing, ID generation, error display) solved two different ways within the diff.
 - **Inconsistent terminology across layers** — the UI calls it a "track", the API calls it a "lane", the DB column says "channel"; renames applied to some layers but not others.
 - **Contradictory patterns** — e.g. signals in one component, BehaviorSubject in its sibling doing the same job; one new endpoint using the project's result-wrapper convention, the next returning bare JSON.
+- **Divergent sibling implementations of one outbound contract** — two or more implementations of the *same* serialization/integration job that disagree on the wire shape. The canonical case: three streaming clients each build an image block, two send `image_url: { url }` and the third sends a bare `image_url: url` — the odd one out is a **likely bug, not a style nit**, because the siblings targeting the same consumer are each other's ground truth. Enumerate the parallel implementations explicitly and compare them field-by-field; a lone divergence in an external-facing payload is a correctness signal — escalate it to the correctness/seam-trace lens rather than filing it as a coherence nit.
 - **Half-migrated approaches** — a refactor applied to some call sites and not others; old and new helper coexisting with no deprecation note; dead code left behind by a direction change mid-implementation.
 - **Style discontinuities that signal a deeper seam** — abrupt changes in naming convention, file organization, or comment voice mid-feature often mark the boundary where two sessions built to different understandings (cross-check with the last-mile lens at that boundary).
+
+## Reading tests adversarially
+
+Changed test files in the diff are **suspects, not oracles** — and they are never an optional skip. A green suite proves the code matches the test's assertion; it says nothing about whether the assertion matches reality. When the test and the code under test were authored together (the normal case for AI-built features), they confirm *each other*, not the real contract — a **tautological test** that ships the bug with a passing checkmark. The benchmark miss this rule exists for: a vision client serialized an image as `image_url: "<data-url>"`, a new contract test asserted exactly that shape, the suite passed 24/24, and the real external consumer rejected it with a 500 — the test had codified the bug and the pre-pass read green.
+
+For every added or changed test, ask:
+
+- **Does this assertion encode the *intended* contract, or just lock in whatever the code currently emits?** An assertion that mirrors the implementation line-for-line verifies nothing.
+- **Is the asserted value a payload sent to an external consumer** (a CLI/binary, third-party API, SDK, another service)? If so, the assertion is only as trustworthy as its source of truth. Check it against ground truth the same way you'd check the producing code: a sibling implementation in-repo that targets the same consumer, the consumer's documented/protocol schema, or — failing both — flag it as an **unverified external contract** (cross-ref the `seam-trace` external-consumer hunt in `references/dimensions.md`).
+- **Was coverage deleted?** A test removed alongside code whose behavior still exists elsewhere is dropped coverage (also a `removed-behavior` signal).
+
+Do not let a passing pre-pass stand in for this reading. The pre-pass reports *that* the suite is green; this lens asks whether green *means* correct.
 
 ## No-plan degradation (PR mode / arbitrary diff)
 
