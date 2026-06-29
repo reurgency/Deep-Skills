@@ -2,19 +2,18 @@
 
 A self-paced curriculum for the **Deep-\*** series: a steerable, fresh-agent-resumable
 workflow that takes a feature from idea to verified code. By the end you will be able to
-drive each skill on real work, know *why* each guardrail exists, and chain all four into one
-clean idea→merge loop.
+drive each skill on real work, know *why* each guardrail exists, and chain all five — from one
+clean idea→merge loop to a standing map of what you built.
 
 ```
-/deep-plan  ──▶  /deep-plan-review  ──▶  /deep-implement  ──▶  /deep-code-review
-  produce         critique                execute               verify
+/deep-plan  ──▶  /deep-plan-review  ──▶  /deep-implement  ──▶  /deep-code-review  ──▶  /deep-docs
+  produce         critique                execute               verify                 orient
 ```
 
-> **Prefer a browsable / video-ready version?** An HTML edition of this whole program lives in
+> **Prefer a browsable version?** An HTML edition of this whole program lives in
 > [`html/`](html/index.html) — open [`html/index.html`](html/index.html) in a browser. It folds
 > the curriculum *and* the [design rationale](design-rationale/index.md) into one styled,
-> per-skill "episode" set, with a [video production guide](html/production-guide.html) for turning
-> the series into a recorded course.
+> per-skill "episode" set.
 
 ---
 
@@ -37,6 +36,7 @@ vocabulary from earlier ones.
 | 2 | `/deep-plan-review` | [deep-plan-review.md](deep-plan-review.md) | Independently critique a plan with fresh, codebase-aware agents. |
 | 3 | `/deep-implement` | [deep-implement.md](deep-implement.md) | Orchestrate phase-by-phase execution with bounded fix loops and checkpoints. |
 | 4 | `/deep-code-review` | [deep-code-review.md](deep-code-review.md) | Run multi-agent, evidence-gated review that catches the last mile. |
+| 5 | `/deep-docs` | [deep-docs.md](deep-docs.md) | Generate context-window-aware, anchored, verified documentation of what's been built. |
 
 > New to the repo? Read the root [`README.md`](../../README.md) first for install and layout,
 > then come back here.
@@ -90,7 +90,12 @@ directory. Knowing this layout makes the whole pipeline legible:
   03-Implementation/  summary.md    ← /deep-implement
   04-Code-Review/     report.md · findings.json · certificate.md  ← /deep-code-review
   05-Security/        (reserved for a future /deep-security)
+  07-Docs/            pointer + manifest line  ← /deep-docs (effort mode)
 ```
+
+`/deep-docs` is the exception to the per-effort tree: its real output is a standing
+**`docs/ai-map/`** at the *target repo* root (machine-owned, regenerated wholesale); in effort
+mode it additionally drops a `07-Docs/` pointer so the manifest links to it.
 
 The **plan document is the durable spine** — it accumulates Phase Summaries, a Deferreds
 ledger, review findings, and (after triage) a fix-phase. Learn to read it and you can resume
@@ -127,7 +132,8 @@ have surfaced ~100% of PR#65's review severity at *plan* time. The
 3. **[deep-plan-review](deep-plan-review.md)** — review that plan; fold findings back in.
 4. **[deep-implement](deep-implement.md)** — execute it in collaborative mode.
 5. **[deep-code-review](deep-code-review.md)** — review the result; run `--triage`.
-6. **Capstone** (below) — run all four end-to-end on one feature, unassisted.
+6. **[deep-docs](deep-docs.md)** — map what you built; confirm every anchor verifies.
+7. **Capstone** (below) — run all five end-to-end on one feature, unassisted.
 
 ### Capstone exercise
 
@@ -137,6 +143,7 @@ Pick a small, real feature in a repo you know. Run the full loop:
 - `/deep-plan-review` it in `--multi-agent` mode; apply accepted fixes to the plan.
 - `/deep-implement` it collaboratively, one phase at a time.
 - `/deep-code-review` the branch, then `/deep-code-review --triage`.
+- `/deep-docs` the result — generate the `docs/ai-map/` and confirm every anchor verifies.
 
 **You've mastered the system when:** a teammate can open only your
 `.deep-skills/<effort>/` directory — no chat history — and reconstruct what was built, why,
@@ -157,3 +164,6 @@ what was reviewed, and what remains deferred.
 | **Directive card** | A human-gated, toggleable learned improvement loaded as data at runtime. |
 | **Manifest** | `00-Manifest/manifest.md`, the per-effort stage-status index. |
 | **Triage** | The opt-in `--triage` step that decides fix/defer/reject and writes to the plan. |
+| **AI map** | `docs/ai-map/`, deep-docs' standing, machine-owned, tiered documentation of what's built. |
+| **Anchor** | A `path:line (symbol)` reference backing a doc claim; symbol-primary, verified before publish. |
+| **Tier-0** | deep-docs' always-loaded `MAP.md` + `index.json`, held under a hard token ceiling. |

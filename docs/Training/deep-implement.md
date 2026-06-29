@@ -1,6 +1,6 @@
 # Training: `/deep-implement`
 
-> Part of the [Deep Skills Training Program](README.md). Skill 3 of 4 — **execute**.
+> Part of the [Deep Skills Training Program](README.md). Skill 3 of 5 — **execute**.
 > Source: [`plugins/deep-skills/skills/deep-implement/SKILL.md`](../../plugins/deep-skills/skills/deep-implement/SKILL.md)
 
 `/deep-implement` executes a finished, reviewed plan **phase by phase**:

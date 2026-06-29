@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Deep Skills — Training Series</title>
-<meta name="description" content="A self-paced, video-ready training series for the Deep-* skills: plan → plan-review → implement → code-review. Learn to drive each skill and understand why every guardrail exists.">
+<meta name="description" content="A self-paced training series for the Deep-* skills: plan → plan-review → implement → code-review → docs. Learn to drive each skill and understand why every guardrail exists.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -24,16 +24,15 @@
       <a href="#episodes">Episodes</a>
       <a href="#artifacts">Artifacts</a>
       <a href="#deep-learn">Deep-Learn</a>
-      <a href="production-guide.html">Production guide</a>
     </div>
   </div>
 </nav>
 
 <!-- ===================== HERO ===================== -->
 <section class="hero wrap">
-  <span class="eyebrow">● Self-paced curriculum · Video-ready</span>
+  <span class="eyebrow">● Self-paced curriculum</span>
   <h1>The Deep Skills<br><span class="grad">Training Series</span></h1>
-  <p class="kicker">Six episodes that take you from <b>idea</b> to <b>verified code</b> — teaching you to <b>drive</b> each skill and understand <b>why every guardrail exists</b>. Built to be read as a course and narrated as a video series.</p>
+  <p class="kicker">Five episodes that take you from <b>idea</b> to <b>verified code</b> — and a standing map of what you built — teaching you to <b>drive</b> each skill and understand <b>why every guardrail exists</b>.</p>
   <div class="cta-row">
     <a class="btn primary" href="deep-plan.html">Start Episode 1 →</a>
     <a class="btn ghost" href="#episodes">Browse all episodes</a>
@@ -76,7 +75,7 @@
 
   <div class="callout note" style="margin-top:30px">
     <span class="t">Who this is for</span>
-    <p>Engineers who will <b>use</b> the deep-skills on their own features, and maintainers who will <b>extend</b> them. No prior exposure to the plugin is assumed — you should be comfortable with Claude Code, git, and reading a codebase. Two further skills, <a href="roadmap.html">deep-bug-fix and deep-docs</a>, are on the roadmap and covered in the bonus episode.</p>
+    <p>Engineers who will <b>use</b> the deep-skills on their own features, and maintainers who will <b>extend</b> them. No prior exposure to the plugin is assumed — you should be comfortable with Claude Code, git, and reading a codebase. A fifth skill, <a href="deep-docs.html">deep-docs</a>, is the orientation layer that maps what the loop produced.</p>
   </div>
 </section>
 
@@ -111,8 +110,8 @@
   </div>
 
   <div class="callout why" style="margin-top:26px">
-    <span class="t">Why this matters for the video series</span>
-    <p>These four ideas are the recurring beats. Each skill episode is, at heart, a demonstration of how that skill enforces one or more of them. If you're scripting narration, open every episode by naming which principle it is about to make concrete.</p>
+    <span class="t">Why these recur</span>
+    <p>These four ideas are the recurring beats of the whole series. Each skill episode is, at heart, a demonstration of how that skill enforces one or more of them — name which principle is in play and the per-skill decisions stop looking arbitrary.</p>
   </div>
 </section>
 
@@ -120,7 +119,7 @@
 <section class="sec wrap" id="episodes">
   <span class="anchor" id="eps"></span>
   <div class="sec-tag">The curriculum</div>
-  <h2>Six episodes</h2>
+  <h2>Five episodes</h2>
   <p class="lead">Work them in order — the skills compose, and later episodes assume the vocabulary from earlier ones. Each page carries learning objectives, a mental model, a guided walkthrough, the <b>design decisions</b> behind the skill, common mistakes, and a mastery checklist.</p>
 
   <div class="grid c2" style="margin-top:28px">
@@ -156,21 +155,13 @@
       <p>Run multi-agent, evidence-gated review that catches the last mile — then triage as a separate, opt-in step.</p>
       <span class="tag">Close the loop</span>
     </a>
-    <a class="card ep-card t5 reveal" href="roadmap.html">
+    <a class="card ep-card t5 reveal" href="deep-docs.html">
       <span class="n">5</span>
-      <span class="k">EPISODE FIVE · BONUS</span>
-      <h3>The roadmap skills</h3>
-      <span class="cmd">deep-bug-fix · deep-docs</span>
-      <p>Two designed-but-unbuilt skills: diagnosis-first bug fixing under regression risk, and a context-window-aware doc layer.</p>
-      <span class="tag">What's next</span>
-    </a>
-    <a class="card ep-card t6 reveal" href="production-guide.html">
-      <span class="n">6</span>
-      <span class="k">FOR PRODUCERS</span>
-      <h3>Video production guide</h3>
-      <span class="cmd">episodes · runtimes · visuals</span>
-      <p>Turn this curriculum into a video series: an episode-by-episode shot list, suggested runtimes, on-screen visuals, and narration beats.</p>
-      <span class="tag">Make the video</span>
+      <span class="k">EPISODE FIVE · ORIENT</span>
+      <h3>deep-docs</h3>
+      <span class="cmd">/deep-docs</span>
+      <p>Generate context-window-aware documentation of what's been built — three loadable tiers, every claim anchored to <code>path:line</code> and verified.</p>
+      <span class="tag">Map what you built</span>
     </a>
   </div>
 </section>
@@ -240,13 +231,14 @@
 <section class="sec wrap">
   <div class="panel bar reveal">
     <div class="sec-tag">The capstone exercise</div>
-    <h2 style="font-size:clamp(24px,3.4vw,34px)">Run all four, unassisted</h2>
+    <h2 style="font-size:clamp(24px,3.4vw,34px)">Run all five, unassisted</h2>
     <p>Pick a small, real feature in a repo you know, and run the full loop end-to-end:</p>
     <ol>
       <li><code>/deep-plan</code> it — choose an effort name; produce a resumable plan with a Data-Flow Contract.</li>
       <li><code>/deep-plan-review</code> it in <code>--multi-agent</code> mode; apply accepted fixes to the plan.</li>
       <li><code>/deep-implement</code> it collaboratively, one phase at a time.</li>
       <li><code>/deep-code-review</code> the branch, then <code>/deep-code-review --triage</code>.</li>
+      <li><code>/deep-docs</code> the result — generate the <code>docs/ai-map/</code> and confirm every anchor verifies.</li>
     </ol>
     <div class="callout why" style="margin-bottom:0">
       <span class="t">You've mastered the system when…</span>
@@ -280,7 +272,7 @@
 
 <footer>
   <div class="wrap">
-    <span>Deep Skills Training Series · a course + video companion for the <code>deep-*</code> plugin</span>
+    <span>Deep Skills Training Series · a self-paced course for the <code>deep-*</code> plugin</span>
     <span><a href="deep-plan.html">Start Episode 1 →</a></span>
   </div>
 </footer>

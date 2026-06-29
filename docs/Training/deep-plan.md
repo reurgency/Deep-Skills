@@ -1,6 +1,6 @@
 # Training: `/deep-plan`
 
-> Part of the [Deep Skills Training Program](README.md). Skill 1 of 4 — **produce**.
+> Part of the [Deep Skills Training Program](README.md). Skill 1 of 5 — **produce**.
 > Source: [`plugins/deep-skills/skills/deep-plan/SKILL.md`](../../plugins/deep-skills/skills/deep-plan/SKILL.md)
 
 `/deep-plan` runs a guided, **interruptible** feature-planning session and produces a

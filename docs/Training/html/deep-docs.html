@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Episode 5 · deep-docs — Deep Skills Training</title>
+<meta name="description" content="Generate context-window-aware, anchored, verified documentation of what a codebase has built — and understand why deep-docs is the series' orientation layer.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="theme-docs">
+<div id="progress"></div>
+<div class="glow a"></div><div class="glow b"></div>
+
+<nav class="top">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="dot"></span> Deep Skills <span class="muted" style="font-weight:400">/ Ep.5 deep-docs</span></a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <div class="navlinks">
+      <a href="index.html">Overview</a>
+      <a href="deep-plan.html">1 · Plan</a>
+      <a href="deep-plan-review.html">2 · Review</a>
+      <a href="deep-implement.html">3 · Implement</a>
+      <a href="deep-code-review.html">4 · Code review</a>
+      <a href="deep-docs.html" class="active">5 · Docs</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero wrap narrow">
+  <div class="ep-badge"><span class="pill">EPISODE 5</span><span class="label">Orient</span></div>
+  <h1><span class="grad">deep-docs</span></h1>
+  <p class="kicker"><code>/deep-docs</code> produces <b>context-window-aware documentation of what's been built</b> — a standing, queryable map structured for <b>progressive disclosure</b>, where every claim is anchored to <code>file:line (symbol)</code> and adversarially verified by fresh agents. <b>Documents only — it never edits source.</b></p>
+  <div class="chips center" style="justify-content:center">
+    <span class="chip"><span class="d"></span> Three loadable tiers</span>
+    <span class="chip"><span class="d"></span> Anchored or it's fiction</span>
+    <span class="chip"><span class="d"></span> Exhaustive verify</span>
+    <span class="chip"><span class="d"></span> 13 design decisions</span>
+  </div>
+</section>
+
+<div class="wrap">
+<div class="layout">
+
+<aside class="toc">
+  <div class="tt">On this page</div>
+  <a href="#objectives">Learning objectives</a>
+  <a href="#model">Mental model</a>
+  <a href="#tiers">The three tiers</a>
+  <a href="#walkthrough">How to use it</a>
+  <a href="#anchoring">Anchoring &amp; verify</a>
+  <a href="#flags">Flags &amp; refresh</a>
+  <a href="#why">Why it's built this way</a>
+  <a href="#mistakes">Common mistakes</a>
+  <a href="#mastery">Mastery checklist</a>
+  <a href="#qref">Quick reference</a>
+</aside>
+
+<main>
+
+<!-- OBJECTIVES -->
+<section class="sec tight" id="objectives">
+  <div class="sec-tag">In this episode</div>
+  <h2>Learning objectives</h2>
+  <div class="obj">
+    <div class="o"><span class="i">1</span><p>Run deep-docs after a build — or standalone on any repo — and produce a <code>docs/ai-map/</code> an agent can crawl under a token budget.</p></div>
+    <div class="o"><span class="i">2</span><p>Explain the <b>three independently-loadable tiers</b> and why tier-0 must stay tiny.</p></div>
+    <div class="o"><span class="i">3</span><p>Understand why <b>every claim is anchored</b> to <code>path:line (symbol)</code> — and why an unverified anchor blocks publish.</p></div>
+    <div class="o"><span class="i">4</span><p>Use <b>refresh</b> to keep the map current without regenerating the whole thing.</p></div>
+    <div class="o"><span class="i">5</span><p>Recognize the boundary: deep-docs <b>documents, never decides</b>, and changes no source.</p></div>
+  </div>
+</section>
+
+<!-- MENTAL MODEL -->
+<section class="sec" id="model">
+  <div class="sec-tag">The frame</div>
+  <h2>Mental model</h2>
+  <div class="panel lead-panel bar reveal">
+    <p>deep-docs is the series' missing <span class="hl">orientation layer</span>. Implement's hand-off notes are change-scoped and discarded; code-review emits defects, not orientation; conventional generators dump one exhaustive human altitude with <span class="hl">no notion of "load only this layer."</span></p>
+    <p>Your product is a <i>standing, queryable map</i> — built so an agent on a token budget pays only for the slice its task needs.</p>
+  </div>
+  <div class="callout why">
+    <span class="t">The signature failure it hunts</span>
+    <p>The <b>dual failure of AI-facing docs</b>: the <b>stale map</b> (describes intent, not the code as it is) and the <b>bloated dump</b> (must be loaded whole). Anchoring + verify defend against the first; tiering + a tier-0 ceiling defend against the second.</p>
+  </div>
+</section>
+
+<!-- THE THREE TIERS -->
+<section class="sec" id="tiers">
+  <div class="sec-tag">The structure</div>
+  <h2>Three independently-loadable tiers</h2>
+  <p>Each tier loads on its own. A crawling agent reads the always-loaded index, then pulls only the cards and references its task actually touches.</p>
+  <div class="code reveal">
+    <div class="hd"><div class="dots"><i></i><i></i><i></i></div><span class="fn">docs/ai-map/ — progressive disclosure</span></div>
+<pre><span class="a">tier-0</span>  MAP.md + index.json   <span class="c">← always loaded · tiny · hard ceiling (~2,000 est)</span>
+<span class="a">tier-1</span>  subsystem cards       <span class="c">← loaded on touch · one per boundary</span>
+<span class="a">tier-2</span>  deep references       <span class="c">← on demand · earned by real cross-layer flow / non-obvious invariant</span></pre>
+  </div>
+  <div class="callout note">
+    <span class="t">Every token figure is an estimate</span>
+    <p>Cost is a cheap <code>ceil(chars/4)</code> heuristic, labeled an estimate on every surface — <code>~450 est</code>, <code>~1.2k est</code> — never presented as exact. Zero dependencies, accurate enough to drive load/skip decisions, and upgradeable to a real tokenizer later (the "estimate" label is the seam).</p>
+  </div>
+</section>
+
+<!-- WALKTHROUGH -->
+<section class="sec" id="walkthrough">
+  <div class="sec-tag">How to use it</div>
+  <h2>The pipeline, stage by stage</h2>
+  <p>Run the default-mode pipeline end-to-end. Each stage has a spine reference; read it before executing that stage.</p>
+  <ol class="steps">
+    <li>
+      <span class="module">Stage 1</span>
+      <h4>Intake &amp; scope</h4>
+      <p>Resolve the input mode (effort diff / named subsystem / whole repo), standalone-vs-effort home, and host conventions (source dirs, language, test layout) — <b>never reading <code>.env</code>/secrets</b>. Apply the <b>existing-docs quarantine</b>: index human docs as <code>human-authored · not anchor-verified</code>, never ingest their prose. State the resolved scope in one line before launching anything.</p>
+    </li>
+    <li>
+      <span class="module">Stage 2</span>
+      <h4>Survey (fan-out per boundary)</h4>
+      <p>Discover boundaries <b>directory-primary + heuristic refine</b> (skip vendored/build dirs; split huge dirs by entry-point; merge tiny siblings; cap ~12). Launch <b>one fresh read-only agent per boundary</b> (≤8 concurrent), each blind to the others, to discover entry points, public surface, key types, invariants, and data flows. Every split/merge/cap decision is recorded in <code>coverage.md</code>.</p>
+    </li>
+    <li>
+      <span class="module">Stage 3</span>
+      <h4>Three-tier layering with anchors</h4>
+      <p>Lay the survey output into the three tiers. Every claim carries a <code>path:line (symbol)</code> anchor; the symbol is the nearest preceding declaration. Every emitted file carries the <code>GENERATED — do not hand-edit; regenerate overwrites</code> header.</p>
+    </li>
+    <li>
+      <span class="module">Stage 4</span>
+      <h4>Anchor-verify (always-on, fan-out per card)</h4>
+      <p>Launch <b>one fresh adversarial verifier per card</b> (≤8 concurrent) that re-resolves <b>every</b> anchor by symbol grep and returns <code>accurate | drifted | over-budget</code>. No sampling. <b>A card with any drifted/over-budget anchor blocks publish</b> — the doc-analogue of an unresolved State/Data-Flow contract row.</p>
+    </li>
+    <li>
+      <span class="module">Stage 5</span>
+      <h4>Index &amp; coverage</h4>
+      <p>Emit <code>index.json</code> (concept/symbol → doc + anchor + token-est + load-when + trust), the machine index the crawling agent reads. Hold tier-0 under its ceiling, switching to <b>grouped overflow</b> rather than truncating. Emit <code>coverage.md</code> — the honesty artifact (documented / not-documented + why / card-only / referenced-vs-ingested / capped boundaries) — plus <code>learn-signal.json</code>, the forward-dependent drift feed (Display-only today).</p>
+    </li>
+    <li>
+      <span class="module">Stage 6</span>
+      <h4>Place (staging + atomic mv) &amp; report</h4>
+      <p>Generate into the sibling staging dir <code>docs/.ai-map.staging/</code> with an <code>.in-progress</code> marker; on success (verify passed) atomically replace <code>docs/ai-map/</code> via <code>mv</code>. A run that finds an existing marker <b>refuses</b>. Effort mode also writes a <code>07-Docs/</code> pointer + the manifest line. Close with the coverage summary and the explicit not-documented list.</p>
+    </li>
+  </ol>
+</section>
+
+<!-- ANCHORING -->
+<section class="sec" id="anchoring">
+  <div class="sec-tag">The teeth</div>
+  <h2>Anchored or it's fiction</h2>
+  <p>No prose enters a trusted tier without a resolvable <code>path:line (symbol)</code> anchor, and every anchor is adversarially verified. Anchoring is <b>symbol-primary</b>:</p>
+  <ul>
+    <li>Verify re-resolves by <b>symbol first</b>, and <b>re-snaps the line number</b> if it drifted (a benign edit above shifted it).</li>
+    <li>It flags <code>drifted</code> only if the <b>symbol is gone</b> — the thing the doc describes no longer exists.</li>
+    <li>Any <code>drifted</code> / <code>over-budget</code> anchor <b>blocks publish</b> for its card.</li>
+  </ul>
+  <div class="callout why">
+    <span class="t">Why symbol-primary, exhaustive, no sampling</span>
+    <p>A raw line number is fragile (any edit above shifts it); a content hash is <i>too</i> sensitive (every reformat trips it). Symbol-primary tolerates benign movement while still catching real removal. And because symbol-grep is cheap, exhaustive verification is affordable — the guarantee is binary: if even one anchor is unverified, the whole trusted tier can't be trusted. This mirrors code-review's fresh-agent adversarial verification, re-skinned for docs.</p>
+  </div>
+</section>
+
+<!-- FLAGS -->
+<section class="sec" id="flags">
+  <div class="sec-tag">Know which to reach for</div>
+  <h2>Flags &amp; refresh</h2>
+  <p>Every flag is <b>natural-language-first</b> — the plain-language trigger is the primary path (users on Copilot/Codex have no slash-commands or CLI flags); the <code>--flag</code> is a convenience on top.</p>
+  <div class="tbl-wrap reveal">
+    <table>
+      <thead><tr><th style="width:170px">Trigger</th><th>Say</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><i>(default)</i></td><td>“map this codebase,” “document what's built”</td><td>Runs the full default-mode pipeline above.</td></tr>
+        <tr><td>put under &lt;path&gt;</td><td>“write the map to <code>docs/foo</code>”</td><td>Overrides the default <code>docs/ai-map/</code> output location.</td></tr>
+        <tr><td><code>--refresh</code></td><td>“refresh the docs,” “regenerate the map”</td><td>Re-resolves anchors <b>and</b> diffs the file-set against the stored fingerprint, then regenerates only the stale + new subsystems.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout note">
+    <span class="t">Refresh uses a dual git-free signal</span>
+    <p><code>--refresh</code> consolidates verify + incremental: (1) re-resolve all anchors → report drift; (2) diff the current source file-set against <code>index.json</code> → catch undocumented additions. A git base ref is an optional accelerator, used <i>only when</i> git is proven reliable for this map; on any dirty/non-git/shallow/brownfield tree the dual git-free signal still drives the decision. A stored <code>alignment_fingerprint</code> drives a convergence model — once anchors stop drifting and the file-set matches across rounds, refresh promotes to the fast git-diff path (and drops back automatically if git stops aligning).</p>
+  </div>
+</section>
+
+<!-- WHY / DESIGN DECISIONS -->
+<section class="sec" id="why">
+  <div class="sec-tag">The design rationale</div>
+  <h2>Why deep-docs is built this way</h2>
+  <p class="lead">Thirteen decisions shape this skill. Expand each for <span class="good">what it does</span>, the <span class="bad">rejected alternative</span>, and <span class="accent">why</span>.</p>
+
+  <details class="decision-block reveal" open>
+    <summary><span class="dn">1</span><span class="dt">Three independently-loadable tiers (progressive disclosure)</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Tier-0 <code>MAP.md</code> + <code>index.json</code> (always-loaded, tiny), tier-1 subsystem cards (on touch), tier-2 deep references (on demand) — each loadable on its own.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>A single exhaustive human-readable dump, the way typedoc/sphinx/docusaurus work — one altitude with no notion of "load only this layer," costing an agent its whole context window to answer a one-subsystem question.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>The product <i>is</i> context-window economy: an agent on a token budget should pay only for the slice its task needs. Tiering is the structural defense against the <i>bloated dump</i> half of the signature failure.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">2</span><span class="dt">Every claim is anchored or it's fiction</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>No prose enters a trusted tier without a resolvable <code>file:line (symbol)</code> anchor, and every anchor is adversarially verified.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Free-prose documentation that describes intent — ordinary doc-generator output. Rejected because it produces the <i>stale map</i>: docs that drift from the code as it actually is.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Anchoring + freshness re-check is the structural defense against the <i>stale map</i>. It's the doc-equivalent of the series' evidence rule (“a <code>path:line</code>, a named symbol, or an observed behavior”) and of an unresolved DLC-001 row blocking a plan.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">3</span><span class="dt">Doc location: in-repo, effort-aware, overridable</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Output defaults to in-repo <code>docs/ai-map/</code>; in effort mode it also writes a <code>07-Docs/</code> pointer + manifest line; the path is overridable by argument.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>A non-version-controlled or out-of-repo store.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>In-repo means the map is standing, version-controlled, and diffs with the PR that changed the code — so doc drift is reviewable, not invisible.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">4</span><span class="dt">Token cost: the chars/4 estimate</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Token cost is a cheap <code>ceil(chars/4)</code> heuristic, labeled an estimate everywhere it appears (e.g. <code>~450 est</code>).</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>A real tokenizer dependency — rejected for the markdown-only / zero-dep baseline.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Zero dependencies fits a markdown-only repo, and the estimate is accurate enough to drive load/skip decisions; it's explicitly upgradeable to a real tokenizer later, with the “estimate” label as the seam.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">5</span><span class="dt">Anchoring: symbol-primary with re-snap</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Anchors are <code>path:line (symbol)</code>, symbol-primary: verify re-resolves by symbol first, re-snaps the line number if it drifted (benign), and flags <code>drifted</code> only if the symbol is gone.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Content-hash anchoring — rejected as noisy (flags benign edits).</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>A raw line number is fragile (any edit above shifts it); a content hash is <i>too</i> sensitive (every reformat trips it). Symbol-primary is the right sensitivity for “did the thing this doc describes still exist?”</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">6</span><span class="dt">Boundary discovery: directory-primary + heuristic refine</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Subsystem boundaries are discovered directory-primary — split huge dirs by entry-point, merge tiny siblings, cap the count.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Import-graph / LSP boundary discovery — rejected as non-portable for the standalone-on-any-repo primary mode; deferred as an opt-in refinement.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Directory structure is universally available; an import graph or LSP is language/tooling-specific and breaks the “runs standalone on any repo” promise. Semantic discovery is kept as a future opt-in layer feeding the same boundary list.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">7</span><span class="dt">Anchor-verify: exhaustive, no sampling</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Always-on, fan-out-per-card verification: one fresh adversarial verifier per card re-resolves <i>every</i> anchor and returns <code>accurate | drifted | over-budget</code>; bounded ~8 concurrency; any drifted/over-budget anchor blocks publish.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Sampled/budgeted verification — rejected because an unverified anchor violates the core anchoring guarantee.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Symbol-grep is cheap, so exhaustive verification is affordable, and the guarantee is binary: if even one anchor is unverified, the trusted tier can't be trusted. This mirrors code-review's fresh-agent adversarial verification.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">8</span><span class="dt">Tier-0 ceiling: grouped overflow, never truncate</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Tier-0 has a fixed hard ceiling (~2,000 est); when subsystems exceed it, <code>MAP.md</code> groups them by top-level area with per-group subtotals + load-when triggers, and detail spills into the grouped index — never silently truncated.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Silent truncation; or scaling the ceiling with repo size.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>A scaling ceiling defeats the purpose (tier-0 must stay tiny and always-loadable); silent truncation reads as “covered everything” when it didn't. Grouping keeps tier-0 under budget while preserving an honest, navigable path to the spilled detail.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">9</span><span class="dt">Refresh: one flag, dual git-free signal + convergence</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>A single <code>--refresh</code>: (1) re-resolve all anchors → report drift; (2) diff the current source file-set against <code>index.json</code> → catch undocumented additions; regenerate only stale + new subsystems. Git is an optional accelerator; a stored alignment fingerprint drives a convergence model.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Git-only or anchor-only refresh signals.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Git-only breaks on non-git/dirty/shallow trees; anchor-only misses <i>new</i> undocumented files. The dual signal catches both drift and additions without depending on git, while still using git as a fast path when it's reliable — two failure modes need two probes.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">10</span><span class="dt">Artifacts are 100% machine-owned</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p><code>docs/ai-map/</code> is 100% machine-owned; every file carries a <code>GENERATED — do not hand-edit; regenerate overwrites</code> header, and regen is a wholesale overwrite, no merge.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>A two-rendering output (an agent map <i>and</i> a separate human site) — rejected, markdown is already human-readable, a second rendering just drifts; and merge-on-regen instead of overwrite.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Docs here are an <i>index, not a narrative</i>, so regenerate-whole is correct and merge would invite drift; humans annotate elsewhere. A single machine-owned rendering can't fall out of sync with itself.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">11</span><span class="dt">Existing docs: quarantine, not launder</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Useful existing docs (README/design notes) are indexed in <code>index.json</code> as external pointers marked <code>human-authored · not anchor-verified</code> so the crawler can find them, but their prose is <b>never</b> absorbed into a trusted tier; <code>coverage.md</code> lists referenced-vs-ingested.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Ingesting existing-doc prose into the trusted tiers (laundering it) — rejected as a risk in its own right.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Unverified human prose absorbed into a trusted tier silently breaks the anchoring guarantee — the reader can no longer tell anchored fact from inherited claim. Quarantine keeps the trust boundary visible.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">12</span><span class="dt">Build by mirroring siblings; rationale stays in docs/Training/</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>The skill is built by mirroring its two closest siblings — <code>deep-code-review</code> (fan-out survey, fresh-agent adversarial verification, evidence/anchor discipline) and <code>deep-plan</code> (skill scaffold, directive-card stanza, artifact/manifest conventions) — reusing host-agnostic machinery verbatim, including a <b>byte-identical</b> copy of <code>load-active-cards.sh</code>. The rationale write-up lives under <code>docs/Training/</code>, never baked into the skill.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Inventing new scaffolding; or shipping a <code>references/design-rationale.md</code> inside the skill — “the skill doesn't read it, so it would only bloat <code>references/</code>.”</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>The series' standalone rule says each skill self-contains and only <code>directives/</code> is shared, with host-agnostic files copied byte-identical — reuse means <i>copy</i>, not import. Rationale justifies design to a <i>human</i>; the skill never loads it, so it belongs in training material.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">13</span><span class="dt">Cross-assistant portability: natural language is primary</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Natural-language invocation is the <b>primary</b> path; <code>--flags</code> are a convenience layered on top, and <code>--refresh</code> plus every interaction ships a plain-language trigger from day one (e.g. “refresh the docs”).</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Slash-command / CLI-flag-only invocation (the convention the four built skills grew up with).</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>The series must be drivable by users on GitHub Copilot or Codex, who have neither Claude-Code slash-commands nor a CLI-flag convention. deep-docs is built as the reference implementation of this portability principle; retrofitting the older skills is a separate sweep.</p></div>
+    </div>
+  </details>
+
+  <div class="callout why">
+    <span class="t">A reflexive observation</span>
+    <p>deep-docs “recreates Claude Code's own Skills architecture” — tier-0 is an always-loaded index, tier-1 cards load on touch, tier-2 refs on demand: exactly the progressive-disclosure shape a <code>SKILL.md</code> + <code>references/</code> uses. The orientation layer for agents is, structurally, the same idea as the skill format that produced it.</p>
+  </div>
+</section>
+
+<!-- MISTAKES -->
+<section class="sec" id="mistakes">
+  <div class="sec-tag">Watch out</div>
+  <h2>Common mistakes</h2>
+  <div class="mistake"><p><b>Editing source or other docs.</b> deep-docs owns <code>docs/ai-map/</code> exclusively and changes no application code.</p></div>
+  <div class="mistake"><p><b>Writing unanchored prose</b> into a trusted tier — every claim needs a resolvable <code>path:line (symbol)</code>.</p></div>
+  <div class="mistake"><p><b>Laundering existing READMEs</b> into a tier. Index them as external-unverified pointers; never ingest the prose.</p></div>
+  <div class="mistake"><p><b>Letting tier-0 bloat past its ceiling</b> — switch to grouped overflow, never truncate.</p></div>
+  <div class="mistake"><p><b>Sampling anchors</b> to save time — one unverified anchor and the whole tier can't be trusted.</p></div>
+  <div class="mistake"><p><b>Reading <code>.env</code> for host conventions</b> — never. Use <code>package.json</code> / <code>angular.json</code> / <code>CLAUDE.md</code>, else ask.</p></div>
+  <div class="mistake"><p><b>Half-writing the map</b> — all generation goes through staging + atomic <code>mv</code>; a second run while a marker exists refuses.</p></div>
+</section>
+
+<!-- MASTERY -->
+<section class="sec" id="mastery">
+  <div class="sec-tag">Prove it</div>
+  <h2>Mastery checklist</h2>
+  <ul class="checklist">
+    <li>Generated a <code>docs/ai-map/</code> an agent can crawl, loading only the slice its task needs.</li>
+    <li>Kept tier-0 under its ceiling — grouped overflow, never truncation.</li>
+    <li>Every claim anchored to <code>path:line (symbol)</code>; every anchor verified before publish.</li>
+    <li>Quarantined existing docs as external-unverified; never laundered their prose.</li>
+    <li>Ran <code>--refresh</code> and regenerated only the stale + new subsystems.</li>
+    <li>Touched no application source — documents, never decides.</li>
+  </ul>
+</section>
+
+<!-- QUICK REF -->
+<section class="sec" id="qref">
+  <div class="sec-tag">At a glance</div>
+  <h2>Quick reference</h2>
+  <div class="qref reveal">
+    <div class="qh">deep-docs</div>
+    <dl>
+      <dt>Output</dt><dd><code>docs/ai-map/</code> → <code>MAP.md</code> · <code>index.json</code> · subsystem cards · <code>coverage.md</code></dd>
+      <dt>Tiers</dt><dd>tier-0 always-loaded · tier-1 on touch · tier-2 on demand</dd>
+      <dt>Hard rules</dt><dd>Anchored or it's fiction; documents, never decides; changes no source</dd>
+      <dt>Refresh</dt><dd>Dual git-free signal — drift + undocumented additions</dd>
+      <dt>Runs</dt><dd>After <code>/deep-implement</code> or <code>/deep-code-review</code>, or standalone on any repo</dd>
+    </dl>
+  </div>
+</section>
+
+<!-- EPISODE NAV -->
+<div class="epnav">
+  <a href="deep-code-review.html"><span class="dir">← Previous</span><span class="ttl">deep-code-review</span><span class="cmd">/deep-code-review</span></a>
+  <a class="next" href="index.html"><span class="dir">Back to →</span><span class="ttl">Series overview</span><span class="cmd">Run all five</span></a>
+</div>
+
+</main>
+</div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>Episode 5 of 5 · deep-docs · Orient</span>
+    <span><a href="index.html">All episodes</a></span>
+  </div>
+</footer>
+
+<script src="assets/series.js"></script>
+</body>
+</html>
