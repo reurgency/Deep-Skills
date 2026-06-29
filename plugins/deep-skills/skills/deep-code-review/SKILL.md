@@ -7,11 +7,23 @@ description: Independently review implemented code with fresh, evidence-driven a
 
 Independently review **implemented code** the way `/deep-plan-review` reviews a *plan*: fresh agents, evidence-required findings, and a clean review report. **Triage is a separate, opt-in step** (`--triage`) — the review run itself makes no fix/defer/reject decisions, asks no triage questions, and **never edits the plan**. **Review only — never edit source** (see Guardrails for what "source" means).
 
-This is the fourth skill of the `deep-*` series: `/deep-plan` (produce) → `/deep-plan-review` (critique the plan) → `/deep-implement` (execute) → **`/deep-code-review` (critique the code)**. It closes the loop: the gate between "the implementation agent says it's done" and "this is actually done."
+This is the fourth skill of the `deep-*` series: `/deep-plan` (produce) → `/deep-plan-review` (critique the plan) → `/deep-implement` (execute) → **`/deep-code-review` (critique the code)** → `/deep-docs` (map what's built). It closes the loop: the gate between "the implementation agent says it's done" and "this is actually done."
 
 ## Core principle: independence + the last mile
 
 The implementer is too close to the code to see what it left out. The review runs in **fresh agent(s)** that receive the diff + the plan + codebase access — **but never the implementation transcript**. Its signature concern is the **last-mile problem**: code where the interface looks correct and the happy path appears connected, but the behavior doesn't make it the last mile — optimistic UI with no real call, swallowed errors, half-wired chains, silently dropped plan scope.
+
+## The deep-* series (separation of concerns)
+
+<!-- Quintet today; becomes a sextet when deep-bug-fix ships — that skill's own series-wiring adds its row here. -->
+
+| Skill | Job | This skill's boundary |
+|---|---|---|
+| `/deep-plan` | Frame → explore → question → write the plan (resumable phases + deferreds). | Out of scope here. |
+| `/deep-plan-review` | Independently review the finished plan with fresh agents. | Out of scope here. |
+| `/deep-implement` | Execute the plan: implement → validate → fix → commit → hand-off. The only skill that writes source. | Out of scope here. |
+| `/deep-code-review` (you) | Independently review implemented code; emit findings. | Independently review implemented code; emit severity-gated, adversarially-verified findings. **Reports, never fixes.** |
+| `/deep-docs` | Map what's built: survey → tier → anchor → verify → index → place a standing `docs/ai-map/`. | Out of scope here. |
 
 ## In-session commands
 

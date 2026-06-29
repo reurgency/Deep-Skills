@@ -14,7 +14,9 @@ All deep-* skills read and write their **artifacts** under the host project's `.
   03-Implementation/  deep-implement work summary + acceptance check-off
   04-Code-Review/     deep-code-review report, findings.json, certificate
   05-Security/        deep-security artifacts (future effort)
-  06–09               reserved
+  06-Bug-Fix/         deep-bug-fix report + fix artifacts (when that skill ships)
+  07-Docs/            deep-docs pointer → in-repo docs/ai-map/ (the canonical map output)
+  08–09               reserved
 ```
 
 Canonical file names per stage:
@@ -23,6 +25,8 @@ Canonical file names per stage:
 - `02-Plan-Review/review.md` — the full review report (deep-plan-review).
 - `03-Implementation/summary.md` — work summary + acceptance check-off (deep-implement).
 - `04-Code-Review/report.md`, `findings.json`, `certificate.md` — code review artifacts (deep-code-review).
+- `06-Bug-Fix/report.md` — root-cause + fix record (deep-bug-fix, when that skill ships).
+- `07-Docs/` — in effort mode, a **pointer** to the canonical in-repo `docs/ai-map/` (deep-docs writes the map to `docs/ai-map/`, not into the effort dir): `MAP.md`, `index.json`, `subsystems/`, `references/`, `coverage.md`, `learn-signal.json`.
 
 ## `00-Manifest/manifest.md` format
 
@@ -37,6 +41,8 @@ One status line per stage, each linking to that stage's artifacts:
 | 02 Plan Review | <pending | in progress | complete> | [review.md](../02-Plan-Review/review.md) |
 | 03 Implementation | <pending | in progress | complete> | [summary.md](../03-Implementation/summary.md) |
 | 04 Code Review | <pending | in progress | complete> | [report.md](../04-Code-Review/report.md) |
+| 06 Bug Fix | <pending | in progress | complete> | [report.md](../06-Bug-Fix/report.md) |
+| 07 Docs | <pending | in progress | complete> | [docs/ai-map/](../../docs/ai-map/) |
 
 <one-paragraph effort summary>
 ```

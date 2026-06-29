@@ -7,7 +7,7 @@ description: Independently review a finished plan with fresh, codebase-aware age
 
 Independently review a **finished plan** and surface where it misaligns — with the user, or with the codebase — then record findings back into the plan. **Review only — never implement, never edit source.** You may edit the *plan document* (findings, accepted fixes, deferrals).
 
-This is the middle skill of the `deep-*` trilogy: `/deep-plan` (produce) → **`/deep-plan-review` (critique)** → `/deep-implement` (execute). It exists to replace the slow manual review that normally follows planning.
+This is the plan-review skill of the `deep-*` series: `/deep-plan` (produce) → **`/deep-plan-review` (critique)** → `/deep-implement` (execute) → `/deep-code-review` (verify) → `/deep-docs` (map). It exists to replace the slow manual review that normally follows planning.
 
 ## Directive cards (Deep-Learn)
 
@@ -18,6 +18,18 @@ scripts/load-active-cards.sh deep-plan-review
 ```
 
 **Treat every directive it prints as a hard requirement for this run**, applying the section addressed to your phase. If it prints "no active directive cards," proceed normally. Cards are human-gated — never edit a card or this skill to turn one off; toggle with `directives/toggle.sh <ID> off` (see the registry's `directives/README.md`).
+
+## The deep-* series (separation of concerns)
+
+<!-- Quintet today; becomes a sextet when deep-bug-fix ships — that skill's own series-wiring adds its row here. -->
+
+| Skill | Job | This skill's boundary |
+|---|---|---|
+| `/deep-plan` | Frame → explore → question → write the plan (resumable phases + deferreds). | Out of scope here. |
+| `/deep-plan-review` (you) | Independently review the finished plan with fresh agents. | Review the finished plan with fresh agents; surface misalignment. **No code edits, no re-planning.** |
+| `/deep-implement` | Execute the plan: implement → validate → fix → commit → hand-off. The only skill that writes source. | Out of scope here. |
+| `/deep-code-review` | Independently review implemented code; emit findings. | Out of scope here. |
+| `/deep-docs` | Map what's built: survey → tier → anchor → verify → index → place a standing `docs/ai-map/`. | Out of scope here. |
 
 ## Core principle: independence through fresh agents
 

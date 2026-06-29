@@ -19,13 +19,17 @@ scripts/load-active-cards.sh deep-plan
 
 **Treat every directive it prints as a hard requirement for this run**, applying the section addressed to your phase. If it prints "no active directive cards," proceed normally. Cards are human-gated — never edit a card or this skill to turn one off; toggle with `directives/toggle.sh <ID> off` (see the registry's `directives/README.md`).
 
-## The deep-* trilogy (separation of concerns)
+## The deep-* series (separation of concerns)
+
+<!-- Quintet today; becomes a sextet when deep-bug-fix ships — that skill's own series-wiring adds its row here. -->
 
 | Skill | Job | This skill's boundary |
 |---|---|---|
-| `/deep-plan` (you) | Frame → explore → question → write the plan (resumable phases + deferreds). | Stop after the plan + optional `/columbo`. **No code edits.** |
-| `/deep-plan-review` | Review the finished plan. | Out of scope here. |
-| `/deep-implement` | implement → validate → fix → commit → hand-off; collaborative/autonomous orchestration. | Out of scope here — you only *structure* phases for it. |
+| `/deep-plan` (you) | Frame → explore → question → write the plan (resumable phases + deferreds). | Stop after the plan (+ optional /columbo). **No code edits** — you only frame and structure the work. |
+| `/deep-plan-review` | Independently review the finished plan with fresh agents. | Out of scope here. |
+| `/deep-implement` | Execute the plan: implement → validate → fix → commit → hand-off. The only skill that writes source. | Out of scope here. |
+| `/deep-code-review` | Independently review implemented code; emit findings. | Out of scope here. |
+| `/deep-docs` | Map what's built: survey → tier → anchor → verify → index → place a standing `docs/ai-map/`. | Out of scope here. |
 
 ## In-session commands — watch for these at EVERY step
 
