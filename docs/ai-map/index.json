@@ -1,0 +1,161 @@
+{
+  "_doc": "deep-docs machine index; see references/index-and-coverage.md",
+  "generated": { "indexed_against_commit": "3be12547cb941ab398fce82963104439f9e759a4", "tool_version": "deep-docs/0.1.0" },
+  "entries": [
+    {
+      "concept": "deep-plan",
+      "doc": "subsystems/deep-plan.md",
+      "anchor": { "path": "plugins/deep-skills/skills/deep-plan/SKILL.md", "line": 6, "symbol": "DeepPlan" },
+      "token_est": 994,
+      "load_when": "running or modifying a feature-planning session",
+      "trust": "anchored"
+    },
+    {
+      "concept": "deep-plan-review",
+      "doc": "subsystems/deep-plan-review.md",
+      "anchor": { "path": "plugins/deep-skills/skills/deep-plan-review/SKILL.md", "line": 6, "symbol": "DeepPlanReview" },
+      "token_est": 968,
+      "load_when": "reviewing or critiquing a finished plan",
+      "trust": "anchored"
+    },
+    {
+      "concept": "deep-implement",
+      "doc": "subsystems/deep-implement.md",
+      "anchor": { "path": "plugins/deep-skills/skills/deep-implement/SKILL.md", "line": 6, "symbol": "DeepImplement" },
+      "token_est": 1168,
+      "load_when": "executing a plan phase-by-phase",
+      "trust": "anchored"
+    },
+    {
+      "concept": "deep-implement — cross-phase execution flow",
+      "doc": "references/deep-implement.md",
+      "anchor": { "path": "plugins/deep-skills/skills/deep-implement/references/validation.md", "line": 34, "symbol": "Green ≠ verified for external shapes" },
+      "token_est": 866,
+      "load_when": "tracing plan→commit phase flow or the DLC-001 contract probe",
+      "trust": "anchored"
+    },
+    {
+      "concept": "deep-code-review",
+      "doc": "subsystems/deep-code-review.md",
+      "anchor": { "path": "plugins/deep-skills/skills/deep-code-review/SKILL.md", "line": 10, "symbol": "This is the fourth skill of the `deep-*` series" },
+      "token_est": 1233,
+      "load_when": "reviewing implemented code, diffs, or PRs",
+      "trust": "anchored"
+    },
+    {
+      "concept": "deep-code-review — multi-agent review pipeline",
+      "doc": "references/deep-code-review.md",
+      "anchor": { "path": "plugins/deep-skills/skills/deep-code-review/references/multi-agent.md", "line": 36, "symbol": "Haiku is NEVER used in this pipeline — any tier, any stage, any agent" },
+      "token_est": 758,
+      "load_when": "tracing the multi-agent review pipeline or last-mile chain-trace",
+      "trust": "anchored"
+    },
+    {
+      "concept": "deep-docs",
+      "doc": "subsystems/deep-docs.md",
+      "anchor": { "path": "plugins/deep-skills/skills/deep-docs/SKILL.md", "line": 10, "symbol": "Documents, never decides" },
+      "token_est": 1229,
+      "load_when": "generating or refreshing the AI map",
+      "trust": "anchored"
+    },
+    {
+      "concept": "deep-docs — generate pipeline",
+      "doc": "references/deep-docs.md",
+      "anchor": { "path": "plugins/deep-skills/skills/deep-docs/references/place-and-report.md", "line": 1, "symbol": "Place & report" },
+      "token_est": 707,
+      "load_when": "tracing the map-generation pipeline or the crash-safety/double-run invariant",
+      "trust": "anchored"
+    },
+    {
+      "concept": "directives",
+      "doc": "subsystems/directives.md",
+      "anchor": { "path": "plugins/deep-skills/directives/README.md", "line": 1, "symbol": "Directives Registry (Deep-Learn)" },
+      "token_est": 881,
+      "load_when": "working with Deep-Learn directive cards",
+      "trust": "anchored"
+    },
+    {
+      "concept": "docs/roadmap/DESIGN-OUTLINE.md (Deep-Learn design)",
+      "doc": "docs/roadmap/DESIGN-OUTLINE.md",
+      "anchor": { "path": "docs/roadmap/DESIGN-OUTLINE.md", "line": 1 },
+      "token_est": 3254,
+      "load_when": "need Deep-Learn design background (human-authored · not anchor-verified)",
+      "trust": "external-unverified"
+    },
+    {
+      "concept": "docs/roadmap/DEEP-DOCS-DESIGN.md (deep-docs design source)",
+      "doc": "docs/roadmap/DEEP-DOCS-DESIGN.md",
+      "anchor": { "path": "docs/roadmap/DEEP-DOCS-DESIGN.md", "line": 1 },
+      "token_est": 2897,
+      "load_when": "need deep-docs design source (human-authored · not anchor-verified)",
+      "trust": "external-unverified"
+    },
+    {
+      "concept": "docs/roadmap/DEEP-BUG-FIX-DESIGN.md (planned deep-bug-fix design)",
+      "doc": "docs/roadmap/DEEP-BUG-FIX-DESIGN.md",
+      "anchor": { "path": "docs/roadmap/DEEP-BUG-FIX-DESIGN.md", "line": 1 },
+      "token_est": 2917,
+      "load_when": "need planned deep-bug-fix design (human-authored · not anchor-verified)",
+      "trust": "external-unverified"
+    },
+    {
+      "concept": "docs/roadmap/DATA-FLOW-CONTRACT.md (DLC-001 seed directive)",
+      "doc": "docs/roadmap/DATA-FLOW-CONTRACT.md",
+      "anchor": { "path": "docs/roadmap/DATA-FLOW-CONTRACT.md", "line": 1 },
+      "token_est": 813,
+      "load_when": "need DLC-001 seed directive background (human-authored · not anchor-verified)",
+      "trust": "external-unverified"
+    },
+    {
+      "concept": "docs/Training/README.md (series curriculum entry point)",
+      "doc": "docs/Training/README.md",
+      "anchor": { "path": "docs/Training/README.md", "line": 1 },
+      "token_est": 2085,
+      "load_when": "need the series curriculum entry point (human-authored · not anchor-verified)",
+      "trust": "external-unverified"
+    },
+    {
+      "concept": "docs/Training/design-rationale/index.md (per-skill design rationale index)",
+      "doc": "docs/Training/design-rationale/index.md",
+      "anchor": { "path": "docs/Training/design-rationale/index.md", "line": 1 },
+      "token_est": 2017,
+      "load_when": "need per-skill design rationale (human-authored · not anchor-verified)",
+      "trust": "external-unverified"
+    },
+    {
+      "concept": "docs/benchmarks/pr65-v4-findings/04-Code-Review/findings.json (PR#65 seed corpus)",
+      "doc": "docs/benchmarks/pr65-v4-findings/04-Code-Review/findings.json",
+      "anchor": { "path": "docs/benchmarks/pr65-v4-findings/04-Code-Review/findings.json", "line": 1 },
+      "token_est": 9176,
+      "load_when": "need the PR#65 seed corpus (human-authored · not anchor-verified)",
+      "trust": "external-unverified"
+    },
+    {
+      "concept": "docs/benchmarks/README.md (benchmark corpus overview)",
+      "doc": "docs/benchmarks/README.md",
+      "anchor": { "path": "docs/benchmarks/README.md", "line": 1 },
+      "token_est": 415,
+      "load_when": "need the benchmark corpus overview (human-authored · not anchor-verified)",
+      "trust": "external-unverified"
+    }
+  ],
+  "alignment_fingerprint": {
+    "indexed_against_commit": null,
+    "file_set": [
+      "plugins/deep-skills/skills/deep-plan/",
+      "plugins/deep-skills/skills/deep-plan-review/",
+      "plugins/deep-skills/skills/deep-implement/",
+      "plugins/deep-skills/skills/deep-code-review/",
+      "plugins/deep-skills/skills/deep-docs/",
+      "plugins/deep-skills/directives/"
+    ],
+    "per_subsystem_anchor_state": {
+      "deep-plan": { "anchor_count": 0, "drifted": 0 },
+      "deep-plan-review": { "anchor_count": 0, "drifted": 0 },
+      "deep-implement": { "anchor_count": 0, "drifted": 0 },
+      "deep-code-review": { "anchor_count": 0, "drifted": 0 },
+      "deep-docs": { "anchor_count": 0, "drifted": 0 },
+      "directives": { "anchor_count": 0, "drifted": 0 }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "_doc": "deep-docs machine index; see references/index-and-coverage.md",
+  "generated": { "indexed_against_commit": "<git SHA or null if non-git>", "tool_version": "<deep-docs version>" },
+  "entries": [
+    {
+      "concept": "<subsystem or concept/symbol name>",
+      "doc": "<relative path to the tier-1 card or tier-2 ref, e.g. subsystems/auth.md>",
+      "anchor": { "path": "src/auth/session.ts", "line": 88, "symbol": "SessionStore.resolve" },
+      "token_est": 450,                 // integer; an ESTIMATE (chars/4), surfaced as "~450 est"
+      "load_when": "<trigger phrase, e.g. 'working inside auth/session'>",
+      "trust": "anchored"               // "anchored" | "external-unverified"
+    }
+  ],
+  "alignment_fingerprint": {            // stub here (nulls), fully populated in Phase 3
+    "indexed_against_commit": "<SHA or null>",
+    "file_set": ["<relative source paths the index covers>"],
+    "per_subsystem_anchor_state": { "<subsystem>": { "anchor_count": 0, "drifted": 0 } }
+  }
+}
+// External (human-authored) docs appear as `entries` with `trust: "external-unverified"` and no
+// `symbol` anchor (a path/line pointer only — see references/intake-and-scope.md, the quarantine
+// policy). The `file_set` above is the explicit stored file list `--refresh` (Phase 3) diffs against.
+// `_`-prefixed keys (here, `_doc`) follow finding.json's annotation convention.
