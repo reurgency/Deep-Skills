@@ -14,7 +14,9 @@ Produce **context-window-aware documentation of what's been built** — the orie
 Its signature failure mode is the **dual failure of AI-facing docs**:
 
 - the **stale map** — docs that describe intent, not the code as it is — defended by `path:line (symbol)` **anchoring** + always-on **anchor-verify**;
-- the **bloated dump** — docs that must be loaded whole — defended by **three-tier layering** (and, in a later phase, a hard tier-0 token ceiling).
+- the **bloated dump** — docs that must be loaded whole — defended by **three-tier layering** and a **hard tier-0 token ceiling** (~2,000 est) with grouped overflow, so the always-loaded layer stays tiny.
+
+Every token figure deep-docs shows is an **estimate** (`chars/4`), labeled as such on every surface — `~450 est`, `~1.2k est` — never presented as exact. See `references/token-budget.md`.
 
 *Every claim is anchored or it's fiction.* No prose enters a trusted tier without a resolvable `file:line (symbol)` anchor. Pre-existing human docs are referenced but **never laundered** into a trusted tier (existing-docs quarantine, `references/intake-and-scope.md`).
 
@@ -59,7 +61,7 @@ Lay the survey output into three tiers — tier-0 `MAP.md`, tier-1 subsystem car
 Launch **one fresh adversarial verifier per card** (≤8 concurrent) that re-resolves **every** anchor by symbol grep, re-snapping the line on benign drift and returning a machine-readable verdict `accurate | drifted | over-budget`. No sampling — an unverified anchor can't be trusted. **A card with any `drifted`/`over-budget` anchor blocks publish** (the doc-analogue of an unresolved State/Data-Flow contract row). See `references/anchor-verify.md`.
 
 ### 5. Index & coverage
-Emit `index.json` (concept/symbol → doc + anchor + token-est + load-when + trust), the machine index the crawling agent reads; populate `token_est` inline with `ceil(chars/4)`. Emit `coverage.md` — the doc-coverage honesty artifact (documented / not-documented + why / card-only / referenced-vs-ingested / capped boundaries). See `references/index-and-coverage.md`.
+Emit `index.json` (concept/symbol → doc + anchor + token-est + load-when + trust), the machine index the crawling agent reads; populate `token_est` inline with `ceil(chars/4)`. Render every facing token figure as an estimate (`~N est` / `~Nk est`); hold tier-0 under its ceiling, switching to grouped overflow (group by top-level area with subtotals + load-when, member detail in `index.json`) rather than truncating — see `references/token-budget.md`. Emit `coverage.md` — the doc-coverage honesty artifact (documented / not-documented + why / card-only / referenced-vs-ingested / boundary & grouping decisions / capped boundaries). See `references/index-and-coverage.md`.
 
 ### 6. Place (staging + atomic mv) & report
 Generate into the sibling staging dir `docs/.ai-map.staging/` with an `.in-progress` marker; on success (verify passed) atomically replace `docs/ai-map/` via `mv`. A run that finds an existing marker **refuses**, naming the in-flight run. Effort mode also writes a `07-Docs/` pointer + the manifest line. Default output is `docs/ai-map/`; the path is overridable. Close with the coverage summary + the explicit not-documented list. See `references/place-and-report.md`.

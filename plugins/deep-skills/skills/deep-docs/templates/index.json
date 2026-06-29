@@ -6,7 +6,7 @@
       "concept": "<subsystem or concept/symbol name>",
       "doc": "<relative path to the tier-1 card or tier-2 ref, e.g. subsystems/auth.md>",
       "anchor": { "path": "src/auth/session.ts", "line": 88, "symbol": "SessionStore.resolve" },
-      "token_est": 450,                 // integer; an ESTIMATE (chars/4), surfaced as "~450 est"
+      "token_est": 450,                 // raw integer (ceil(chars/4)); an ESTIMATE. Every facing surface renders it labeled: "~450 est", or "~1.2k est" at >=1000 (see references/token-budget.md)
       "load_when": "<trigger phrase, e.g. 'working inside auth/session'>",
       "trust": "anchored"               // "anchored" | "external-unverified"
     }
@@ -17,6 +17,11 @@
     "per_subsystem_anchor_state": { "<subsystem>": { "anchor_count": 0, "drifted": 0 } }
   }
 }
+// `token_est` is the raw integer ONLY here in index.json; MAP.md and every other facing surface
+// render it through the "estimate, not exact" labeling rule ("~N est" / "~Nk est") — see
+// references/token-budget.md. index.json is also the GROUPED INDEX: when MAP.md groups subsystems to
+// stay under the tier-0 ceiling, every member subsystem still has its own entry here (nothing is
+// truncated — the grouping is logged in coverage.md).
 // External (human-authored) docs appear as `entries` with `trust: "external-unverified"` and no
 // `symbol` anchor (a path/line pointer only — see references/intake-and-scope.md, the quarantine
 // policy). The `file_set` above is the explicit stored file list `--refresh` (Phase 3) diffs against.
