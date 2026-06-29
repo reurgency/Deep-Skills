@@ -11,10 +11,10 @@
       "trust": "anchored"               // "anchored" | "external-unverified"
     }
   ],
-  "alignment_fingerprint": {            // stub here (nulls), fully populated in Phase 3
-    "indexed_against_commit": "<SHA or null>",
-    "file_set": ["<relative source paths the index covers>"],
-    "per_subsystem_anchor_state": { "<subsystem>": { "anchor_count": 0, "drifted": 0 } }
+  "alignment_fingerprint": {            // stub shape here; REWRITTEN with real values every run. See references/refresh.md + index-and-coverage.md ("The alignment-fingerprint schema").
+    "indexed_against_commit": "<HEAD SHA, or null when git is unusable (non-git/shallow/dirty/absent)>",
+    "file_set": ["<concrete source-file paths the index covers; boundary-dir roots are the acceptable Phase-1 stub form>"],
+    "per_subsystem_anchor_state": { "<subsystem>": { "anchor_count": 0, "drifted": 0 } }  // anchor_count = anchors in card(+ref); drifted = last anchor-verify drift count (0 for every published subsystem)
   }
 }
 // `token_est` is the raw integer ONLY here in index.json; MAP.md and every other facing surface
@@ -24,5 +24,5 @@
 // truncated — the grouping is logged in coverage.md).
 // External (human-authored) docs appear as `entries` with `trust: "external-unverified"` and no
 // `symbol` anchor (a path/line pointer only — see references/intake-and-scope.md, the quarantine
-// policy). The `file_set` above is the explicit stored file list `--refresh` (Phase 3) diffs against.
+// policy). The `file_set` above is the explicit stored file list `--refresh` diffs against (refresh.md).
 // `_`-prefixed keys (here, `_doc`) follow finding.json's annotation convention.

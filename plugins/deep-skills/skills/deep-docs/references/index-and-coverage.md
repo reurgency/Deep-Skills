@@ -15,9 +15,19 @@ The concrete authority on shape is `templates/index.json` — the executor copie
   - **`token_est`** — see token-est ownership below.
   - **`load_when`** — the trigger phrase telling a crawler when this doc is worth loading (e.g. `working inside auth/session`).
   - **`trust`** — `"anchored"` for a deep-docs-generated, anchor-verified entry; `"external-unverified"` for a quarantined existing human doc (pointer only, no `symbol`; see `intake-and-scope.md`).
-- **`alignment_fingerprint`** — the `--refresh` substrate: `indexed_against_commit`, the `file_set` (the explicit list of source paths the index covers — what `--refresh` diffs against to find undocumented additions), and `per_subsystem_anchor_state`. **Stubbed with nulls/zeros in Phase 1**; fully populated in Phase 3 (`refresh.md`).
+- **`alignment_fingerprint`** — the `--refresh` substrate (full schema below). **Stubbed with nulls/zeros/boundary-roots in Phase 1**; rewritten with real values on every run from Phase 3 on (`refresh.md`).
 
 External (human-authored) docs appear as `entries` with `trust: "external-unverified"` and no `symbol` anchor — found by the crawler, never trusted as a tier.
+
+## The alignment-fingerprint schema
+
+`alignment_fingerprint` is the state `--refresh` stands on: every run **writes** it, and the **next** `--refresh` **reads** it to decide what changed (this is the plan's State/Data-Flow contract row #4 — same `index.json` is writer and reader). It has exactly three fields:
+
+- **`indexed_against_commit`** — the git commit `HEAD` resolved to when the map was built, or `null` when git is unusable (non-git tree, shallow clone, dirty working tree, or `git` absent/erroring). `--refresh`'s git-index alignment check compares this against current `git log`/`HEAD`; a `null` here forces the git-free path. (This mirrors `generated.indexed_against_commit`; the fingerprint copy is the one `--refresh` aligns against.)
+- **`file_set`** — the **explicit stored roster of source paths the index covers**, and the exact list `--refresh` diffs the current source tree against to find undocumented additions and deletions. The authoritative fully-populated form (from Phase 3) is the **concrete source-file list** (every documented file path), which lets refresh detect file-level additions/deletions precisely. A **coarser boundary-root form** (one directory root per documented boundary, e.g. `src/auth/`) is the acceptable Phase-1 stub — the committed dogfood carries this form (the six boundary dirs). When refresh finds only roots, it cannot diff at file precision, so round 1 expands each root to its current source files, treats that as the baseline, and writes the concrete file list back (the convergence model's "round 1 writes a fresh fingerprint," `refresh.md`). Walk/diff under the same host-convention filters survey used (skip vendored/build dirs; same source-extension set).
+- **`per_subsystem_anchor_state`** — a map `{ <subsystem>: { anchor_count, drifted } }`, one entry per documented subsystem. **`anchor_count`** is the number of anchors in that subsystem's card (+ its tier-2 ref, if any); **`drifted`** is how many came back `drifted` from the last anchor-verify. Because a drifted anchor blocks publish (`anchor-verify.md`), every *published* subsystem's `drifted` is `0` — a non-zero value can only exist transiently mid-run. `--refresh` reads `anchor_count` to size the re-verification fan-out and uses the per-subsystem keys to know which subsystems exist to compare against.
+
+**How each run rewrites it.** On every default generation and every `--refresh`, after anchor-verify passes and before the atomic `mv`: set `indexed_against_commit` to the current `HEAD` (or `null` if git is unusable), set `file_set` to the source roster just walked, and rebuild `per_subsystem_anchor_state` from the published cards' anchor counts (with `drifted: 0`). The fingerprint a run writes is precisely the baseline the next `--refresh` diffs against — see `refresh.md` for the read side and the convergence model.
 
 ## Token-est ownership (Phase 1 vs Phase 2)
 
