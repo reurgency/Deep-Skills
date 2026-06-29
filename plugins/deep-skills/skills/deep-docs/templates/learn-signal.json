@@ -1,0 +1,34 @@
+{
+  "_doc": "deep-docs Deep-Learn signal; forward-dependent reader (Distiller/Pattern Ledger) — Display-only today; see references/learn-signal.md",
+  "generated": {
+    "indexed_against_commit": "<git SHA the map was built against, or null on a non-git/unusable-git tree>",
+    "round": 1                          // refresh round; default generation is round 1, each --refresh increments
+  },
+  "drift": [                            // one entry per drifted anchor (anchor-verify verdict); EMPTY on a clean map
+    {
+      "subsystem": "auth",
+      "anchor": "src/auth/session.ts:88 (SessionStore.resolve)",   // human-readable path:line (symbol)
+      "verdict": "drifted",            // only "drifted" earns an entry; accurate/re-snapped anchors produce none
+      "round": 1
+    }
+  ],
+  "undocumented": [                     // one entry per file in the tree but not in fingerprint.file_set (refresh Signal 2); EMPTY from-scratch
+    {
+      "subsystem": "auth",
+      "path": "src/auth/mfa.ts",
+      "first_seen_round": 1
+    }
+  ],
+  "churn": [                            // per-subsystem rounds-touched ACCUMULATED across refresh rounds; EMPTY until refresh runs
+    {
+      "subsystem": "auth",
+      "rounds_touched": 3
+    }
+  ]
+}
+// `_`-prefixed keys (here, `_doc`) follow finding.json's annotation convention. The EMITTED
+// docs/ai-map/learn-signal.json is strict JSON — NO `//` comments, only the `_doc` string key
+// (exactly like the committed docs/ai-map/index.json). Every array is always present even when
+// empty: an empty drift/undocumented/churn list is a true signal ("no drift yet"), not a missing
+// key. The machine reader (Distiller / Pattern Ledger) is a FORWARD DEPENDENCY (plan Deferred #1) —
+// Display-only today, surfaced to humans via coverage.md. See references/learn-signal.md.

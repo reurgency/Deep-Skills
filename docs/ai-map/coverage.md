@@ -65,6 +65,8 @@ Anchors that came back `drifted` (these block publish until their subsystem is r
 
 - none yet — anchor-verify runs next (this is the layering stage).
 
+> Machine-readable drift/undocumented/churn feed: `learn-signal.json` (Display-only today — its Deep-Learn Distiller/Pattern-Ledger reader is a forward dependency; round 1, all signals empty for this clean from-scratch map).
+
 ## Capped boundaries (whole-repo scale cap)
 
 - none — full repo mapped; no interactive scope cap applied.
