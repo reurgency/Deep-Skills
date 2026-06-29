@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Skills — Training Series</title>
+<meta name="description" content="A self-paced, video-ready training series for the Deep-* skills: plan → plan-review → implement → code-review. Learn to drive each skill and understand why every guardrail exists.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="theme-code">
+<div id="progress"></div>
+<div class="glow a"></div><div class="glow b"></div><div class="glow c"></div>
+
+<nav class="top">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="dot"></span> Deep Skills <span class="muted" style="font-weight:400">/ Training</span></a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <div class="navlinks">
+      <a href="#pipeline">Pipeline</a>
+      <a href="#mental-model">Mental model</a>
+      <a href="#episodes">Episodes</a>
+      <a href="#artifacts">Artifacts</a>
+      <a href="#deep-learn">Deep-Learn</a>
+      <a href="production-guide.html">Production guide</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero wrap">
+  <span class="eyebrow">● Self-paced curriculum · Video-ready</span>
+  <h1>The Deep Skills<br><span class="grad">Training Series</span></h1>
+  <p class="kicker">Six episodes that take you from <b>idea</b> to <b>verified code</b> — teaching you to <b>drive</b> each skill and understand <b>why every guardrail exists</b>. Built to be read as a course and narrated as a video series.</p>
+  <div class="cta-row">
+    <a class="btn primary" href="deep-plan.html">Start Episode 1 →</a>
+    <a class="btn ghost" href="#episodes">Browse all episodes</a>
+  </div>
+</section>
+
+<!-- ===================== PIPELINE ===================== -->
+<section class="sec wrap" id="pipeline">
+  <span class="anchor" id="pipeline-a"></span>
+  <div class="sec-tag">The one-loop overview</div>
+  <h2>One clean idea&nbsp;→&nbsp;merge loop</h2>
+  <p class="lead">The Deep-* series is four skills, each doing exactly one job. They chain into a single workflow — and each one hands a <b>self-contained artifact</b> to the next, so a fresh agent could pick up anywhere.</p>
+
+  <div class="relay reveal">
+    <a class="phase p1" href="deep-plan.html">
+      <span class="num">01</span><span class="verb">Produce</span>
+      <h3>Plan</h3>
+      <span class="cmd">/deep-plan</span>
+      <p>A steerable planning session that emits a resumable plan document. Plans only — writes no code.</p>
+    </a>
+    <a class="phase p2" href="deep-plan-review.html">
+      <span class="num">02</span><span class="verb">Critique</span>
+      <h3>Plan review</h3>
+      <span class="cmd">/deep-plan-review</span>
+      <p>Fresh, codebase-aware agents critique the plan against the user and the repo — never the source.</p>
+    </a>
+    <a class="phase p3" href="deep-implement.html">
+      <span class="num">03</span><span class="verb">Execute</span>
+      <h3>Implement</h3>
+      <span class="cmd">/deep-implement</span>
+      <p>Phase-by-phase orchestration with bounded fix loops and checkpoints. The only skill that writes source.</p>
+    </a>
+    <a class="phase p4" href="deep-code-review.html">
+      <span class="num">04</span><span class="verb">Verify</span>
+      <h3>Code review</h3>
+      <span class="cmd">/deep-code-review</span>
+      <p>Multi-agent, evidence-gated review that catches the last mile. Review and triage are split.</p>
+    </a>
+  </div>
+
+  <div class="callout note" style="margin-top:30px">
+    <span class="t">Who this is for</span>
+    <p>Engineers who will <b>use</b> the deep-skills on their own features, and maintainers who will <b>extend</b> them. No prior exposure to the plugin is assumed — you should be comfortable with Claude Code, git, and reading a codebase. Two further skills, <a href="roadmap.html">deep-bug-fix and deep-docs</a>, are on the roadmap and covered in the bonus episode.</p>
+  </div>
+</section>
+
+<!-- ===================== MENTAL MODEL ===================== -->
+<section class="sec wrap" id="mental-model">
+  <span class="anchor" id="mm"></span>
+  <div class="sec-tag">Watch this before any episode</div>
+  <h2>Four ideas that recur everywhere</h2>
+  <p class="lead">Internalize these once and every per-skill decision reads as an instance of a few ideas. This is the spine of the whole series.</p>
+
+  <div class="grid c2" style="margin-top:28px">
+    <div class="card reveal">
+      <span class="k">PRINCIPLE 01</span>
+      <h3>One skill, one job</h3>
+      <p>The pipeline is split so no skill does two things. Plan only plans. Plan-review only critiques. Implement is the <b>only</b> writer of source. Code-review only reviews — and even splits <i>reviewing</i> from <i>triaging</i>. When a skill is tempted to cross its boundary, it stops and points you to the right sibling.</p>
+    </div>
+    <div class="card reveal">
+      <span class="k">PRINCIPLE 02</span>
+      <h3>Fresh-agent resumability</h3>
+      <p>Every artifact is written so a fresh agent with <b>only the artifact + the repo</b> can continue cold — no conversation history. That is why plans are self-contained, why phases carry their own context, and why reviews never get the upstream transcript. <i>“Could a fresh agent pick this up?”</i> is the acceptance test for almost everything.</p>
+    </div>
+    <div class="card reveal">
+      <span class="k">PRINCIPLE 03</span>
+      <h3>Independence through fresh eyes</h3>
+      <p>Both review skills run in fresh agents that <b>never see the upstream transcript</b>. The planner and the implementer are too close to their own work to see its blind spots; the reviewer gets the artifact + codebase + your recorded preferences, but not the argument that produced it. Independence is the source of the catch.</p>
+    </div>
+    <div class="card reveal">
+      <span class="k">PRINCIPLE 04</span>
+      <h3>The last mile + evidence</h3>
+      <p>The signature failure the system hunts: code where the interface <i>looks</i> wired and the happy path <i>appears</i> connected, but the behavior doesn't make it the last mile — optimistic UI with no real call, swallowed errors, half-wired chains, silently dropped scope. Every finding must cite <b>evidence</b>: a <code>path:line</code>, a named symbol, or an observed behavior.</p>
+    </div>
+  </div>
+
+  <div class="callout why" style="margin-top:26px">
+    <span class="t">Why this matters for the video series</span>
+    <p>These four ideas are the recurring beats. Each skill episode is, at heart, a demonstration of how that skill enforces one or more of them. If you're scripting narration, open every episode by naming which principle it is about to make concrete.</p>
+  </div>
+</section>
+
+<!-- ===================== EPISODES ===================== -->
+<section class="sec wrap" id="episodes">
+  <span class="anchor" id="eps"></span>
+  <div class="sec-tag">The curriculum</div>
+  <h2>Six episodes</h2>
+  <p class="lead">Work them in order — the skills compose, and later episodes assume the vocabulary from earlier ones. Each page carries learning objectives, a mental model, a guided walkthrough, the <b>design decisions</b> behind the skill, common mistakes, and a mastery checklist.</p>
+
+  <div class="grid c2" style="margin-top:28px">
+    <a class="card ep-card t1 reveal" href="deep-plan.html">
+      <span class="n">1</span>
+      <span class="k">EPISODE ONE · PRODUCE</span>
+      <h3>deep-plan</h3>
+      <span class="cmd">/deep-plan</span>
+      <p>Run a steerable planning session that produces a resumable plan artifact — the durable spine the whole series writes back into.</p>
+      <span class="tag">Build a plan</span>
+    </a>
+    <a class="card ep-card t2 reveal" href="deep-plan-review.html">
+      <span class="n">2</span>
+      <span class="k">EPISODE TWO · CRITIQUE</span>
+      <h3>deep-plan-review</h3>
+      <span class="cmd">/deep-plan-review</span>
+      <p>Independently critique a plan with fresh, codebase-aware agents on two lenses — user alignment and codebase alignment.</p>
+      <span class="tag">Catch it early</span>
+    </a>
+    <a class="card ep-card t3 reveal" href="deep-implement.html">
+      <span class="n">3</span>
+      <span class="k">EPISODE THREE · EXECUTE</span>
+      <h3>deep-implement</h3>
+      <span class="cmd">/deep-implement</span>
+      <p>Orchestrate phase-by-phase execution with bounded fix loops and checkpoints. The only skill allowed to write source.</p>
+      <span class="tag">Ship the code</span>
+    </a>
+    <a class="card ep-card t4 reveal" href="deep-code-review.html">
+      <span class="n">4</span>
+      <span class="k">EPISODE FOUR · VERIFY</span>
+      <h3>deep-code-review</h3>
+      <span class="cmd">/deep-code-review</span>
+      <p>Run multi-agent, evidence-gated review that catches the last mile — then triage as a separate, opt-in step.</p>
+      <span class="tag">Close the loop</span>
+    </a>
+    <a class="card ep-card t5 reveal" href="roadmap.html">
+      <span class="n">5</span>
+      <span class="k">EPISODE FIVE · BONUS</span>
+      <h3>The roadmap skills</h3>
+      <span class="cmd">deep-bug-fix · deep-docs</span>
+      <p>Two designed-but-unbuilt skills: diagnosis-first bug fixing under regression risk, and a context-window-aware doc layer.</p>
+      <span class="tag">What's next</span>
+    </a>
+    <a class="card ep-card t6 reveal" href="production-guide.html">
+      <span class="n">6</span>
+      <span class="k">FOR PRODUCERS</span>
+      <h3>Video production guide</h3>
+      <span class="cmd">episodes · runtimes · visuals</span>
+      <p>Turn this curriculum into a video series: an episode-by-episode shot list, suggested runtimes, on-screen visuals, and narration beats.</p>
+      <span class="tag">Make the video</span>
+    </a>
+  </div>
+</section>
+
+<!-- ===================== ARTIFACTS ===================== -->
+<section class="sec wrap" id="artifacts">
+  <span class="anchor" id="art"></span>
+  <div class="sec-tag">Where everything lands</div>
+  <h2>The artifact tree</h2>
+  <p class="lead">Deep-skills runs write to the <b>target repo</b>, not to the plugin repo, under a per-effort directory. Knowing this layout makes the whole pipeline legible — and the <b>plan document is the durable spine</b>: it accumulates phase summaries, a Deferreds ledger, review findings, and a triage fix-phase.</p>
+
+  <div class="code reveal">
+    <div class="hd"><div class="dots"><i></i><i></i><i></i></div><span class="fn">.deep-skills/&lt;effort-name&gt;/</span></div>
+<pre><span class="c"># per-effort directory in the TARGET repo</span>
+.deep-skills/&lt;effort-name&gt;/
+  <span class="a">00-Manifest/</span>        manifest.md   <span class="c">← stage statuses (any skill creates it on first write)</span>
+  <span class="a">01-Plan/</span>            plan.md       <span class="c">← /deep-plan  (+ the --triage fix-phase append)</span>
+  <span class="a">02-Plan-Review/</span>     review.md     <span class="c">← /deep-plan-review</span>
+  <span class="a">03-Implementation/</span>  summary.md    <span class="c">← /deep-implement</span>
+  <span class="a">04-Code-Review/</span>     report.md · findings.json · certificate.md  <span class="c">← /deep-code-review</span>
+  <span class="a">05-Security/</span>        <span class="c">(reserved for a future /deep-security)</span></pre>
+  </div>
+
+  <div class="callout why">
+    <span class="t">The plan is the spine — learn to read it</span>
+    <p>Co-locating every stage's output under one effort tree gives the durable spine the series depends on. The manifest is a single status table linking each stage's artifact, so a fresh agent can find the whole history of an effort from one place. Per-<i>project</i> (not per-user) placement keeps artifacts with the repo they describe.</p>
+  </div>
+</section>
+
+<!-- ===================== DEEP-LEARN ===================== -->
+<section class="sec wrap" id="deep-learn">
+  <span class="anchor" id="dl"></span>
+  <div class="sec-tag">The self-improving loop</div>
+  <h2>Deep-Learn — improvements are data, not prose</h2>
+  <p class="lead">The skills themselves <b>never change</b> to encode a lesson. Instead, recurring issue classes are distilled into toggleable <b>directive cards</b> — structured data the upstream skills load at runtime via <code>scripts/load-active-cards.sh &lt;phase&gt;</code>.</p>
+
+  <div class="grid c3" style="margin-top:26px">
+    <div class="card reveal">
+      <span class="k">PRODUCER</span>
+      <h4>code-review finds it</h4>
+      <p>Every <code>/deep-code-review</code> run emits a machine-readable <code>findings.json</code>. Recurring bug <i>classes</i> across runs are the raw material for the loop.</p>
+    </div>
+    <div class="card reveal">
+      <span class="k">DISTILLER</span>
+      <h4>a card is authored</h4>
+      <p>A class becomes a directive card with clean on/off (<code>toggle.sh &lt;ID&gt; on|off</code>), provenance, and effectiveness telemetry. <b>Human-gated</b> — nothing reaches <code>active/</code> without approval.</p>
+    </div>
+    <div class="card reveal">
+      <span class="k">CONSUMERS</span>
+      <h4>upstream skills apply it</h4>
+      <p>plan / plan-review / implement load active cards at runtime and prevent the same bug <b>earlier</b> next time — without anyone editing a skill by hand.</p>
+    </div>
+  </div>
+
+  <div class="callout decision" style="margin-top:26px">
+    <span class="t">The seed card — DLC-001</span>
+    <p>The first card adds a <b>State / Data-Flow Contract</b> to plans: one row per piece of state read or written, where <i>“the reader resolves the same source the writer wrote to”</i> is a binary you can't fudge. It would have surfaced ~100% of one benchmark PR's review severity at <b>plan</b> time. You'll meet it again in Episodes 1–3.</p>
+  </div>
+
+  <div class="callout warn">
+    <span class="t">Trainee rule</span>
+    <p>When a skill prints a directive at the start of a run, treat it as a <b>hard requirement</b> for that run. Don't edit cards or skills to silence one — toggle it.</p>
+  </div>
+</section>
+
+<!-- ===================== CAPSTONE ===================== -->
+<section class="sec wrap">
+  <div class="panel bar reveal">
+    <div class="sec-tag">The capstone exercise</div>
+    <h2 style="font-size:clamp(24px,3.4vw,34px)">Run all four, unassisted</h2>
+    <p>Pick a small, real feature in a repo you know, and run the full loop end-to-end:</p>
+    <ol>
+      <li><code>/deep-plan</code> it — choose an effort name; produce a resumable plan with a Data-Flow Contract.</li>
+      <li><code>/deep-plan-review</code> it in <code>--multi-agent</code> mode; apply accepted fixes to the plan.</li>
+      <li><code>/deep-implement</code> it collaboratively, one phase at a time.</li>
+      <li><code>/deep-code-review</code> the branch, then <code>/deep-code-review --triage</code>.</li>
+    </ol>
+    <div class="callout why" style="margin-bottom:0">
+      <span class="t">You've mastered the system when…</span>
+      <p>A teammate can open <b>only</b> your <code>.deep-skills/&lt;effort&gt;/</code> directory — no chat history — and reconstruct what was built, why, what was reviewed, and what remains deferred.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== GLOSSARY ===================== -->
+<section class="sec wrap">
+  <span class="anchor" id="glossary"></span>
+  <div class="sec-tag">Reference</div>
+  <h2>Glossary</h2>
+  <div class="tbl-wrap reveal">
+    <table>
+      <thead><tr><th style="width:200px">Term</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><b>Effort name</b></td><td>Kebab-case slug for one piece of work; names its <code>.deep-skills/&lt;effort&gt;/</code> dir.</td></tr>
+        <tr><td><b>Fresh agent</b></td><td>A subagent briefed only with artifacts + codebase, never the upstream transcript.</td></tr>
+        <tr><td><b>Phase</b></td><td>A self-contained, cold-executable unit of a multi-phase plan.</td></tr>
+        <tr><td><b>Deferreds ledger</b></td><td>Plan section tracking deferred work: What / Why deferred / Integration.</td></tr>
+        <tr><td><b>Last mile</b></td><td>The gap between “looks wired” and “actually behaves correctly end-to-end.”</td></tr>
+        <tr><td><b>Lens</b></td><td>One review perspective (e.g. Correctness, Plan Conformance, Coherence).</td></tr>
+        <tr><td><b>Directive card</b></td><td>A human-gated, toggleable learned improvement loaded as data at runtime.</td></tr>
+        <tr><td><b>Manifest</b></td><td><code>00-Manifest/manifest.md</code>, the per-effort stage-status index.</td></tr>
+        <tr><td><b>Triage</b></td><td>The opt-in <code>--triage</code> step that decides fix/defer/reject and writes to the plan.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Deep Skills Training Series · a course + video companion for the <code>deep-*</code> plugin</span>
+    <span><a href="deep-plan.html">Start Episode 1 →</a></span>
+  </div>
+</footer>
+
+<script src="assets/series.js"></script>
+</body>
+</html>

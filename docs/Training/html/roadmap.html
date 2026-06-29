@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bonus · The roadmap skills — Deep Skills Training</title>
+<meta name="description" content="Two designed-but-unbuilt skills — deep-bug-fix and deep-docs — plus a deeper look at the Deep-Learn directive loop and the cross-cutting decisions that shape the whole series.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="theme-roadmap">
+<div id="progress"></div>
+<div class="glow a"></div><div class="glow b"></div><div class="glow c"></div>
+
+<nav class="top">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="dot"></span> Deep Skills <span class="muted" style="font-weight:400">/ Bonus · Roadmap</span></a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <div class="navlinks">
+      <a href="index.html">Overview</a>
+      <a href="deep-code-review.html">4 · Code review</a>
+      <a href="#cross-cutting">Cross-cutting</a>
+      <a href="#bug-fix">deep-bug-fix</a>
+      <a href="#docs">deep-docs</a>
+      <a href="production-guide.html">Production guide</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero wrap narrow">
+  <div class="ep-badge"><span class="pill">BONUS</span><span class="label">The roadmap</span></div>
+  <h1>The skills that<br><span class="grad">aren't built yet</span></h1>
+  <p class="kicker">Two more skills are fully designed but not yet shipped: <b>deep-bug-fix</b> (diagnosis-first remediation under regression risk) and <b>deep-docs</b> (a context-window-aware orientation layer). This episode also zooms out to the <b>cross-cutting decisions</b> that shape the entire series and the <b>Deep-Learn</b> loop.</p>
+</section>
+
+<div class="wrap"><div class="layout">
+
+<aside class="toc">
+  <div class="tt">On this page</div>
+  <a href="#cross-cutting">Cross-cutting decisions</a>
+  <a href="#deep-learn">The Deep-Learn loop</a>
+  <a href="#bug-fix">deep-bug-fix</a>
+  <a href="#docs">deep-docs</a>
+  <a href="#stage">A note on stage</a>
+</aside>
+
+<main>
+
+<!-- CROSS-CUTTING -->
+<section class="sec tight" id="cross-cutting">
+  <div class="sec-tag">The shape of the whole series</div>
+  <h2>Eight cross-cutting decisions</h2>
+  <p class="lead">Some decisions aren't owned by any single skill — they recur across all of them. Learn these and the per-skill choices read as instances of a few ideas.</p>
+
+  <div class="grid c2" style="margin-top:24px">
+    <div class="card reveal"><span class="k">01</span><h4>One skill, one job</h4><p>The pipeline is split so no skill does two things — and code-review even splits reviewing from triaging. The clearest evidence is the commit that pulled all routing out of the review run into a separate <code>--triage</code> step.</p></div>
+    <div class="card reveal"><span class="k">02</span><h4>Fresh-agent resumability</h4><p>Every artifact lets a fresh agent continue from <b>only the artifact + the repo</b>. The plan is a durable spine; implement carries per-phase hand-offs; deep-docs tiers load independently.</p></div>
+    <div class="card reveal"><span class="k">03</span><h4>Independence through fresh eyes</h4><p>Both reviewers never see the upstream transcript. deep-bug-fix <i>tunes</i> this — continuity for diagnose→fix, a fresh adversarial agent for proof so the fixer can't grade itself.</p></div>
+    <div class="card reveal"><span class="k">04</span><h4>The last mile + evidence</h4><p>Each skill has its own dialect of the last-mile failure — implement's “green ≠ verified,” review's last-mile lens, bug-fix's “claimed fix,” deep-docs's “stale map.” Every claim cites evidence.</p></div>
+    <div class="card reveal"><span class="k">05</span><h4>Improvements are data, not prose</h4><p>Recurring bug classes become toggleable directive cards. A SKILL.md is never edited to encode a lesson — that causes bloat, drift, merge conflicts, and no clean on/off.</p></div>
+    <div class="card reveal"><span class="k">06</span><h4>Standalone, two byte-identical files</h4><p>Each skill self-contains; only the <code>directives/</code> registry is shared. The two host-agnostic files are <b>copied byte-identical</b>, with a consistency sweep. “Reuse” here means copy, not link.</p></div>
+    <div class="card reveal"><span class="k">07</span><h4>Shift-left</h4><p>When code-review proves it catches a class only late, prevention is pushed upstream — interaction-edge + re-entry became a plan REQUIRES / plan-review CONFIRMS pair; external-contract became implement construction rules.</p></div>
+    <div class="card reveal"><span class="k">08</span><h4>Natural-language invocation is primary</h4><p>The series must be drivable on Copilot or Codex, which have no slash-commands. Natural language is primary; <code>--flags</code> are a convenience on top. deep-docs is the reference implementation.</p></div>
+  </div>
+</section>
+
+<!-- DEEP-LEARN -->
+<section class="sec" id="deep-learn">
+  <div class="sec-tag">The self-improving loop</div>
+  <h2>Deep-Learn, in more depth</h2>
+  <p>The loop is hub-and-spoke. <b>deep-code-review is the producer</b> — its <code>findings.json</code> is the loop's input. A <b>distiller</b> turns recurring classes into cards, gated by a human. The upstream skills — plan, plan-review, implement — are the <b>consumers</b> that load active cards and prevent the bug earlier. code-review itself carries <b>no card loader</b>: it measures, it doesn't apply.</p>
+  <div class="callout decision">
+    <span class="t">DLC-001 is a many-to-many class</span>
+    <p>The seed card touches three skills at once: deep-plan <b>requires</b> the State/Data-Flow Contract, deep-plan-review <b>checks</b> it, deep-implement <b>validates</b> it with a contract probe. One lesson, distributed across the pipeline as roles — exactly what the data-not-prose design makes cheap.</p>
+  </div>
+  <div class="callout warn">
+    <span class="t">Why never edit a SKILL.md</span>
+    <p>Encoding a lesson by editing prose causes skill bloat, drift across the spokes, merge conflicts, and — fatally — no clean on/off. A card has a status flip, provenance, and effectiveness telemetry. The skills stop changing; the registry changes.</p>
+  </div>
+</section>
+
+<!-- DEEP BUG FIX -->
+<section class="sec" id="bug-fix">
+  <div class="sec-tag">5th skill · design outline</div>
+  <h2>deep-bug-fix</h2>
+  <div class="panel lead-panel bar reveal">
+    <p><b>One job:</b> <span class="hl">diagnosis-first remediation of existing behavior under regression risk</span> — root-cause clustering, proof-of-fix, and blast-radius containment that <code>/deep-implement</code> structurally lacks.</p>
+    <p><b>Signature failure it hunts:</b> the <span class="hl">claimed fix</span> — a change that makes the reproduction stop without addressing the root cause, or that patches one symptom of a cluster and silently leaves its siblings.</p>
+  </div>
+
+  <h3>Why a dedicated skill (vs re-running implement on findings)?</h3>
+  <p><code>/deep-implement</code> is forward construction from a trusted spec: known steps, adds code, gates on <i>new</i> failures in changed files. Bug-fixing inverts all four assumptions — the spec is unknown (diagnose first), you modify working code (the highest-risk edit class), findings often share one root cause, and “done” means <b>provably gone</b>, not “the step ran.” Pointing a fresh agent at <code>findings.json</code> and saying “fix these” yields N symptom patches with no proof and no regression guard.</p>
+
+  <div class="grid c2" style="margin-top:18px">
+    <div class="card reveal"><span class="k">DECISION</span><h4>Diagnosis before remediation</h4><p>The finding's recommendation is a <b>hypothesis, not a spec</b> — bug-fix re-diagnoses independently and may reject the suggested fix. (A real finding even hedged: “Register the route <b>or</b> correct the service URL.”)</p></div>
+    <div class="card reveal"><span class="k">DECISION</span><h4>Root-cause clustering</h4><p>Group distinct findings by <b>shared underlying cause</b>, one fix per cause — a coarser altitude than review-time dedup. One benchmark PR's six findings shared a single cause.</p></div>
+    <div class="card reveal"><span class="k">DECISION</span><h4>Proof-of-fix, two tiers</h4><p>Default: a static chain-trace proof (reusing the last-mile method). <code>--reproduce</code>: a dynamic red→green test. Both gated by an adversarial proof agent — “the fixer does not mark its own homework.”</p></div>
+    <div class="card reveal"><span class="k">DECISION</span><h4>Regression containment by default</h4><p>Identify changed symbols, find their callers/dependents, re-run their tests. The danger lives in the <i>dependents</i> — containment looks outward, not just inward (implement validates imports, not dependents).</p></div>
+    <div class="card reveal"><span class="k">DECISION</span><h4>Tuned independence</h4><p>Diagnose + fix is <b>one agent per cluster</b> (continuity is the point); proof is a <b>fresh adversarial agent</b> returning <code>fixed | unproven | regressed</code>. Keeps the series' DNA exactly where it pays.</p></div>
+    <div class="card reveal"><span class="k">DECISION</span><h4>Triage still decides</h4><p>Bug-fix is the specialized executor for the <code>accepted</code> set only — it makes no triage decisions. It replaces implement as the fix-phase executor and also runs standalone on a raw bug report / trace / failing test.</p></div>
+  </div>
+
+  <div class="callout note">
+    <span class="t">Open by design</span>
+    <p>The design note records its own unresolved questions (round model for re-review, normalized defect shape, whether to keep implement's fix-phase path, regression-scope discovery by grep vs LSP). These are deferred to the eventual <code>/deep-plan</code> pass — not missing rationale, but decisions intentionally left open at this stage.</p>
+  </div>
+</section>
+
+<!-- DEEP DOCS -->
+<section class="sec" id="docs">
+  <div class="sec-tag">6th skill · planned</div>
+  <h2>deep-docs</h2>
+  <div class="panel lead-panel bar reveal">
+    <p><b>One job:</b> the series' missing <span class="hl">orientation layer</span> — context-window-aware documentation of <i>what's been built</i>, structured for Progressive Disclosure so an agent under a token budget loads only the slice its task needs.</p>
+    <p><b>Signature failure:</b> the <span class="hl">dual failure of AI-facing docs</span> — the <i>stale map</i> (describes intent, not the code as it is) and the <i>bloated dump</i> (must be loaded whole).</p>
+  </div>
+
+  <div class="grid c2" style="margin-top:18px">
+    <div class="card reveal"><span class="k">DECISION</span><h4>Three loadable tiers</h4><p>Tier-0 <code>MAP.md</code> + index (always-loaded, tiny), tier-1 subsystem cards (on touch), tier-2 deep refs (on demand). The structural defense against the <i>bloated dump</i>.</p></div>
+    <div class="card reveal"><span class="k">DECISION</span><h4>Anchored or it's fiction</h4><p>No prose enters a trusted tier without a resolvable <code>path:line (symbol)</code> anchor, and every anchor is adversarially verified. The defense against the <i>stale map</i>.</p></div>
+    <div class="card reveal"><span class="k">DECISION</span><h4>Symbol-primary anchoring</h4><p>Verify re-resolves by symbol first, re-snaps the line if it drifted (benign), flags <code>drifted</code> only if the symbol is gone. Line numbers are fragile; content hashes are too sensitive.</p></div>
+    <div class="card reveal"><span class="k">DECISION</span><h4>Exhaustive verify, no sampling</h4><p>One fresh verifier per card re-resolves <i>every</i> anchor; any drift blocks publish. Symbol-grep is cheap, and the guarantee is binary — one unverified anchor and the tier can't be trusted.</p></div>
+    <div class="card reveal"><span class="k">DECISION</span><h4>Machine-owned artifacts</h4><p><code>docs/ai-map/</code> is 100% machine-owned with a “regenerate overwrites” header. Docs here are an index, not a narrative — humans annotate elsewhere, so a single rendering can't fall out of sync with itself.</p></div>
+    <div class="card reveal"><span class="k">DECISION</span><h4>Quarantine existing docs</h4><p>Useful READMEs are indexed as external pointers marked “not anchor-verified,” never absorbed into a trusted tier — laundering unverified prose would silently break the anchoring guarantee.</p></div>
+  </div>
+
+  <div class="callout why">
+    <span class="t">A reflexive observation</span>
+    <p>deep-docs “recreates Claude Code's own Skills architecture” — tier-0 is an always-loaded index, tier-1 cards load on touch, tier-2 refs on demand: exactly the progressive-disclosure shape a <code>SKILL.md</code> + <code>references/</code> uses. The orientation layer for agents is, structurally, the same idea as the skill format that produced it.</p>
+  </div>
+</section>
+
+<!-- STAGE NOTE -->
+<section class="sec" id="stage">
+  <div class="callout warn">
+    <span class="t">A note on stage — read rationale at the right altitude</span>
+    <p>The four built skills' rationale is anchored to live skill files + git history. <b>deep-bug-fix</b> is anchored to its design note and <b>deep-docs</b> to its resolved plan — both have open questions still unresolved <i>by design</i>. When these ship, expect details to firm up; the <i>shape</i> of the decisions above is settled, the specifics may move.</p>
+  </div>
+</section>
+
+<div class="epnav">
+  <a href="deep-code-review.html"><span class="dir">← Previous</span><span class="ttl">deep-code-review</span><span class="cmd">/deep-code-review</span></a>
+  <a class="next" href="production-guide.html"><span class="dir">For producers →</span><span class="ttl">Video production guide</span><span class="cmd">episodes · runtimes · visuals</span></a>
+</div>
+
+</main>
+</div></div>
+
+<footer>
+  <div class="wrap">
+    <span>Bonus episode · The roadmap skills</span>
+    <span><a href="index.html">All episodes</a></span>
+  </div>
+</footer>
+
+<script src="assets/series.js"></script>
+</body>
+</html>

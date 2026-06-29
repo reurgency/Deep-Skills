@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Episode 1 · deep-plan — Deep Skills Training</title>
+<meta name="description" content="Run a steerable planning session that produces a fresh-agent-resumable plan artifact — and understand why deep-plan is shaped the way it is.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="theme-plan">
+<div id="progress"></div>
+<div class="glow a"></div><div class="glow b"></div>
+
+<nav class="top">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="dot"></span> Deep Skills <span class="muted" style="font-weight:400">/ Ep.1 deep-plan</span></a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <div class="navlinks">
+      <a href="index.html">Overview</a>
+      <a href="deep-plan.html" class="active">1 · Plan</a>
+      <a href="deep-plan-review.html">2 · Review</a>
+      <a href="deep-implement.html">3 · Implement</a>
+      <a href="deep-code-review.html">4 · Code review</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero wrap narrow">
+  <div class="ep-badge"><span class="pill">EPISODE 1</span><span class="label">Produce</span></div>
+  <h1><span class="grad">deep-plan</span></h1>
+  <p class="kicker"><code>/deep-plan</code> runs a guided, <b>interruptible</b> feature-planning session and produces a self-contained, fresh-agent-resumable plan document. <b>Plan only — it never implements.</b></p>
+  <div class="chips center" style="justify-content:center">
+    <span class="chip"><span class="d"></span> Objectives</span>
+    <span class="chip"><span class="d"></span> Mental model</span>
+    <span class="chip"><span class="d"></span> Walkthrough</span>
+    <span class="chip"><span class="d"></span> 13 design decisions</span>
+    <span class="chip"><span class="d"></span> Mistakes &amp; mastery</span>
+  </div>
+</section>
+
+<div class="wrap">
+<div class="layout">
+
+<!-- TOC -->
+<aside class="toc">
+  <div class="tt">On this page</div>
+  <a href="#objectives">Learning objectives</a>
+  <a href="#model">Mental model</a>
+  <a href="#walkthrough">How to use it</a>
+  <a href="#commands">The steering wheel</a>
+  <a href="#contract">The Data-Flow Contract</a>
+  <a href="#why">Why it's built this way</a>
+  <a href="#mistakes">Common mistakes</a>
+  <a href="#mastery">Mastery checklist</a>
+  <a href="#qref">Quick reference</a>
+</aside>
+
+<!-- CONTENT -->
+<main>
+
+<!-- OBJECTIVES -->
+<section class="sec tight" id="objectives">
+  <div class="sec-tag">In this episode</div>
+  <h2>Learning objectives</h2>
+  <div class="obj">
+    <div class="o"><span class="i">1</span><p>Run a planning session end-to-end and produce a <code>plan.md</code> a fresh agent could execute cold.</p></div>
+    <div class="o"><span class="i">2</span><p>Choose the right <b>question cadence</b> and keep questions decision-relevant.</p></div>
+    <div class="o"><span class="i">3</span><p>Drive the in-session commands (<code>/drill</code>, <code>/breakout</code>, <code>/gaps</code>, <code>/risks</code>, <code>/constraints</code>, <code>/columbo</code>) without losing your place.</p></div>
+    <div class="o"><span class="i">4</span><p>Structure a <b>multi-phase</b> plan and maintain a <b>Deferreds ledger</b> so nothing is lost.</p></div>
+    <div class="o"><span class="i">5</span><p>Fill the <b>State / Data-Flow Contract</b> (directive DLC-001) so cross-layer bugs surface at plan time.</p></div>
+  </div>
+</section>
+
+<!-- MENTAL MODEL -->
+<section class="sec" id="model">
+  <div class="sec-tag">The frame</div>
+  <h2>Mental model</h2>
+  <div class="panel lead-panel bar reveal">
+    <p>You are the <span class="hl">session host</span>, not a code author. Your product is a <i>document</i>. The user <b>steers</b> at any time with in-session commands; you service the command and return to exactly where you were.</p>
+    <p>The deep work is asking sharp questions, <span class="hl">reusing before inventing</span>, and writing down enough that the conversation becomes disposable.</p>
+  </div>
+  <div class="callout why">
+    <span class="t">The single acceptance test</span>
+    <p>Could a fresh agent with <b>only this plan + the repo</b> succeed? Everything you write is judged against that one question.</p>
+  </div>
+</section>
+
+<!-- WALKTHROUGH -->
+<section class="sec" id="walkthrough">
+  <div class="sec-tag">How to use it</div>
+  <h2>The session, module by module</h2>
+  <p>The workflow is an eight-step interruptible state machine. Run the modules in order, but watch for steering commands at <i>every</i> step.</p>
+
+  <ol class="steps">
+    <li>
+      <span class="module">Module 1</span>
+      <h4>Setup &amp; framing</h4>
+      <p>Restate the feature in <b>one sentence</b> and confirm it. Pick a question cadence. Propose a kebab-case <b>effort name</b> — the plan lands at <code>.deep-skills/&lt;effort&gt;/01-Plan/plan.md</code>. State scope, explicit <b>non-goals</b>, and your assumptions; get a quick confirm.</p>
+    </li>
+    <li>
+      <span class="module">Module 2</span>
+      <h4>Explore before you ask (read-only)</h4>
+      <p>Launch up to <b>3 Explore agents in parallel</b> to find reusable patterns, integration points, data models, and the files that will be touched. <b>Reuse before inventing</b> — name existing functions with their paths. No edits in this phase. Every question you can answer from exploration is a question you shouldn't ask the user.</p>
+    </li>
+    <li>
+      <span class="module">Module 3</span>
+      <h4>Question rounds</h4>
+      <p>Emit questions per the chosen cadence, each rendered via <code>AskUserQuestion</code> from a JSON template. Keep them <b>decision-relevant</b> — skip anything exploration already answered. Honor <code>/drill</code> and <code>/breakout</code> mid-round without losing place.</p>
+    </li>
+    <li>
+      <span class="module">Module 4</span>
+      <h4>In-session commands — the steering wheel</h4>
+      <p>Watch for steering commands at every step. Service, then resume exactly where you were. (Full table below.)</p>
+    </li>
+    <li>
+      <span class="module">Module 5</span>
+      <h4>The pre-write nudge</h4>
+      <p>Before writing <b>anything</b>, ask plainly: <i>“Want a /gaps, /risks, or /constraints pass before I write the plan?”</i> Honor any, all, or none — repeatably. Only write when the user is ready. This is a mandatory step, never skipped.</p>
+    </li>
+    <li>
+      <span class="module">Module 6</span>
+      <h4>Design &amp; write the plan</h4>
+      <p>Write to <code>01-Plan/plan.md</code> using the template. Include self-contained Context / Approach / Steps / Files / Verification, reused functions <b>with their paths</b>, a Deferreds ledger, and the State / Data-Flow Contract. If multi-phase, structure each phase to run cold and leave an empty <b>Phase Summaries</b> appendix for <code>/deep-implement</code>. No source edits — only the plan document.</p>
+    </li>
+    <li>
+      <span class="module">Module 7</span>
+      <h4>Deferreds — nothing forgotten</h4>
+      <p>Anything you defer goes in the ledger with three fields: <b>What</b>, <b>Why deferred</b>, <b>Integration</b> (how it connects back when done). Never bury a deferral in prose.</p>
+    </li>
+    <li>
+      <span class="module">Module 8 &amp; 9</span>
+      <h4>The contract, then review &amp; hand off</h4>
+      <p>Fill the State / Data-Flow Contract (below). Present the plan, fold in feedback, update the doc. Offer <code>/columbo</code> <b>last</b> as the final completeness check; fix what it surfaces. That's the hand-off point to <a href="deep-plan-review.html">/deep-plan-review</a> and <a href="deep-implement.html">/deep-implement</a>.</p>
+    </li>
+  </ol>
+
+  <div class="callout video">
+    <span class="t">Narration beat</span>
+    <p>On camera, the most underrated module is <b>Module 1</b>. Demonstrate producing <i>just</i> the restatement, three non-goals, and an effort name — then stop. It's the most-skipped, highest-value step, and showing the discipline of stopping early sells the whole skill.</p>
+  </div>
+</section>
+
+<!-- COMMANDS -->
+<section class="sec" id="commands">
+  <div class="sec-tag">Module 4, expanded</div>
+  <h2>The steering wheel</h2>
+  <p>These commands work at every step. The skill recognizes them whether typed as a slash command or as a plain keyword — so they work for users on Copilot or Codex too.</p>
+  <div class="tbl-wrap reveal">
+    <table>
+      <thead><tr><th style="width:150px">Command</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>/drill &lt;note&gt;</code></td><td>Deepen the current question <b>in this session</b> (shared context, full history), then resume.</td></tr>
+        <tr><td><code>/breakout &lt;note&gt;</code></td><td>Dispatch an <b>isolated fresh subagent</b> with a compact briefing; return only its distilled answer — protects main context.</td></tr>
+        <tr><td><code>/gaps</code></td><td>Gap-analysis round; surface gaps / conflicts / assumptions as follow-ups. Repeatable.</td></tr>
+        <tr><td><code>/risks</code></td><td>Risk assessment of the emerging plan.</td></tr>
+        <tr><td><code>/constraints</code></td><td>Suggest likely constraints <b>and</b> ask the user for theirs; fold accepted ones in.</td></tr>
+        <tr><td><code>/columbo</code></td><td>Fresh-agent “one more thing” completeness gut-check on the written plan.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout why">
+    <span class="t">/drill vs /breakout — a core skill</span>
+    <p><b>Drill</b> stays in the shared conversation (cheap, contextual). <b>Breakout</b> spins an isolated agent (protects your main context from a deep tangent). Reach for breakout when the side-quest would otherwise flood the session — the away-team returns only the “pearl,” not the whole transcript.</p>
+  </div>
+</section>
+
+<!-- CONTRACT -->
+<section class="sec" id="contract">
+  <div class="sec-tag">Module 8 · directive DLC-001</div>
+  <h2>The State / Data-Flow Contract</h2>
+  <p>A required table: <b>one row per piece of state the feature reads or writes at runtime.</b></p>
+  <div class="tbl-wrap reveal">
+    <table>
+      <thead><tr><th>#</th><th>State</th><th>Writer(s) path:line</th><th>Runtime reader(s) path:line</th><th>Same source?</th><th>Resolution / AC</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>…</td><td>…</td><td>…</td><td>✓ / ✕</td><td>…</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>A row is <b>resolved</b> only if the runtime reader resolves the <b>same source</b> the writer wrote to. Otherwise it <b>blocks plan completion</b> unless marked Display-only and moved to Deferreds.</p>
+  <p>The four rules:</p>
+  <ul>
+    <li>Every new persisted store appears as a <b>writer</b> row.</li>
+    <li>Every “single source of truth” AC points to <b>exactly one</b> source.</li>
+    <li><b>Deletion-parity</b>: removing a surface re-homes each behavior it provided.</li>
+    <li>Reader = none, or reader-source ≠ writer-source ⇒ the row <b>blocks</b>.</li>
+  </ul>
+  <div class="callout why">
+    <span class="t">Why it has teeth</span>
+    <p>You can't fill the row honestly without discovering the bug. The writer column forces “where does the save land?”; the reader column forces a runtime trace; “Same?” is a binary you can't fudge. This single card would have surfaced ~100% of one benchmark PR's review severity at <b>plan</b> time, instead of at code-review time.</p>
+  </div>
+</section>
+
+<!-- WHY / DESIGN DECISIONS -->
+<section class="sec" id="why">
+  <div class="sec-tag">The design rationale</div>
+  <h2>Why deep-plan is built this way</h2>
+  <p class="lead">Thirteen non-obvious decisions are baked into this skill. Expand each to see <span class="good">what it does</span>, the <span class="bad">alternative that was rejected</span>, and <span class="accent">why this choice</span> was made.</p>
+
+  <details class="decision-block reveal" open>
+    <summary><span class="dn">1</span><span class="dt">Planning-only boundary</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>The skill is hard-bounded to planning: “Plan only — never implement,” restated as a guardrail and as explicit “No code edits” lines. A table assigns one job per sibling skill.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>The monolithic “plan-and-build” assistant that does everything in one session. deep-plan stops after the plan (+ optional <code>/columbo</code>) and hands off.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Separation of concerns plus resumability: the plan is a durable hand-off artifact, so the skill that produces it must not also mutate the codebase out from under that artifact. Asked to build, it points you to <code>/deep-implement</code> rather than silently crossing the boundary.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">2</span><span class="dt">Plan as a durable spine, per-effort tree</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>All artifacts live under <code>.deep-skills/&lt;effort&gt;/</code>, one subdir per effort, with numbered stage folders. deep-plan writes <code>01-Plan/plan.md</code> and, on first write, creates the manifest if absent. The effort name is a slug deep-plan proposes and the user confirms.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>A flat per-user plans directory (<code>~/.claude/plans/</code>) — kept reachable only via explicit path. Making deep-plan the <i>sole</i> manifest creator — rejected so a mid-series entry can self-bootstrap.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Co-locating every stage's output under one tree gives the durable spine; the manifest links each stage so a fresh agent finds the whole history from one place. Per-project placement keeps artifacts with the repo they describe.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">3</span><span class="dt">Interruptible state machine + always-watch commands</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>An eight-step interruptible state machine; at every step the host watches for commands and, after servicing one, returns “to exactly where you were.” Commands are accepted even without the leading slash if the user clearly means it.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>A rigid fixed-script interview that runs to completion before the user can intervene.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Steerability is a first-class goal. Accepting keyword forms without the slash ties to cross-assistant portability — slash syntax can't be assumed on every host.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">4</span><span class="dt">/drill vs /breakout — in-room dive vs isolated agent</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p><code>/drill</code> deepens the current question inside the session with shared context. <code>/breakout</code> dispatches an isolated fresh subagent with a compact briefing — not the whole transcript — and returns only the distilled pearl, choosing agent type by need.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>A single “investigate deeper” command. Passing the full transcript to the subagent — explicitly rejected (“NOT the whole transcript”).</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Context-budget management: dives that would bloat the main session are pushed into a throwaway agent that returns only its conclusion, while dives that benefit from full shared history stay in-room.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">5</span><span class="dt">Question cadence as a user-chosen knob</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Step 1 asks the user to pick a cadence — 1-at-a-time, 3-at-a-time, or all-at-once — held for the session but changeable any time. All-at-once is the default for small, well-scoped work. Cadence governs <i>delivery, not volume</i>.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>A single fixed interview rhythm. 1-at-a-time is reserved for cases where each answer reshapes the next question.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Different features have different question-dependency structures, and users have different tolerance for back-and-forth. The “delivery, not volume” rule keeps the knob from becoming an excuse to over-ask.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">6</span><span class="dt">Question formats as editable JSON templates</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Three question types ship as fill-in JSON schemas — multiple-choice, yes-no-explain, open-ended — that the skill fills and renders via <code>AskUserQuestion</code>. Fields are modeled on an existing app type (<code>BlueprintQuestion</code>), reusing a known schema. <code>_*</code> keys are docs-only and stripped before rendering.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Hardcoding question shapes in SKILL prose. Instead they're external, clonable files with an “Adding a new type” recipe.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Treating formats as data lets a user tweak the question surface without editing the skill — the same data-not-prose philosophy used for directive cards. Reusing the app schema keeps templates compatible with existing tooling.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">7</span><span class="dt">The mandatory pre-write nudge, in natural language</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>A non-skippable prompt before writing offers gaps/risks/constraints passes — any, all, or none, repeatably — followed by a one-line recommendation only “if pertinent.” Phrased in plain language so it works on Copilot/Codex too.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Silently writing the plan once questions end. Always recommending a pass — rejected as a reflexive nag.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>It forces a deliberate quality gate before the artifact is committed, while keeping the user in control. The natural-language phrasing is again cross-assistant portability.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">8</span><span class="dt">Cold-executable phase structuring + empty Phase Summaries appendix</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Every phase carries Goal, Prerequisites, Files (reuse-before-new), Steps, and Acceptance. “No phase may rely on conversation memory.” A Phase Summaries appendix is reserved empty for <code>/deep-implement</code> to append to.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>deep-plan pre-writing the per-phase hand-offs (owned by implement). Leaving phase dependencies implicit — rejected; cross-phase deps must be stated and reconciled against the ledger.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Direct expression of fresh-agent-resumability at phase granularity. The empty appendix preserves the durable spine — execution writes back into the same document deep-plan authored.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">9</span><span class="dt">The Deferreds ledger (three fields, never prose)</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Anything deferred goes into a ledger with exactly three fields — What, Why deferred, and Integration (how it connects back). “Never drop a deferral into prose where it gets lost.”</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Recording deferrals inline in narrative prose — the named, rejected alternative.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>“Nothing gets forgotten by phase 4.” The mandatory Integration field guarantees a deferred item carries what it needs to rejoin completed work, rather than evaporating into text a later agent skims past.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">10</span><span class="dt">DLC-001 as a runtime directive, not SKILL prose</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>The Data-Flow Contract requirement ships as the active directive card DLC-001, loaded at runtime — <b>not</b> baked into SKILL.md. deep-plan owns it; deep-plan-review checks it; deep-implement validates it with a contract probe.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Trusting prose ACs that merely <i>claim</i> a single source of truth. The card forces every such claim to point to exactly one source and treats two writers feeding one concept as a conflict row.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>It's “the first and highest-leverage directive,” hand-authored from a real PR, that would have surfaced ~100% of that review's severity at plan time. Catching cross-layer write-no-reader bugs at plan time is far cheaper than at review time.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">11</span><span class="dt">The directive-card loader + byte-identical shared files</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>deep-plan runs <code>load-active-cards.sh deep-plan</code> and treats every printed directive as a hard requirement. The loader is self-locating and matches a card to a phase by <b>exact token</b> (so <code>deep-plan</code> ≠ <code>deep-plan-review</code>). Cards are human-gated — toggle, never edit.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Encoding each lesson by editing SKILL.md (“Improvements are data, never SKILL.md edits”). Cross-skill <code>references</code> imports — rejected by the standalone rule. Substring matching — rejected for exact-token.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Data-not-prose lets improvements be toggled by a status flip with provenance and effectiveness tracking, without editing a SKILL.md. Byte-identical copies satisfy the standalone rule while a consistency sweep keeps copies in sync.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">12</span><span class="dt">Trigger-gated Interaction &amp; re-entry gate (shift-left)</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>For a feature adding a user-triggered action/submit/navigation or a stateful/resumable flow, the plan must fill an <b>Interaction &amp; re-entry</b> section — double-submit guard, processing feedback, navigation fallback, re-entry story. Omitted for pure refactors.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Leaving interaction-edge/re-entry to be caught at code-review time — too late and expensive. (The situational-check mechanism and cross-sibling consistency were deliberately <i>not</i> ported.)</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>A “shift-left port” of a code-review hardening, mapped 1:1 to a real benchmark bug caught only after the fact. Trigger-gating means pure refactors pay nothing — cost is charged only to features that introduce the surface.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">13</span><span class="dt">The Explore-agent read-only exploration step</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Up to 3 parallel <code>Explore</code> agents find reusable patterns, integration points, data models, and touched files — “Reuse before inventing” — and explicitly edit nothing. Reused functions are named with paths in the plan.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Inventing new code by default. Read-only is enforced — exploration stays inside the planning-only boundary.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Reuse-before-invent reduces duplication and grounds the plan in real repo paths a fresh agent can follow; capping at 3 read-only agents bounds cost and preserves the no-edits invariant.</p></div>
+    </div>
+  </details>
+
+  <div class="callout warn">
+    <span class="t">A documented wart</span>
+    <p>The in-session-commands reference still claims each command is a “thin command file in <code>.claude/commands/</code>.” The skill actually recognizes these as keywords whether or not such a file exists — so the assertion is misleading for hosts (Copilot/Codex) that have no such directory. Flagged in the source rationale, not yet fixed.</p>
+  </div>
+</section>
+
+<!-- MISTAKES -->
+<section class="sec" id="mistakes">
+  <div class="sec-tag">Watch out</div>
+  <h2>Common mistakes</h2>
+  <div class="mistake"><p><b>Writing code.</b> This skill plans only. If asked to build, point to <code>/deep-implement</code>.</p></div>
+  <div class="mistake"><p><b>Asking what you could have explored.</b> Burn the Explore budget first.</p></div>
+  <div class="mistake"><p><b>Burying deferrals in prose.</b> They evaporate. Use the ledger's three fields.</p></div>
+  <div class="mistake"><p><b>A plan that needs the chat to understand.</b> Fails the fresh-agent test — make it self-contained.</p></div>
+  <div class="mistake"><p><b>Skipping the Data-Flow Contract</b> on a stateful feature — that's exactly where cross-layer bugs hide.</p></div>
+  <div class="mistake"><p><b>Writing before the pre-write nudge</b> — you skip the user's chance to ask for gaps/risks.</p></div>
+</section>
+
+<!-- MASTERY -->
+<section class="sec" id="mastery">
+  <div class="sec-tag">Prove it</div>
+  <h2>Mastery checklist</h2>
+  <ul class="checklist">
+    <li>Produced a <code>plan.md</code> a fresh agent executed without the conversation.</li>
+    <li>Chose cadence deliberately and kept every question decision-relevant.</li>
+    <li>Used <code>/drill</code> vs <code>/breakout</code> for the right reasons.</li>
+    <li>Multi-phase plan with cold-executable phases + an empty Phase Summaries appendix.</li>
+    <li>Every deferral in the ledger; every state row resolved or explicitly Display-only/deferred.</li>
+    <li>Ran <code>/columbo</code> as the last gate before hand-off.</li>
+  </ul>
+</section>
+
+<!-- QUICK REF -->
+<section class="sec" id="qref">
+  <div class="sec-tag">At a glance</div>
+  <h2>Quick reference</h2>
+  <div class="qref reveal">
+    <div class="qh">deep-plan</div>
+    <dl>
+      <dt>Output</dt><dd><code>.deep-skills/&lt;effort&gt;/01-Plan/plan.md</code></dd>
+      <dt>Template</dt><dd><code>templates/plan-template.md</code></dd>
+      <dt>Hard rule</dt><dd>Plan only — no source edits</dd>
+      <dt>Hand-off to</dt><dd><a href="deep-plan-review.html">/deep-plan-review</a> → <a href="deep-implement.html">/deep-implement</a></dd>
+    </dl>
+  </div>
+</section>
+
+<!-- EPISODE NAV -->
+<div class="epnav">
+  <a href="index.html"><span class="dir">← Back to</span><span class="ttl">Series overview</span><span class="cmd">The shared mental model</span></a>
+  <a class="next" href="deep-plan-review.html"><span class="dir">Next episode →</span><span class="ttl">deep-plan-review</span><span class="cmd">/deep-plan-review</span></a>
+</div>
+
+</main>
+</div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>Episode 1 of 6 · deep-plan · Produce</span>
+    <span><a href="index.html">All episodes</a></span>
+  </div>
+</footer>
+
+<script src="assets/series.js"></script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+# Deep Skills — Training Program
+
+A self-paced curriculum for the **Deep-\*** series: a steerable, fresh-agent-resumable
+workflow that takes a feature from idea to verified code. By the end you will be able to
+drive each skill on real work, know *why* each guardrail exists, and chain all four into one
+clean idea→merge loop.
+
+```
+/deep-plan  ──▶  /deep-plan-review  ──▶  /deep-implement  ──▶  /deep-code-review
+  produce         critique                execute               verify
+```
+
+> **Prefer a browsable / video-ready version?** An HTML edition of this whole program lives in
+> [`html/`](html/index.html) — open [`html/index.html`](html/index.html) in a browser. It folds
+> the curriculum *and* the [design rationale](design-rationale/index.md) into one styled,
+> per-skill "episode" set, with a [video production guide](html/production-guide.html) for turning
+> the series into a recorded course.
+
+---
+
+## Who this is for
+
+Engineers who will *use* the deep-skills on their own features, and maintainers who will
+*extend* them. No prior exposure to the plugin is assumed. You should be comfortable with
+Claude Code, git, and reading a codebase.
+
+## How to use this program
+
+Each skill has its own training page with **learning objectives**, a **mental model**, a
+**module-by-module curriculum**, **hands-on exercises**, **common mistakes**, and a
+**mastery checklist**. Work them in order — the skills compose, and later pages assume the
+vocabulary from earlier ones.
+
+| # | Skill | Training page | You'll be able to… |
+|---|---|---|---|
+| 1 | `/deep-plan` | [deep-plan.md](deep-plan.md) | Run a steerable planning session that produces a resumable plan artifact. |
+| 2 | `/deep-plan-review` | [deep-plan-review.md](deep-plan-review.md) | Independently critique a plan with fresh, codebase-aware agents. |
+| 3 | `/deep-implement` | [deep-implement.md](deep-implement.md) | Orchestrate phase-by-phase execution with bounded fix loops and checkpoints. |
+| 4 | `/deep-code-review` | [deep-code-review.md](deep-code-review.md) | Run multi-agent, evidence-gated review that catches the last mile. |
+
+> New to the repo? Read the root [`README.md`](../../README.md) first for install and layout,
+> then come back here.
+
+---
+
+## The shared mental model (read this before any skill page)
+
+Four ideas recur across every skill. Internalize them once and the rest follows.
+
+### 1. Separation of concerns — one skill, one job
+The pipeline is deliberately split so no skill does two things. `/deep-plan` **only**
+plans (no code edits). `/deep-plan-review` **only** critiques the plan. `/deep-implement`
+is the **only** skill that writes source. `/deep-code-review` **only** reviews code (and
+even splits *reviewing* from *triaging*). When a skill is tempted to cross its boundary, it
+stops and points you to the right sibling. Learning the boundaries is half of learning the
+system.
+
+### 2. Fresh-agent resumability — write for someone with no memory
+Every artifact is written so that **a fresh agent with only the artifact + the repo can
+continue cold** — no conversation history required. That is why plans are self-contained,
+why phases carry their own context, and why reviews never receive the planning or
+implementation transcript. "Could a fresh agent pick this up?" is the acceptance test for
+almost everything you produce.
+
+### 3. Independence through fresh eyes
+Both review skills run in **fresh agents that never see the upstream transcript**. The
+planner and the implementer are too close to their own work to see its blind spots; the
+reviewer is briefed with the artifact + codebase + your recorded preferences, but *not* the
+argument that produced it. Independence is the source of the catch.
+
+### 4. The last mile + evidence
+The signature failure the system hunts is the **last-mile problem**: code where the
+interface looks wired and the happy path appears connected, but the behavior doesn't make
+it the last mile — optimistic UI with no real call, swallowed errors, half-wired chains,
+silently dropped scope. Every finding must cite **evidence** (a `path:line`, a named symbol,
+or an observed behavior). No vague "consider improving."
+
+---
+
+## The artifact tree (where everything lands)
+
+Deep-skills runs write to the **target repo**, not to this plugin repo, under a per-effort
+directory. Knowing this layout makes the whole pipeline legible:
+
+```
+.deep-skills/<effort-name>/
+  00-Manifest/        manifest.md   ← stage statuses (any skill creates it on first write)
+  01-Plan/            plan.md       ← /deep-plan  (and the --triage fix-phase append)
+  02-Plan-Review/     review.md     ← /deep-plan-review
+  03-Implementation/  summary.md    ← /deep-implement
+  04-Code-Review/     report.md · findings.json · certificate.md  ← /deep-code-review
+  05-Security/        (reserved for a future /deep-security)
+```
+
+The **plan document is the durable spine** — it accumulates Phase Summaries, a Deferreds
+ledger, review findings, and (after triage) a fix-phase. Learn to read it and you can resume
+any effort.
+
+---
+
+## Deep-Learn — the self-improving directive loop
+
+The skills themselves never change to encode a lesson. Instead, recurring issue classes are
+distilled into toggleable **directive cards** — structured data in
+[`plugins/deep-skills/directives/`](../../plugins/deep-skills/directives/) that the upstream
+skills load at runtime via `scripts/load-active-cards.sh <phase>`. A card is human-gated
+(nothing reaches `active/` without approval), has clean on/off (`toggle.sh <ID> on|off`), and
+carries provenance and effectiveness telemetry — so the same bug gets prevented *earlier*
+next time without editing a skill by hand.
+
+The seed card, [`DLC-001`](../../plugins/deep-skills/directives/cards/active/DLC-001.md), adds
+a **State / Data-Flow Contract** to plans — one row per piece of state read or written, where
+"reader resolves the same source the writer wrote to" is a binary you can't fudge. It would
+have surfaced ~100% of PR#65's review severity at *plan* time. The
+[design notes](../../docs/roadmap/) explain the full loop.
+
+> **Why this matters for trainees:** when a skill prints a directive at the start of a run,
+> treat it as a hard requirement for that run. Don't edit cards or skills to silence one —
+> toggle it.
+
+---
+
+## Recommended learning path
+
+1. **Read this page** — the shared mental model and artifact tree above.
+2. **[deep-plan](deep-plan.md)** — produce a plan for a small real feature.
+3. **[deep-plan-review](deep-plan-review.md)** — review that plan; fold findings back in.
+4. **[deep-implement](deep-implement.md)** — execute it in collaborative mode.
+5. **[deep-code-review](deep-code-review.md)** — review the result; run `--triage`.
+6. **Capstone** (below) — run all four end-to-end on one feature, unassisted.
+
+### Capstone exercise
+
+Pick a small, real feature in a repo you know. Run the full loop:
+
+- `/deep-plan` it (choose an effort name; produce a resumable plan with a Data-Flow Contract).
+- `/deep-plan-review` it in `--multi-agent` mode; apply accepted fixes to the plan.
+- `/deep-implement` it collaboratively, one phase at a time.
+- `/deep-code-review` the branch, then `/deep-code-review --triage`.
+
+**You've mastered the system when:** a teammate can open only your
+`.deep-skills/<effort>/` directory — no chat history — and reconstruct what was built, why,
+what was reviewed, and what remains deferred.
+
+---
+
+## Glossary
+
+| Term | Meaning |
+|---|---|
+| **Effort name** | Kebab-case slug for one piece of work; names its `.deep-skills/<effort>/` dir. |
+| **Fresh agent** | A subagent briefed only with artifacts + codebase, never the upstream transcript. |
+| **Phase** | A self-contained, cold-executable unit of a multi-phase plan. |
+| **Deferreds ledger** | Plan section tracking deferred work: What / Why deferred / Integration. |
+| **Last mile** | The gap between "looks wired" and "actually behaves correctly end-to-end." |
+| **Lens** | One review perspective (e.g. Correctness, Plan Conformance, Coherence). |
+| **Directive card** | A human-gated, toggleable learned improvement loaded as data at runtime. |
+| **Manifest** | `00-Manifest/manifest.md`, the per-effort stage-status index. |
+| **Triage** | The opt-in `--triage` step that decides fix/defer/reject and writes to the plan. |

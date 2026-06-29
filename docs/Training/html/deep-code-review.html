@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Episode 4 · deep-code-review — Deep Skills Training</title>
+<meta name="description" content="Run multi-agent, evidence-gated review that catches the last mile — and learn why review is split from triage, why findings stay open, and why the pipeline bans Haiku.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="theme-code">
+<div id="progress"></div>
+<div class="glow a"></div><div class="glow b"></div>
+
+<nav class="top">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="dot"></span> Deep Skills <span class="muted" style="font-weight:400">/ Ep.4 deep-code-review</span></a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <div class="navlinks">
+      <a href="index.html">Overview</a>
+      <a href="deep-plan.html">1 · Plan</a>
+      <a href="deep-plan-review.html">2 · Review</a>
+      <a href="deep-implement.html">3 · Implement</a>
+      <a href="deep-code-review.html" class="active">4 · Code review</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero wrap narrow">
+  <div class="ep-badge"><span class="pill">EPISODE 4</span><span class="label">Verify</span></div>
+  <h1><span class="grad">deep-code-review</span></h1>
+  <p class="kicker"><code>/deep-code-review</code> independently reviews <b>implemented code</b> the way plan-review reviews a plan: fresh agents, evidence-required findings, a clean report. Its signature concern is the <b>last-mile problem</b>. <b>Review only — never edits source.</b> Triage is a separate, opt-in step.</p>
+  <div class="chips center" style="justify-content:center">
+    <span class="chip"><span class="d"></span> Review ≠ triage</span>
+    <span class="chip"><span class="d"></span> Four lenses</span>
+    <span class="chip"><span class="d"></span> 8-finder fleet</span>
+    <span class="chip"><span class="d"></span> Model-tier discipline</span>
+    <span class="chip"><span class="d"></span> 18 design decisions</span>
+  </div>
+</section>
+
+<div class="wrap">
+<div class="layout">
+
+<aside class="toc">
+  <div class="tt">On this page</div>
+  <a href="#objectives">Learning objectives</a>
+  <a href="#model">Mental model</a>
+  <a href="#walkthrough">How to use it</a>
+  <a href="#lenses">The four lenses</a>
+  <a href="#lastmile">The last-mile method</a>
+  <a href="#flags">Flags &amp; the fleet</a>
+  <a href="#triage">Triage</a>
+  <a href="#why">Why it's built this way</a>
+  <a href="#mistakes">Common mistakes</a>
+  <a href="#mastery">Mastery checklist</a>
+  <a href="#qref">Quick reference</a>
+</aside>
+
+<main>
+
+<section class="sec tight" id="objectives">
+  <div class="sec-tag">In this episode</div>
+  <h2>Learning objectives</h2>
+  <div class="obj">
+    <div class="o"><span class="i">1</span><p>Resolve and <b>state the scope</b> of a diff before launching anything, asking on ambiguity.</p></div>
+    <div class="o"><span class="i">2</span><p>Run the <b>deterministic pre-pass</b> (lint/typecheck/tests) as tools, never agents.</p></div>
+    <div class="o"><span class="i">3</span><p>Review across the <b>four lenses</b> and apply the <b>last-mile</b> chain-tracing methodology.</p></div>
+    <div class="o"><span class="i">4</span><p>Produce a correct <b>findings.json + report.md + certificate.md</b>, all findings <code>open</code>.</p></div>
+    <div class="o"><span class="i">5</span><p>Choose <b>default / <code>--multi-agent</code> / <code>--mega</code></b> and respect the model-tier discipline.</p></div>
+    <div class="o"><span class="i">6</span><p>Run the decoupled <b><code>--triage</code></b> step — the only mode that writes to the plan.</p></div>
+  </div>
+</section>
+
+<section class="sec" id="model">
+  <div class="sec-tag">The frame</div>
+  <h2>Mental model</h2>
+  <div class="panel lead-panel bar reveal">
+    <p>The implementer is <span class="hl">too close to the code</span> to see what it left out. The review runs in fresh agent(s) that receive the diff + the plan + codebase access — <b>but never the implementation transcript.</b></p>
+    <p>Its signature concern is the <span class="hl">last mile</span>: code where the interface looks correct and the happy path appears connected, but the behavior doesn't make it the last mile — optimistic UI with no real call, swallowed errors, half-wired chains, silently dropped plan scope.</p>
+  </div>
+  <div class="grid c2" style="margin-top:8px">
+    <div class="callout decision" style="margin:0"><span class="t">Review ≠ triage</span><p>The review autonomously produces findings (all <code>open</code>) and stops. A human decides fix/defer/reject later, under <code>--triage</code>.</p></div>
+    <div class="callout decision" style="margin:0"><span class="t">Determinism ≠ judgment</span><p>Lint/typecheck/tests run as scripts; agents do the reasoning. Compilers are exact at what they do — don't make an LLM do it.</p></div>
+  </div>
+</section>
+
+<section class="sec" id="walkthrough">
+  <div class="sec-tag">How to use it</div>
+  <h2>The review, module by module</h2>
+  <ol class="steps">
+    <li><span class="module">Module 1</span><h4>Resolve scope, and state it</h4><p>No args: current branch vs the base it was cut from (PR-declared base → merge-base candidates → <b>ask on any ambiguity</b>). PR argument: resolve via <code>gh</code>. Explicit paths: review just those. <b>Before launching anything</b>, print the resolved scope in one line — e.g. <code>Diffing feat/x against develop (working tree included) — 14 files, +812/−214</code>. Never guess a base branch.</p></li>
+    <li><span class="module">Module 2</span><h4>Resolve the effort &amp; artifact home</h4><p>A deep-* plan exists → artifacts go to that effort's <code>04-Code-Review/</code>; read the plan in full. No plan → ask for an effort name (default: slugified branch); create the dir + manifest.</p></li>
+    <li><span class="module">Module 3</span><h4>Deterministic pre-pass</h4><p>Run lint, typecheck, and tests as <b>deterministic tools, never agents</b>. Discover commands from the host project — <b>never from <code>.env</code>/secrets</b>. Results feed the report as findings.</p></li>
+    <li><span class="module">Module 4</span><h4>Match situational checks</h4><p>Match the diff against the situational-check catalog — surface-specific bug hunts whose bodies load <b>only when the diff matches their trigger</b>. Append each matched body to the brief of the lens it attaches to. Disclose which checks fired in the report header.</p></li>
+    <li><span class="module">Module 5</span><h4>The four lenses</h4><p>Default: one fresh agent, four lenses — the “would a senior engineer approve this PR” pass. Details below.</p></li>
+    <li><span class="module">Module 6</span><h4>The last-mile methodology</h4><p>Enumerate promised behaviors, walk each chain hop-by-hop with evidence per hop, hunt the named AI failure modes. <b>Findings without a cited chain are rejected at synthesis.</b></p></li>
+    <li><span class="module">Module 7</span><h4>Findings &amp; report — the review stops here</h4><p>Write <code>report.md</code>, <code>findings.json</code>, <code>certificate.md</code> into <code>04-Code-Review/</code> — <b>every finding <code>open</code></b>. No triage decisions, nothing written outside that folder (it never edits the plan). Close with: <i>Review complete — N findings (status: open). Run /deep-code-review --triage…</i></p></li>
+    <li><span class="module">Module 8</span><h4>Triage — the only mode that writes to the plan</h4><p>On the latest open findings: Blockers auto-accept (user informed); Major/Minor/Nit → HITL fix/defer/reject. Accepted findings become a <b>fix-phase appended to the plan</b> so <code>/deep-implement</code> can execute it cold.</p></li>
+  </ol>
+</section>
+
+<section class="sec" id="lenses">
+  <div class="sec-tag">Module 5, expanded</div>
+  <h2>The four lenses</h2>
+  <div class="grid c2" style="margin-top:8px">
+    <div class="card reveal"><span class="k">LENS 1</span><h4>Correctness</h4><p>Logic errors, null handling, race conditions, broken error paths.</p></div>
+    <div class="card reveal"><span class="k">LENS 2 · the signature</span><h4>Functional Completeness (Last-Mile)</h4><p>Every behavior the plan promises, traced hop-by-hop through the full chain — not merely a connected happy path.</p></div>
+    <div class="card reveal"><span class="k">LENS 3</span><h4>Plan Conformance</h4><p>Everything the plan said is present; no silently dropped scope or undeclared deviations.</p></div>
+    <div class="card reveal"><span class="k">LENS 4</span><h4>Coherence</h4><p>The change reads as one mind's work; no contradictory or half-migrated patterns.</p></div>
+  </div>
+  <div class="callout note">
+    <span class="t">No plan? The lenses degrade — and say so</span>
+    <p>With no plan, the conformance lenses degrade to PR-description / commit-message conformance, and the report must state that explicitly. The review is honest about what ground truth it had.</p>
+  </div>
+</section>
+
+<section class="sec" id="lastmile">
+  <div class="sec-tag">Module 6 · the heart of the skill</div>
+  <h2>The last-mile methodology</h2>
+  <p>Walk every promised behavior through its full chain, citing evidence at <b>every hop</b>. The canonical chain:</p>
+  <div class="code reveal">
+    <div class="hd"><div class="dots"><i></i><i></i><i></i></div><span class="fn">trace each promised behavior, hop by hop</span></div>
+<pre><span class="a">UI event</span> → handler → service → HTTP → route → handler → persistence → response → <span class="a">UI update</span> → secondary effects</pre>
+  </div>
+  <h4>The named AI failure modes it hunts</h4>
+  <ul>
+    <li><b>Optimistic UI</b> — the interface updates with no real call behind it.</li>
+    <li><b>Leftover mocks</b> — a stub never swapped for the real implementation.</li>
+    <li><b>Swallowed errors</b> — a catch that hides the failure.</li>
+    <li><b>Contract drift</b> — a payload that no longer matches what the consumer accepts (even past the repo's seams, to external CLIs / APIs / SDKs).</li>
+    <li><b>Unregistered routes</b> — a handler that's never wired in.</li>
+    <li><b>Two halves, different understandings</b> — front and back built to mismatched assumptions.</li>
+  </ul>
+  <div class="callout why">
+    <span class="t">The non-negotiable synthesis rule</span>
+    <p>A last-mile finding without a cited hop-by-hop chain is <b>rejected at synthesis</b>. “Save might not work” doesn't qualify; “the chain breaks at hop 4 — the handler at <code>x:120</code> calls a route that's never registered” does. Requiring a cited chain forces the reviewer to actually trace rather than gesture.</p>
+  </div>
+  <div class="callout note">
+    <span class="t">Static-first, then <code>--browser</code></span>
+    <p>The method is static-first; <code>--browser</code> escalates to <b>observation</b> against an already-running dev server, citing real request/response traffic — the strongest evidence the review can produce. It never starts a server, never reads <code>.env</code> for ports, and confirms before mutating.</p>
+  </div>
+</section>
+
+<section class="sec" id="flags">
+  <div class="sec-tag">Know which to reach for</div>
+  <h2>Flags &amp; the finder fleet</h2>
+  <div class="tbl-wrap reveal">
+    <table>
+      <thead><tr><th style="width:150px">Flag</th><th>When</th><th>What it changes</th></tr></thead>
+      <tbody>
+        <tr><td><i>(default)</i></td><td>Most reviews</td><td>One fresh agent, four lenses + deterministic pre-pass.</td></tr>
+        <tr><td><code>--multi-agent</code></td><td>Large/risky diffs</td><td>Five-stage pipeline: scripted setup → <b>8 model-tiered single-lens finders</b> → dedup/decompose → <b>severity-gated adversarial verification</b> → script-assembled synthesis.</td></tr>
+        <tr><td><code>--mega</code></td><td>Release gates</td><td>Same pipeline, dials at max — all finders/verifiers on the main tier; ~2× wall clock. <b>Confirm cost first.</b></td></tr>
+        <tr><td><code>--browser</code></td><td>Live last-mile proof</td><td>Exercises promised behaviors against an already-running dev server; cites observed traffic.</td></tr>
+        <tr><td><code>--triage</code></td><td>After a review</td><td>Runs only triage; the one mode that writes to the plan.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout warn">
+    <span class="t">Model-tier discipline — load-bearing</span>
+    <p>Finders are <b>model-tiered by what each lens catches</b>, and the model is set explicitly on every launch as a <b>pinned full ID</b> (<code>claude-fable-5</code> / <code>claude-opus-4-8</code> / latest <code>claude-sonnet-*</code>) — never a bare alias, <b>never Haiku, any tier, any stage.</b> Blocker/Major lenses run on the main tier; diff-scan/conformance/coherence on mid; the combined quality sweep on cheap, capped ≤4. A run that silently fell to Haiku produced <b>zero findings on a diff with two known Criticals.</b> If any agent ran below its tier — discard and relaunch it.</p>
+  </div>
+  <div class="callout decision">
+    <span class="t">Finders find, verifiers prove</span>
+    <p>The eight finders <b>overgenerate</b> (every evidenced sev ≥4 candidate, no caps) but are budgeted — read each chunk once, ~25 tool calls, one decisive trace per candidate. Precision is restored downstream by a <b>verification floor at sev ≥5</b>: Minor-and-up candidates get a fresh adversarial verifier briefed to <i>refute</i> them; sev ≤4 ships <code>unverified</code> with finder evidence intact. Every verification outcome that changed anything happened at sev ≥4 — so the floor restores precision exactly where it pays.</p>
+  </div>
+</section>
+
+<section class="sec" id="triage">
+  <div class="sec-tag">Module 8</div>
+  <h2>Triage — the decoupled decision step</h2>
+  <p>Triage is split out so the review never blocks on a human. On the latest <code>open</code> findings:</p>
+  <ul>
+    <li><span class="sev b">Blockers</span> <b>auto-accept</b> (user informed) → <code>accepted</code>.</li>
+    <li><span class="sev m">Major</span> <span class="sev n">Minor</span> <span class="sev t">Nit</span> → <b>HITL</b>, finding by finding: <b>fix</b> / <b>defer</b> (→ Deferreds ledger) / <b>reject</b>.</li>
+    <li>Accepted findings become a <b>fix-phase appended to the plan</b> (Goal / Prerequisites / Files / Steps / Acceptance) so <code>/deep-implement</code> can execute it cold. No-plan mode generates a minimal plan stub.</li>
+  </ul>
+</section>
+
+<section class="sec" id="why">
+  <div class="sec-tag">The design rationale</div>
+  <h2>Why deep-code-review is built this way</h2>
+  <p class="lead">Eighteen decisions shape the most intricate skill in the series — many calibrated from measured benchmark runs. Expand each for <span class="good">what it does</span>, the <span class="bad">rejected alternative</span>, and <span class="accent">why</span>.</p>
+
+  <details class="decision-block reveal" open>
+    <summary><span class="dn">1</span><span class="dt">Review / triage separation — the run never edits the plan</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>A finished review leaves every finding <code>open</code> and writes to exactly one place — its own <code>04-Code-Review/</code> artifacts + the manifest. All routing/acceptance moves to a separate, opt-in <code>--triage</code> step.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>The pre-split design had the review perform triage inline, routing acceptance into the plan and auto-accepting Blockers during the run.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>So the review never blocks on a human and never edits the plan — it can run autonomously as an unattended gate, while HITL triage happens on the user's schedule. Cleanly separates producer (review) from plan-mutating consumer (triage).</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">2</span><span class="dt">“Findings stay open” — the review writes no verdicts</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Every finding is written <code>open</code> in all three artifacts, triage outcomes pending. Even Blockers stay open during the run — the review only flags a Blocker in the certificate verdict, it doesn't route it.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Auto-accepting Blockers and writing their fix-phase as part of producing the review.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>A consistent open-everywhere state makes the review a pure, side-effect-free producer and keeps <code>findings.json</code> a clean snapshot the Deep-Learn distiller can consume without untangling what the run already acted on.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">3</span><span class="dt">Independence: fresh agents, never the implementation transcript</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Fresh agent(s) get the diff + plan + codebase access but never the implementation transcript. Restated in every finder brief.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Passing the implementer's reasoning/transcript for cheaper context priming — “an agent that saw the implementation reasoning will rationalize the same gaps.”</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>The implementer is too close to the code to see what it left out. A reviewer who never absorbed the implementer's mental model is the one positioned to notice the half-wired chain.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">4</span><span class="dt">The last-mile lens as the signature concern</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Functional Completeness (Last-Mile) is one of four default lenses and the skill's signature lens: enumerate promised behaviors, walk each chain hop-by-hop with evidence per hop, verify the complete behavior. Six named AI failure modes are hunted explicitly.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>The shallow-checkbox approach — ticking “traced it” without producing the trace. “Save might not work” is rejected; only a cited break qualifies.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>The last-mile problem is the series' signature failure. Requiring a cited chain forces the reviewer to actually trace rather than gesture — which is what catches the gap.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">5</span><span class="dt">Interaction-edge, re-entry, and external-consumer additions</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Three new bodies of last-mile hunting, each mapped to a real benchmark bug the review had <i>missed</i>: external-consumer contract drift (past the repo's seams), interaction-edge checks (double-submit guard, processing feedback, navigation fallback), and re-entry/idempotency checks (stale artifacts, “a prior run exists” signal, duplicated side effects).</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Leaving the lens at “trace the happy-path chain” — it missed all five manually-found bugs in the calibration benchmark.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Each addition is calibrated to a specific miss with an in-text exemplar (the button that spawned a fresh run on every click; the abandoned blueprint leaving files on disk; the navigation crash with no fallback route). Two of these three were later shift-left ported upstream.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">6</span><span class="dt">Adversarial test-reading + the Coherence divergent-sibling hunt</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Changed test files are “suspects, not oracles” — a <b>tautological test</b> (one whose assertion encodes the code's current output, not the intended contract) ships the bug with a passing checkmark. And enumerate parallel implementations of an outbound contract field-by-field; a lone divergence in an external-facing payload is a correctness signal, not a style nit.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Treating a green test suite as evidence of correctness; filing a lone wire-shape divergence as a style nit.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>The benchmark miss it exists for: a vision client serialized an image one way, a new contract test asserted exactly that shape, the suite passed 24/24, and the real external consumer rejected it with a 500. The test had codified the bug and the pre-pass read green.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">7</span><span class="dt">The multi-agent finder fan-out (eight single-lens passes)</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Stage A is eight independent, fresh, read-only, single-lens finder passes (diff-scan, removed-behavior, seam-trace, last-mile, frozen-state-probe, conformance, coherence, and a combined quality sweep), launched as one parallel batch capped at 8 concurrent. Finders overgenerate above the nit floor but are budgeted.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>One broad combined agent (“a single agent's lenses anchor on each other; eight fresh agents can't”); earlier 10- then 7-finder rosters; letting finders build verification-grade proofs (“paying for it twice was the single largest cost in the first baseline”).</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Calibrated from two measured baseline runs: many narrow independent passes out-find one broad pass, and the cheap-find / expensive-verify split keeps cost proportional. The rematch covered 20 of 24 matrix rows, beating the prior best of 15.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">8</span><span class="dt">Severity model + the sev ≥5 verification floor</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Canonical 1–10 numeric severity mapped to four tiers (9–10 Blocker · 7–8 Major · 5–6 Minor · 1–4 Nit), justified by counting independent user-reachable trigger paths. Under <code>--multi-agent</code>, sev ≥5 candidates get an adversarial verifier; sev ≤4 ships unverified. A finder proposing exactly sev 5 must say why it isn't a 4.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Verifying everything including the nit tail (consumed ~¼ of the run for zero changed verdicts); lowering the floor mid-run; words-as-canonical (the number is canonical, words derived).</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Every verification outcome that changed anything happened at sev ≥4 — the floor restores precision where it pays and stops spend where it didn't. Trigger-path counting gives severity an objective, checkable basis.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">9</span><span class="dt">Model-tier resolution and the Haiku ban</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Three tiers (main/mid/cheap) resolve from the orchestrator's own model at launch, set explicitly on every launch as a pinned full ID. Blocker/Major lenses on main; diff-scan/conformance/coherence on mid; quality on cheap (capped ≤4). <b>Haiku is never used — any tier, any stage.</b></p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Bare aliases (a run with the <code>opus</code> alias got Opus 4.6, silently below tier); implicit/inherited resolution (“exactly how the Haiku mis-route happened”); Haiku anywhere (“worse than no output — it ships false confidence”).</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>A run whose main-tier lenses silently fell to Haiku produced 0 Blockers and 0 Majors on a diff with two known Criticals. Tiering is calibrated by what each lens catches. Any agent shown running below tier is invalid — discard and relaunch.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">10</span><span class="dt">Stage 0 scripted setup + script-assembled synthesis</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Everything deterministic is scripted: diff pre-chunking with an index (finders never ingest the monolithic diff), the pre-pass launched in parallel with finders, verifier fact pre-harvest, situational matching by grep. Synthesis assembles findings.json, rollups, funnel line, nit table, refuted appendix, and certificate scaffold from fixed-format verdicts — “the model writes only the judgment.”</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Each finder re-deriving the chunk split (“the single largest token sink”); running the pre-pass serially (~13 min idle for nothing); hand-writing the whole report (~103k tokens of transcription; a 161 KB report); per-dimension reports (“one aggregated, deduped, verified report is the contract”).</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Determinism trades no accuracy — deterministic work belongs in scripts where it's cheaper and exact, freeing the model's tokens for the judgment only it can make.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">11</span><span class="dt">Deterministic pre-pass — tools, not agents</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Lint, typecheck, tests run as deterministic tools with conventional severities. Commands discovered from the host (package.json → CLAUDE.md → tool configs), never <code>.env</code>. Always run the affected suite as one combined invocation; attribute failures by a scripted base-vs-head two-worktree diff.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Linting as an LLM dimension; an agent reasoning out which failures are pre-existing (~13 min, four-plus suite runs for what one comparison classifies exactly); per-file-only test runs (can report green over a suite that fails on a fresh checkout).</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Compilers and linters are faster, cheaper, and exact; offloading frees review agents to hunt what tools can't see. The combined-run and base-vs-head rules each close a specific real miss.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">12</span><span class="dt">seam-trace and frozen-state-probe specialists</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p><b>seam-trace:</b> for every value the diff writes, who reads it — and when the reader is external, does the serialized shape match what that consumer expects? Establish ground truth (sibling impl → documented schema → else file an unverified-external-contract finding). <b>frozen-state-probe:</b> for every persisted value whose writer/clearer/repair the diff deletes, run surviving readers against the concrete frozen value. “No probed chain, no finding.”</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Reading the reader's code forward only — “both longest-standing benchmark misses were exactly this shape… the code looked fine read forward; it failed only at the frozen value.”</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>frozen-state-probe adds what the other dimensions don't: the reader's behavior at the concrete value. It was added specifically to land two rows that survived every benchmark run. Overlap is deliberate; synthesis dedupes.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">13</span><span class="dt">Situational checks — progressive disclosure</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>A sparse catalog is read every run; a check's full body loads <b>only when its Match pattern hits the diff</b>, then augments an existing brief — never adds agents. Fired checks are disclosed in the report header. Triggers err toward loading (a false match costs one read; a false miss costs the bug class).</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Baking every surface-specific hunt into the always-on lenses (dead weight on 90% of diffs); pre-reading bodies to gauge relevance (“the Match pattern <i>is</i> the relevance test”); porting the mechanism upstream (deliberately not — only one proven check exists).</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Mirrors how the skill system manages context: pay only for the few checks that fire. It scales to dozens of checks at near-zero standing cost.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">14</span><span class="dt">Scope resolution — ask on any ambiguity</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Three input modes (no-arg, PR, explicit paths). Base detection: PR-declared base → merge-base comparison → ask on ANY ambiguity. The resolved scope is printed as one verbatim line before any launch and reproduced into every artifact.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Guessing a base branch (“Do not pick ‘probably main’”); disturbing the user's checkout (prefer <code>gh pr diff</code> + read-only at PR head).</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>“Wrong scope poisons everything downstream”; the scope line is the contract for the whole review — everything downstream cites it.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">15</span><span class="dt">Browser verification — observed, never inferred</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p><code>--browser</code> escalates last-mile from tracing to observation against an already-running dev server, citing observed request/response. Three hard rules: never start a server, never read <code>.env</code> for ports, confirm before mutating. Static-first; browser is the escalation when tracing leaves real doubt.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Starting a dev server if none is running (“never” — it collides with the user's processes/ports); inferred claims as evidence (“the network log line that isn't there is the evidence”).</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Observed traffic is the strongest evidence the review can produce — where the named last-mile failure modes die or get caught. Static-first keeps the common case cheap.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">16</span><span class="dt">Machine-readable findings.json, certificate, report</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Three artifacts: <code>report.md</code> (human triage doc), <code>findings.json</code> (machine record — numeric severity canonical, tier derived, <code>_doc</code>-keys omitted in real files), <code>certificate.md</code> (pass = no Blockers). Shape kept compatible with a thin future in-app importer.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>A separate annotation file; a words-first severity model.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>The machine-readable file is the <b>data source for Deep-Learn</b> — every <code>findings.json</code> feeds the loop. Numeric severity and a stable shape let the distiller (and a future bridge) consume it with no remapping.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">17</span><span class="dt">No card loader — code-review is a producer, not a consumer</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>deep-code-review has no <code>scripts/</code> directory — it's the one built skill that does not load directive cards at runtime.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Giving it a loader stanza like its siblings (implicitly rejected by its absence).</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>In the hub-and-spoke Deep-Learn model, code-review is the <b>producer of lessons</b> (its findings feed the distiller → cards) while upstream skills are the consumers that apply them. A reviewer that applied prevention cards would also blur its role as the independent measurement point of the loop. <i>(Recovered by inference from the design; no explicit prohibition sentence in the skill's own files.)</i></p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">18</span><span class="dt">The <code>--security</code> seam — documented but inert</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p><code>--security</code> is a documented seam, inert until <code>/deep-security</code> exists. The contract for when it lands: its dimension agents join this fan-out under the same finder rules and finding shape; findings <b>merge</b> into this report's Security section for a single triage pass.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>A separate security report / separate triage pass (“Merge, don't fork”); implementing the flag now.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Documenting the integration contract up front means the future skill plugs into a fixed shape rather than forcing a redesign. The seam is honest about being inert so a user invoking it today isn't misled.</p></div>
+    </div>
+  </details>
+</section>
+
+<section class="sec" id="mistakes">
+  <div class="sec-tag">Watch out</div>
+  <h2>Common mistakes</h2>
+  <div class="mistake"><p><b>Launching before stating scope</b> — or guessing a base branch. State it; ask on ambiguity.</p></div>
+  <div class="mistake"><p><b>Passing the implementation transcript</b> — fresh eyes only.</p></div>
+  <div class="mistake"><p><b>Reviewing the happy path</b> and calling it complete — that's exactly the last-mile trap.</p></div>
+  <div class="mistake"><p><b>A finding without a cited chain/evidence</b> — rejected at synthesis.</p></div>
+  <div class="mistake"><p><b>Letting the review triage</b> — it never decides fix/defer/reject or edits the plan; that's <code>--triage</code>.</p></div>
+  <div class="mistake"><p><b>Reading <code>.env</code> for commands/ports</b> — never. Use package.json / angular.json / CLAUDE.md, else ask.</p></div>
+  <div class="mistake"><p><b>Relaxing token discipline</b> mid-run because the diff “feels important” — escalating to <code>--mega</code> is the user's call, before launch.</p></div>
+  <div class="mistake"><p><b>A bare model alias</b> (or Haiku) in the multi-agent pipeline — pin the full ID per launch.</p></div>
+</section>
+
+<section class="sec" id="mastery">
+  <div class="sec-tag">Prove it</div>
+  <h2>Mastery checklist</h2>
+  <ul class="checklist">
+    <li>Stated resolved scope in one line before any agent; asked on ambiguity.</li>
+    <li>Ran the deterministic pre-pass as tools, not agents; never touched <code>.env</code>.</li>
+    <li>Reviewed all four lenses; traced each promised behavior hop-by-hop with evidence.</li>
+    <li>Produced report.md + findings.json + certificate.md with <b>all findings <code>open</code></b>, nothing written outside <code>04-Code-Review/</code>.</li>
+    <li>Chose the right flag for the diff's risk and respected the model-tier discipline.</li>
+    <li>Ran <code>--triage</code> as a separate step and routed accepted fixes into a cold-executable fix-phase.</li>
+  </ul>
+</section>
+
+<section class="sec" id="qref">
+  <div class="sec-tag">At a glance</div>
+  <h2>Quick reference</h2>
+  <div class="qref reveal">
+    <div class="qh">deep-code-review</div>
+    <dl>
+      <dt>Input</dt><dd>A diff: default branch-vs-base, a PR, or explicit paths</dd>
+      <dt>Output</dt><dd><code>04-Code-Review/</code> → report.md · findings.json · certificate.md (all <code>open</code>)</dd>
+      <dt>Lenses</dt><dd>Correctness · Last-Mile · Plan Conformance · Coherence</dd>
+      <dt>Pass</dt><dd>No Blockers</dd>
+      <dt>Hard rules</dt><dd>Review never edits source or the plan; only <code>--triage</code> writes to the plan; never Haiku in the pipeline</dd>
+      <dt>Loops back to</dt><dd><a href="deep-implement.html">/deep-implement</a> (executes the triaged fix-phase)</dd>
+    </dl>
+  </div>
+</section>
+
+<div class="epnav">
+  <a href="deep-implement.html"><span class="dir">← Previous</span><span class="ttl">deep-implement</span><span class="cmd">/deep-implement</span></a>
+  <a class="next" href="roadmap.html"><span class="dir">Bonus episode →</span><span class="ttl">The roadmap skills</span><span class="cmd">deep-bug-fix · deep-docs</span></a>
+</div>
+
+</main>
+</div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>Episode 4 of 6 · deep-code-review · Verify</span>
+    <span><a href="index.html">All episodes</a></span>
+  </div>
+</footer>
+
+<script src="assets/series.js"></script>
+</body>
+</html>

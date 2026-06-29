@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Episode 2 · deep-plan-review — Deep Skills Training</title>
+<meta name="description" content="Independently critique a finished plan with fresh, codebase-aware agents — and understand why independence through fresh eyes is the source of the catch.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="theme-review">
+<div id="progress"></div>
+<div class="glow a"></div><div class="glow b"></div>
+
+<nav class="top">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="dot"></span> Deep Skills <span class="muted" style="font-weight:400">/ Ep.2 deep-plan-review</span></a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <div class="navlinks">
+      <a href="index.html">Overview</a>
+      <a href="deep-plan.html">1 · Plan</a>
+      <a href="deep-plan-review.html" class="active">2 · Review</a>
+      <a href="deep-implement.html">3 · Implement</a>
+      <a href="deep-code-review.html">4 · Code review</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero wrap narrow">
+  <div class="ep-badge"><span class="pill">EPISODE 2</span><span class="label">Critique</span></div>
+  <h1><span class="grad">deep-plan-review</span></h1>
+  <p class="kicker"><code>/deep-plan-review</code> independently reviews a <b>finished plan</b> and surfaces where it misaligns — with the <b>user</b> (taste, preferences, recorded decisions) or the <b>codebase</b> (best-practices, patterns, duplicate behavior, conflicts) — then records findings back into the plan. <b>Review only — may edit the plan doc, never source.</b></p>
+  <div class="chips center" style="justify-content:center">
+    <span class="chip"><span class="d"></span> Independence</span>
+    <span class="chip"><span class="d"></span> Two lenses</span>
+    <span class="chip"><span class="d"></span> Multi-agent fan-out</span>
+    <span class="chip"><span class="d"></span> 12 design decisions</span>
+  </div>
+</section>
+
+<div class="wrap">
+<div class="layout">
+
+<aside class="toc">
+  <div class="tt">On this page</div>
+  <a href="#objectives">Learning objectives</a>
+  <a href="#model">Mental model</a>
+  <a href="#walkthrough">How to use it</a>
+  <a href="#lenses">The two lenses</a>
+  <a href="#severity">Findings &amp; severity</a>
+  <a href="#why">Why it's built this way</a>
+  <a href="#mistakes">Common mistakes</a>
+  <a href="#mastery">Mastery checklist</a>
+  <a href="#qref">Quick reference</a>
+</aside>
+
+<main>
+
+<section class="sec tight" id="objectives">
+  <div class="sec-tag">In this episode</div>
+  <h2>Learning objectives</h2>
+  <div class="obj">
+    <div class="o"><span class="i">1</span><p>Explain why review must run in <b>fresh agents</b> without the planning transcript.</p></div>
+    <div class="o"><span class="i">2</span><p>Locate the right plan and choose <b>single-agent vs <code>--multi-agent</code></b> mode.</p></div>
+    <div class="o"><span class="i">3</span><p>Brief reviewers with the two lenses + the user's recorded preference sources.</p></div>
+    <div class="o"><span class="i">4</span><p>Present findings by <b>severity</b>, each with <b>evidence</b> and a concrete recommendation.</p></div>
+    <div class="o"><span class="i">5</span><p>Record correctly: a full report <b>and</b> a summary folded into the plan, with fixes applied and deferrals routed.</p></div>
+  </div>
+</section>
+
+<section class="sec" id="model">
+  <div class="sec-tag">The frame</div>
+  <h2>Mental model</h2>
+  <div class="panel lead-panel bar reveal">
+    <p>The planner and the user are <span class="hl">too close to the plan</span> to see its blind spots. So the review runs in fresh agent(s) that receive the plan + codebase access + the user's recorded preferences — <b>but not the planning conversation.</b></p>
+    <p>Fresh eyes, codebase-aware, <span class="hl">unanchored by how the plan was argued into being.</span> That independence <i>is</i> the value; passing the transcript would destroy it.</p>
+  </div>
+  <div class="callout why">
+    <span class="t">Why this is the middle skill</span>
+    <p>It replaces the slow manual review that normally follows planning — and it's the cheapest place in the whole pipeline to catch a misaligned plan, before a single line of code is written against it.</p>
+  </div>
+</section>
+
+<section class="sec" id="walkthrough">
+  <div class="sec-tag">How to use it</div>
+  <h2>The review, step by step</h2>
+  <ol class="steps">
+    <li><span class="module">Module 1</span><h4>Locate the plan</h4><p>Resolve in order: explicit path → the plan referenced in conversation → the most recent <code>01-Plan/plan.md</code>. Confirm if ambiguous. <b>Read it in full.</b></p></li>
+    <li><span class="module">Module 2</span><h4>Choose mode</h4><p><b>Single-agent</b> (default): one agent covers both lenses. <b><code>--multi-agent</code></b>: fan out one fresh agent per dimension in parallel, then synthesize. Recommend it when the plan is large or multi-phase.</p></li>
+    <li><span class="module">Module 3</span><h4>The two review lenses</h4><p>Hunt on exactly two lenses: <b>User alignment</b> (taste, preferences, recorded decisions) and <b>Codebase alignment</b> (best-practices, patterns, duplicate/overlapping behavior, conflicts). Details below.</p></li>
+    <li><span class="module">Module 4</span><h4>Dispatch the review (briefing discipline)</h4><p>Brief each fresh agent with the plan text, the two lenses, read access to the codebase, and pointers to preference sources (<code>MEMORY.md</code> + <code>feedback_*</code> memories, root <code>CLAUDE.md</code>, per-app <code>CLAUDE.md</code>). <b>Do not pass the planning transcript.</b> Single-agent uses one <code>Agent</code>; multi-agent launches dimension agents in parallel, then a synthesis pass.</p></li>
+    <li><span class="module">Module 5</span><h4>Present findings</h4><p>Group by severity — <span class="sev b">Blocker</span> <span class="sev m">Major</span> <span class="sev n">Minor</span> <span class="sev t">Nit</span> — each tagged with its lens, with evidence and a concrete recommendation. Lead with Blockers and Majors. Be honest: say plainly when a lens is clean.</p></li>
+    <li><span class="module">Module 6</span><h4>Record the review</h4><p>Write the full report to <code>02-Plan-Review/review.md</code>. Record a findings summary + link in the plan. With the user's go-ahead, apply accepted fixes to the plan and route deferrals into the Deferreds ledger. Update the manifest.</p></li>
+    <li><span class="module">Module 7 &amp; 8</span><h4>Optional /columbo, then hand off</h4><p><code>/columbo</code> is a fresh-agent completeness gut-check — “could a fresh agent <i>execute</i> this?” When the user is satisfied, the plan is ready for <a href="deep-implement.html">/deep-implement</a>.</p></li>
+  </ol>
+  <div class="callout note">
+    <span class="t">Scaling the fan-out</span>
+    <p>A small plan may warrant only two agents; a large multi-phase plan warrants all four. Don't spawn agents with nothing to chew on. Parallelism is capped at 2–4 per the standing rule against mass-spawning heavy agents — and review agents are the safe case (read-only, no worktree isolation needed because nothing here writes source).</p>
+  </div>
+</section>
+
+<section class="sec" id="lenses">
+  <div class="sec-tag">Module 3, expanded</div>
+  <h2>A plan can be wrong in two independent ways</h2>
+  <div class="grid c2" style="margin-top:8px">
+    <div class="card reveal">
+      <span class="k">LENS A</span>
+      <h3>User alignment</h3>
+      <p>Does the plan match the user's taste, preferences, and recorded decisions? Four dimensions: choice/preference, taste/style, knowledge fit, coherence with prior decisions. <b>Source of truth:</b> memory / <code>feedback_*</code> / <code>CLAUDE.md</code>.</p>
+    </div>
+    <div class="card reveal">
+      <span class="k">LENS B</span>
+      <h3>Codebase alignment</h3>
+      <p>Does it match best-practices and existing patterns? Does it <b>duplicate or overlap</b> existing behavior? Does it <b>conflict</b> with what's there? Six dimensions, including behavioral completeness. <b>Source of truth:</b> the repo itself.</p>
+    </div>
+  </div>
+  <div class="callout why">
+    <span class="t">Why split them</span>
+    <p>The two failure modes require <i>different sources of truth</i> — the user's recorded preferences vs the repo. Separating them keeps each finding grounded in its own evidence. A canonical Lens-B catch: the plan rebuilds an existing <code>pickPort()</code> when a <code>PORT_SAFETY_RULE</code> already exists — duplicate, drift-prone logic, caught by name and path.</p>
+  </div>
+</section>
+
+<section class="sec" id="severity">
+  <div class="sec-tag">The findings contract</div>
+  <h2>Severity model + mandatory evidence</h2>
+  <div class="tbl-wrap reveal">
+    <table>
+      <thead><tr><th style="width:120px">Severity</th><th>Means</th></tr></thead>
+      <tbody>
+        <tr><td><span class="sev b">Blocker</span></td><td>The plan will produce a wrong, conflicting, or duplicate result if executed as written. Must fix before <code>/deep-implement</code>.</td></tr>
+        <tr><td><span class="sev m">Major</span></td><td>Significant misalignment or risk that should be addressed.</td></tr>
+        <tr><td><span class="sev n">Minor</span></td><td>Worth fixing, but won't break execution.</td></tr>
+        <tr><td><span class="sev t">Nit</span></td><td>Stylistic / preference-level.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Every finding carries: Severity, Lens, Title, <b>Evidence</b>, Impact, <b>Recommendation</b>. Severity is anchored to <i>impact on execution</i>, not author confidence.</p>
+  <div class="callout warn">
+    <span class="t">Two banned behaviors</span>
+    <p><b>Vague advisory findings</b> (“consider improving”) — every finding must cite a path, a plan section, or a named existing function. <b>Manufacturing findings</b> to look thorough — if a lens is clean, say so. Both erode trust in the report.</p>
+  </div>
+</section>
+
+<section class="sec" id="why">
+  <div class="sec-tag">The design rationale</div>
+  <h2>Why deep-plan-review is built this way</h2>
+  <p class="lead">Twelve decisions shape this skill. Expand each for <span class="good">what it does</span>, the <span class="bad">rejected alternative</span>, and <span class="accent">why</span>.</p>
+
+  <details class="decision-block reveal" open>
+    <summary><span class="dn">1</span><span class="dt">Rename deep-review → deep-plan-review</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>The skill is named <code>deep-plan-review</code> with slash command <code>/deep-plan-review</code>.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>The prior name <code>deep-review</code>.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>The series now has a <i>second</i> reviewer — <code>deep-code-review</code> — so a bare “deep-review” is ambiguous about <i>what</i> it reviews. “plan” names the artifact under review and avoids collision. The rename was cosmetically safe: consumer wiring references the plugin, not the skill.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">2</span><span class="dt">Independence through fresh agents (withhold the transcript)</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Review runs in fresh agent(s) that get the plan + codebase + recorded preferences — but not the planning conversation. Restated as a hard dispatch rule and repeated for every dimension agent.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Letting the planner (or the agent holding the transcript) review its own plan.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>A reviewer who read the argument inherits the plan's framing and rationalizations. Withholding the transcript forces judgment against ground truth — the codebase + preferences — not the plan's own narrative. In parallel mode, “four agents can't anchor on each other the way one agent's single pass can.”</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">3</span><span class="dt">Review-only guardrail — edits the plan doc, never source</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>“Review only — never implement, never edit source.” The only writable surface is the plan document (findings, accepted fixes, deferrals).</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>A reviewer that also applies the code fixes it finds — routed to <code>/deep-implement</code> instead.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Clean separation of concerns: the review can't silently mutate source and blur the line between critique and execution. The plan stays the single source of truth implement executes against.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">4</span><span class="dt">Two review lenses (user / codebase)</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Every pass examines the plan through Lens A (user alignment, 4 dimensions) and Lens B (codebase alignment, 6 dimensions).</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>A single undifferentiated “is this plan good?” pass.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>A plan fails in two ways needing two sources of truth (memory/CLAUDE.md vs the repo). Separating them keeps each finding grounded in its own evidence.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">5</span><span class="dt">Single-agent default, multi-agent escalation</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Default single-agent; use parallel only with the flag, but recommend it for large/multi-phase plans.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Always-multi-agent (rejected for cost); always-single (rejected for large plans where one pass loses breadth).</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Most plans don't justify four agents; one fresh agent already provides the core independence benefit. Multi-agent “trades tokens for breadth and independence” — reserved for plans big enough to pay for it.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">6</span><span class="dt">Multi-agent fan-out + synthesis pass</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Launch dimension agents in parallel (one message, multiple <code>Agent</code> calls) — codebase-duplication, patterns-and-practices, user-alignment, coherence-conflicts — then a synthesis pass dedupes, resolves conflicts, ranks, and presents one clean list. Raw per-agent output stays behind the curtain.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Showing the user raw per-agent outputs; sequential dispatch.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Parallel single-dimension agents maximize independence and depth. The synthesis pass is the counterweight — parallel agents raise the same issue twice and may disagree, so a final pass collapses duplicates and takes a position, sparing the human four overlapping reports.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">7</span><span class="dt">Agent-type and parallelism caps (Explore vs general-purpose, ≤4)</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p><code>Explore</code> for read-only/codebase-heavy sweeps; <code>general-purpose</code> when an agent must reason across lenses. Parallelism capped at 2–4.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Unbounded fan-out — rejected per the standing guidance against spawning many heavy agents.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Agent type is matched to task; the cap honors a standing user guideline. Review agents are the safe case — read-only, so worktree isolation is unnecessary.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">8</span><span class="dt">Findings format — severity + mandatory evidence</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Four-level severity anchored to impact on execution; required fields including Evidence and Recommendation; presentation grouped by severity then lens, ending in a per-lens verdict.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Vague advisory findings (banned); manufacturing findings to look thorough (banned — say the plan is clean instead).</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Severity tied to <i>what breaks at implement time</i> lets the human triage by execution risk; mandatory evidence makes each finding independently verifiable; the “say it's clean” rule prevents inflation and padding.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">9</span><span class="dt">Review/apply separation — findings stay open</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>The review records findings first; applying them is a separate, user-gated step. Each finding carries a <code>Status</code> defaulting to <code>open</code>: open / accepted→fixed in plan / deferred→see Deferreds / dismissed by user.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Auto-applying findings as they're found.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Reaches the same review-then-route separation as <code>deep-code-review</code> but by a lighter mechanism — there's no <code>--triage</code> flag here, just the “with the user's go-ahead” gate plus the Status ledger. Dismissed findings stay listed so the decision is on record.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">10</span><span class="dt">DLC-001 contract check injected at dispatch</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>At dispatch, each fresh agent is briefed to confirm the State/Data-Flow Contract is present, every row resolved, and every “single source of truth” AC names exactly one source. The check lives as <b>data</b> in DLC-001, loaded at runtime — not in SKILL prose.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Hard-coding the contract check into SKILL.md (“Improvements are data, never SKILL.md edits”).</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>deep-plan owns the contract; deep-plan-review is the <b>check</b> spoke — an unresolved non-Display-only row becomes a blocking finding. Encoding it as a toggleable card keeps the improvement human-gated and removable.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">11</span><span class="dt">Behavioral-completeness dimension — CONFIRMS what deep-plan REQUIRES</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Lens B dimension #6: for user-triggered actions and stateful flows, a <i>missing specification</i> of interaction-edge and re-entry requirements is a finding (no double-submit guard, no processing feedback, no navigation fallback, no re-entry story). A plan with no such surface is clean — say so.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Leaving interaction-edge/re-entry to be caught at code-review time — too late, too expensive.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>The “shift-left” port as a paired gate: <b>deep-plan REQUIRES</b> the spec, <b>deep-plan-review CONFIRMS</b> it. Trigger-gated so pure refactors pay nothing. The reviewer is the backstop so the requirement can't be silently skipped by the planner.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">12</span><span class="dt">Directive-card loader + byte-identical shared files</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Runs <code>load-active-cards.sh deep-plan-review</code> and treats each directive as a hard requirement. Self-locating loader, exact-token phase matching. <code>load-active-cards.sh</code> and <code>artifact-structure.md</code> are byte-identical copies across every deep-* skill.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Cross-skill imports of shared files (rejected by the standalone rule); baking learned improvements into each SKILL.md.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Skills install independently, so each must self-contain — verbatim copies plus a consistency sweep, not a shared import. Exact-token matching prevents the <code>deep-plan</code>/<code>deep-plan-review</code> prefix collision.</p></div>
+    </div>
+  </details>
+</section>
+
+<section class="sec" id="mistakes">
+  <div class="sec-tag">Watch out</div>
+  <h2>Common mistakes</h2>
+  <div class="mistake"><p><b>Passing the planning transcript</b> — kills the independence that makes the review work.</p></div>
+  <div class="mistake"><p><b>Inventing findings</b> to look thorough. If a lens is clean, say so.</p></div>
+  <div class="mistake"><p><b>Vague findings.</b> Every finding cites a path, a plan section, or a named existing function.</p></div>
+  <div class="mistake"><p><b>Severity inflation</b> — a stylistic nit is not a Blocker; severity must reflect impact.</p></div>
+  <div class="mistake"><p><b>Editing source.</b> This skill touches only the plan document.</p></div>
+  <div class="mistake"><p><b>Forgetting to fold the summary into the plan</b> — the full report alone leaves the plan blind to its own review.</p></div>
+</section>
+
+<section class="sec" id="mastery">
+  <div class="sec-tag">Prove it</div>
+  <h2>Mastery checklist</h2>
+  <ul class="checklist">
+    <li>Briefed reviewers with plan + lenses + preference sources, never the transcript.</li>
+    <li>Produced findings on both lenses, each with evidence and a concrete recommendation.</li>
+    <li>Grouped by severity, led with Blockers/Majors, called clean lenses honestly.</li>
+    <li>Wrote the full report <b>and</b> the in-plan summary + link.</li>
+    <li>Applied accepted fixes to the plan; routed deferrals to the ledger; updated the manifest.</li>
+  </ul>
+</section>
+
+<section class="sec" id="qref">
+  <div class="sec-tag">At a glance</div>
+  <h2>Quick reference</h2>
+  <div class="qref reveal">
+    <div class="qh">deep-plan-review</div>
+    <dl>
+      <dt>Input</dt><dd>The most recent <code>01-Plan/plan.md</code> (or explicit path)</dd>
+      <dt>Output</dt><dd><code>02-Plan-Review/review.md</code> + in-plan summary</dd>
+      <dt>Lenses</dt><dd>User alignment · Codebase alignment</dd>
+      <dt>Hard rule</dt><dd>Review only — may edit the plan doc, never source</dd>
+      <dt>Hand-off to</dt><dd><a href="deep-implement.html">/deep-implement</a></dd>
+    </dl>
+  </div>
+</section>
+
+<div class="epnav">
+  <a href="deep-plan.html"><span class="dir">← Previous</span><span class="ttl">deep-plan</span><span class="cmd">/deep-plan</span></a>
+  <a class="next" href="deep-implement.html"><span class="dir">Next episode →</span><span class="ttl">deep-implement</span><span class="cmd">/deep-implement</span></a>
+</div>
+
+</main>
+</div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>Episode 2 of 6 · deep-plan-review · Critique</span>
+    <span><a href="index.html">All episodes</a></span>
+  </div>
+</footer>
+
+<script src="assets/series.js"></script>
+</body>
+</html>

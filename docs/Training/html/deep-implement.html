@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Episode 3 · deep-implement — Deep Skills Training</title>
+<meta name="description" content="Orchestrate phase-by-phase execution with bounded fix loops and checkpoints — the only deep-* skill that writes source — and learn why it's an orchestrator, not an author.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="theme-implement">
+<div id="progress"></div>
+<div class="glow a"></div><div class="glow b"></div>
+
+<nav class="top">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="dot"></span> Deep Skills <span class="muted" style="font-weight:400">/ Ep.3 deep-implement</span></a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <div class="navlinks">
+      <a href="index.html">Overview</a>
+      <a href="deep-plan.html">1 · Plan</a>
+      <a href="deep-plan-review.html">2 · Review</a>
+      <a href="deep-implement.html" class="active">3 · Implement</a>
+      <a href="deep-code-review.html">4 · Code review</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero wrap narrow">
+  <div class="ep-badge"><span class="pill">EPISODE 3</span><span class="label">Execute</span></div>
+  <h1><span class="grad">deep-implement</span></h1>
+  <p class="kicker"><code>/deep-implement</code> executes a finished, reviewed plan <b>phase by phase</b>: implement → validate → fix → commit → hand-off — in collaborative or autonomous mode. It is the <b>only</b> deep-* skill that writes source code.</p>
+  <div class="chips center" style="justify-content:center">
+    <span class="chip"><span class="d"></span> Orchestrator role</span>
+    <span class="chip"><span class="d"></span> Bounded fix loop</span>
+    <span class="chip"><span class="d"></span> Validation gating</span>
+    <span class="chip"><span class="d"></span> 13 design decisions</span>
+  </div>
+</section>
+
+<div class="wrap">
+<div class="layout">
+
+<aside class="toc">
+  <div class="tt">On this page</div>
+  <a href="#objectives">Learning objectives</a>
+  <a href="#model">Mental model</a>
+  <a href="#loop">The per-phase loop</a>
+  <a href="#walkthrough">How to use it</a>
+  <a href="#validation">Validation &amp; the fix loop</a>
+  <a href="#why">Why it's built this way</a>
+  <a href="#mistakes">Common mistakes</a>
+  <a href="#mastery">Mastery checklist</a>
+  <a href="#qref">Quick reference</a>
+</aside>
+
+<main>
+
+<section class="sec tight" id="objectives">
+  <div class="sec-tag">In this episode</div>
+  <h2>Learning objectives</h2>
+  <div class="obj">
+    <div class="o"><span class="i">1</span><p>Act as an <b>orchestrator</b>: spawn a fresh sub-agent per phase rather than coding yourself.</p></div>
+    <div class="o"><span class="i">2</span><p>Choose <b>collaborative vs autonomous</b> mode and use <code>--worktree</code> / <code>--parallel</code> correctly — and know when not to.</p></div>
+    <div class="o"><span class="i">3</span><p>Run the per-phase loop with a <b>bounded fix loop</b> and correct <b>validation gating</b>.</p></div>
+    <div class="o"><span class="i">4</span><p>Maintain the durable record: Phase Summaries, per-phase commits, hand-offs, Deferreds reconciliation.</p></div>
+    <div class="o"><span class="i">5</span><p>Recognize the boundary: stop and surface gaps instead of silently re-planning.</p></div>
+  </div>
+</section>
+
+<section class="sec" id="model">
+  <div class="sec-tag">The frame</div>
+  <h2>Mental model</h2>
+  <div class="panel lead-panel bar reveal">
+    <p>You are the <span class="hl">orchestrator, not the author.</span> By default you do <b>not</b> write the code — you spawn a fresh sub-agent per phase, validate its work, drive the fix loop, commit checkpoints, and hand off.</p>
+    <p>You reuse existing machinery (test runner, worktrees, hand-off/resume) rather than reinventing it. <span class="hl">The plan is the contract;</span> you execute exactly what it specifies.</p>
+  </div>
+  <div class="callout why">
+    <span class="t">Lightweight by design</span>
+    <p>This is a <i>plan-driven</i> orchestrator — deliberately not a heavy DB-backed pipeline. Keep it slim. Separating orchestration from authoring keeps validation/commit/hand-off discipline outside the agent that has motivated reasons to call its own work done.</p>
+  </div>
+</section>
+
+<section class="sec" id="loop">
+  <div class="sec-tag">The heartbeat</div>
+  <h2>The per-phase loop</h2>
+  <div class="code reveal">
+    <div class="hd"><div class="dots"><i></i><i></i><i></i></div><span class="fn">for each phase</span></div>
+<pre><span class="g">implement</span>  <span class="c">→ fresh sub-agent, briefed with plan + THIS phase + prior summaries</span>
+   <span class="a">↓</span>
+<span class="g">validate</span>   <span class="c">→ scoped typecheck + tests; block only on NEW failures in changed files</span>
+   <span class="a">↓</span>
+<span class="g">fix</span>        <span class="c">→ bounded loop, cap: 2 attempts, else blocker report</span>
+   <span class="a">↓</span>
+<span class="g">commit</span>     <span class="c">→ mode-dependent: autonomous checkpoints; collaborative gates first</span>
+   <span class="a">↓</span>
+<span class="g">summarize</span>  <span class="c">→ append to Phase Summaries appendix IN THE PLAN</span>
+   <span class="a">↓</span>
+<span class="g">hand-off</span>   <span class="c">→ slim next-phase hand-off, then continue</span></pre>
+  </div>
+</section>
+
+<section class="sec" id="walkthrough">
+  <div class="sec-tag">How to use it</div>
+  <h2>The run, module by module</h2>
+  <ol class="steps">
+    <li><span class="module">Module 1</span><h4>Inputs &amp; flags</h4><p>Plan: explicit path → plan in context → most recent <code>01-Plan/plan.md</code>. Read it <b>fully</b>, including Phase Summaries and Deferreds. <code>--autonomous</code>/<code>--collaborative</code> set mode (ask if omitted on a multi-phase plan). <code>--worktree</code> isolates work; default is the current branch. <code>--parallel</code> is opt-in, only for provably independent phases.</p></li>
+    <li><span class="module">Module 2</span><h4>Load &amp; assess</h4><p>Identify single- vs multi-phase, which phases are done (read the summaries), the ledger, and each phase's acceptance criteria. <b>If resuming, start at the first unfinished phase</b> — this is where resumability pays off.</p></li>
+    <li><span class="module">Module 3</span><h4>Worktree / branch setup</h4><p>With <code>--worktree</code>, create the isolated worktree. Otherwise <b>branch-first if on main/develop.</b> Code changes go in the worktree; <b>plan/summary updates go to the source branch root.</b></p></li>
+    <li><span class="module">Module 4</span><h4>Execute phases</h4><p>Sequential (default): for each phase, spawn one fresh sub-agent briefed with the plan + that phase + prior summaries. It implements <b>only that phase</b>. <code>--parallel</code> (guarded): only for phases verified independent.</p></li>
+    <li><span class="module">Module 5</span><h4>Validate each phase</h4><p>Typecheck (e.g. <code>bunx tsc</code> from the app dir — <b>never <code>npx</code> from root</b>), run relevant tests via the test-runner, and the prompt-assembly snapshot test if the phase touched that pipeline. Block only on <b>new</b> failures in changed files / their imports.</p></li>
+    <li><span class="module">Module 6</span><h4>The bounded fix loop</h4><p>If validation fails, the phase agent fixes and re-validates. <b>Cap: 2 attempts.</b> Still failing → stop, write a blocker report, notify, and in autonomous mode do <b>not</b> commit broken code.</p></li>
+    <li><span class="module">Module 7</span><h4>Commit / gate (mode-dependent)</h4><p><b>Collaborative:</b> present diff + validation + summary; await approve/request-fix; commit only if the user wants. <b>Autonomous:</b> on green, commit a per-phase checkpoint (conventional message + <code>Co-Authored-By</code> trailer), append the summary, write the hand-off, continue.</p></li>
+    <li><span class="module">Module 8 &amp; 9</span><h4>Summarize, hand off, finish</h4><p>Append a summary to the plan's Phase Summaries appendix and write a slim next-phase hand-off. At the end, write <code>03-Implementation/summary.md</code>, check off acceptance criteria, update the manifest, and <b>reconcile the Deferreds ledger</b>. Hand off to <a href="deep-code-review.html">/deep-code-review</a>.</p></li>
+  </ol>
+  <div class="callout note">
+    <span class="t">Phase Summaries live in the plan</span>
+    <p>The plan document is the durable record. <code>03-Implementation/summary.md</code> does <b>not</b> replace the Phase Summaries — those stay in the plan so a fresh agent can resume by reading the appendix, finding the first phase not marked done, and continuing. Worktree copies are ephemeral and lost on removal, which is why plan/summary/hand-off updates go to the source branch root.</p>
+  </div>
+</section>
+
+<section class="sec" id="validation">
+  <div class="sec-tag">The two nets</div>
+  <h2>Validation gating &amp; the fix loop</h2>
+  <div class="grid c2" style="margin-top:8px">
+    <div class="card reveal">
+      <span class="k">GATING</span>
+      <h4>New failures only</h4>
+      <p>Validation is scoped to the <b>changed files and their imports</b>. Pre-existing errors elsewhere are expected noise. You block only on <b>new</b> failures. This keeps gating fast and signal-rich on a long multi-phase run.</p>
+    </div>
+    <div class="card reveal">
+      <span class="k">FIX CAP</span>
+      <h4>Two attempts, then hand back</h4>
+      <p>A fixed small bound converts open-ended thrash into a deterministic hand-back to a human. The blocker report captures what failed, what was tried attempt-by-attempt, the suspected cause, files in flight, and <b>the specific human decision needed</b>.</p>
+    </div>
+  </div>
+  <div class="callout warn">
+    <span class="t">Green ≠ verified for external shapes (DLC-001 + construction rules)</span>
+    <p>A clean typecheck and green unit tests are structurally blind to a write whose runtime reader resolves a <i>different</i> source. So DLC-001 adds a <b>contract probe</b> (write → execute → assert read), and two construction rules are appended to the phase-agent brief: <b>verify external shapes against ground truth before coding to them</b>, and <b>don't write tautological contract tests</b> (a test asserting the shape you just authored passes regardless of whether the consumer accepts it).</p>
+  </div>
+</section>
+
+<section class="sec" id="why">
+  <div class="sec-tag">The design rationale</div>
+  <h2>Why deep-implement is built this way</h2>
+  <p class="lead">Thirteen decisions shape this skill. Expand each for <span class="good">what it does</span>, the <span class="bad">rejected alternative</span>, and <span class="accent">why</span>.</p>
+
+  <details class="decision-block reveal" open>
+    <summary><span class="dn">1</span><span class="dt">Orchestrator, not author: fresh sub-agent per phase</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>The main session orchestrates and does not write code itself by default. Each phase agent is briefed with the full plan, <i>its phase only</i>, prior summaries, and the latest hand-off, and is told “Implement only this phase… Do not exceed scope… Do not commit.”</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>The orchestrator coding directly; one long-lived agent across all phases; letting the phase agent own validation/commits/summaries.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>“A fresh agent per phase keeps context lean over long runs and matches the plan's ‘any phase executable cold’ design.” Separating orchestration from authoring keeps discipline outside the agent motivated to call its own work done.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">2</span><span class="dt">Phase-by-phase execution with checkpoints</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>One phase at a time through implement → validate → fix → (commit) → summarize → hand-off; autonomous produces a per-phase checkpoint commit.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Implement the whole plan in one pass; replicate the heavy DB-backed story pipeline (“deliberately not that; don't duplicate that machinery”).</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Phased execution with checkpoints makes the run resumable, lean, and recoverable — each commit is a known-green restart point. It keeps the skill a lightweight, plan-driven orchestrator.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">3</span><span class="dt">Execution modes: collaborative vs autonomous</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Collaborative = a review gate between phases. Autonomous = continuous execution; on green commit and continue, on a blocker hard-stop. Ask if mode is omitted on a multi-phase plan; the user may switch modes at any phase boundary.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>A single fixed cadence; silently defaulting to one mode on multi-phase plans.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>The two modes map to the user's presence. Autonomous assumes the user enabled bypass-permissions and walked away; collaborative keeps them in the loop. Switching mid-run lets a user go autonomous until a risky phase, then collaborative.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">4</span><span class="dt">Bounded fix loop (cap: 2 attempts)</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>On validation failure, fix and re-validate, capped at 2 attempts; still failing → stop, blocker report, notify, never commit broken code.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Unbounded retry until green; committing partial/broken work after exhausting attempts.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>A fixed small bound converts open-ended thrash into a deterministic hand-back. <i>(The exact number 2 vs 3 is stated but not separately justified in the sources.)</i></p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">5</span><span class="dt">The blocker-report mechanism + template</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>When the cap is hit, emit a structured report appended to Phase Summaries that also drives the notification: when/after how many attempts, branch &amp; worktree (uncommitted — broken code never committed), what failed, what was tried, suspected cause, files in flight, the specific human decision needed.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Silently skipping a failing phase; a free-form failure note.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>A structured stop-and-handback makes the failure actionable without conversation history — it states the decision required and preserves in-flight state.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">6</span><span class="dt">Phase Summaries + slim hand-off: the durable spine</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>After each phase, append a summary to the plan's appendix and write a slim hand-off. Resume = read the appendix, find the first phase not done, continue. Summaries live in the plan, not in <code>03-Implementation/summary.md</code>.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Progress in conversation/agent memory; moving per-phase detail into <code>summary.md</code>; reusing <code>/handoff</code> machinery exclusively (kept as an optional add-on).</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Fresh-agent resumability: pinning the durable record to the portable plan document (not chat or ephemeral artifacts) is what guarantees a cold resume.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">7</span><span class="dt">Validation strategy: scoped, new-failures-only, + the contract probe</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Scoped to changed files + imports; block only on new failures. Per-app typecheck with <code>bunx</code> from inside the app dir (never <code>npx tsc</code> from root, which fetches a stub that hangs); tests via the test-runner with an explicit SUCCESS marker; a snapshot test trigger; plus the DLC-001 contract probe.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Block on the whole repo's state; trust green typecheck + unit tests as proof; run heavy behavioral validation every phase.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Scoping keeps gating fast and signal-rich. The probe exists because a clean typecheck is structurally blind to a write whose runtime reader resolves a different source — the exact bug class Deep-Learn was built to kill upstream.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">8</span><span class="dt">External-contract + adversarial-test construction rules</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>When a phase produces a payload an external consumer reads, two rules are appended to the brief: (1) verify external shapes against ground truth before coding to them — “neither repo code nor a repo test is ground truth for an out-of-repo consumer”; (2) don't write tautological contract tests. Restated as “Green ≠ verified for external shapes.”</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Treating a green in-repo test as confirmation of an external contract; letting an unverified shape pass silently (record it as <b>unverified</b> instead).</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>An explicit shift-left: porting two code-review hardening principles upstream as preventative gates, each mapped 1:1 to a benchmark bug the review caught only after the fact. These are the failure modes that pass typecheck and tests while the feature is broken.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">9</span><span class="dt">Commit &amp; branch policy; worktree documentation rule</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Never commit on main/develop — branch first as <code>feat/&lt;plan-slug&gt;</code>. Conventional messages ending with the <code>Co-Authored-By</code> trailer; never push unless asked. Code stays in the worktree, but plan/summary/hand-off updates go to the source branch root.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Default to a worktree (default is the current branch); commit broken code or commit on a default branch; push automatically.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Per-phase green-only checkpoints give the recoverable spine; branch-first protects shared branches; the worktree-doc split keeps the durable record from being lost when an ephemeral worktree is removed.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">10</span><span class="dt">Parallelism is opt-in and safety-gated</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Sequential by default; <code>--parallel</code> required, and even then must prove independence on all three checks: no shared files, no ordering dependency, contract pre-defined. Canonical safe case: one agent builds frontend, another backend, both coding to a shared contract. Bounded to a small handful, never a swarm.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Auto-parallelize to save time (“never auto-parallelize; the user must ask, and the safety checks must pass”); unbounded fan-out.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Parallel phases that share files or ordering produce silent corruption; gating on a pre-defined contract is what makes concurrency safe. The bound respects a standing rule against parallel token burn.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">11</span><span class="dt">Sparse notifications</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Notify only on two events: a blocker (fix cap hit) and autonomous full-run completion. Mechanisms in preference order: <code>PushNotification</code>, a native macOS banner fallback, a user-extensible Notification hook.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Notify between successful phases / in collaborative mode; adding a Slack/push hook silently (offer to scaffold instead).</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>“Over-notifying erodes trust in the signal.” Notifications are reserved for the moments that genuinely need the user — a hard stop or “I'm done” — aligning with autonomous mode's premise that the user stepped away.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">12</span><span class="dt">Scope boundary: forward construction only</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Builds only what the plan specifies; on a gap or conflict mid-execution it stops and surfaces it rather than silently re-planning (“that's <code>/deep-plan</code>'s job”). Gates on new failures in changed files, not on dependents or pre-existing behavior.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Diagnosing root causes, demanding reproductions, or verifying dependents didn't regress — deliberately out of scope and assigned to a future <code>/deep-bug-fix</code>.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Keeping implement a pure forward-constructor from a trusted spec is what lets it be lean, phased, and resumable. Diagnosis-first remediation under regression risk is a structurally different problem.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">13</span><span class="dt">Directive-card loader + byte-identical shared-file rule</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Runs <code>load-active-cards.sh deep-implement</code> and treats each directive as a hard requirement; cards are toggled, never edited. DLC-001 gives implement a <b>validate</b> role — exit invariant + contract probe.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Editing SKILL.md prose to encode a lesson (“fatally — no clean on/off”); cross-skill references to one shared file (rejected by the standalone rule).</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Improvements are data, not prose: one stable loader stanza, all variability in the toggleable registry — clean on/off, provenance, and telemetry without mutating the skill.</p></div>
+    </div>
+  </details>
+</section>
+
+<section class="sec" id="mistakes">
+  <div class="sec-tag">Watch out</div>
+  <h2>Common mistakes</h2>
+  <div class="mistake"><p><b>Writing the code yourself</b> instead of orchestrating sub-agents (the default is fresh agent per phase).</p></div>
+  <div class="mistake"><p><b>Committing on main/develop</b> — always branch first. <b>Never commit failing code.</b></p></div>
+  <div class="mistake"><p><b>Parallelizing without <code>--parallel</code></b> or without proving independence.</p></div>
+  <div class="mistake"><p><b>Blocking on pre-existing failures</b> instead of only new failures in changed files.</p></div>
+  <div class="mistake"><p><b>A third fix attempt</b> — the cap is 2; then stop and report.</p></div>
+  <div class="mistake"><p><b>Silently re-planning</b> when you hit a gap. Stop and surface it — re-planning is <code>/deep-plan</code>'s job.</p></div>
+  <div class="mistake"><p><b>Over-notifying</b> — notify on blockers and autonomous completion only, not routine progress.</p></div>
+</section>
+
+<section class="sec" id="mastery">
+  <div class="sec-tag">Prove it</div>
+  <h2>Mastery checklist</h2>
+  <ul class="checklist">
+    <li>Orchestrated phases via fresh sub-agents; you did not hand-author the code by default.</li>
+    <li>Chose mode deliberately; branched before any commit; never committed broken code.</li>
+    <li>Gated only on new failures in changed files/imports; honored the 2-attempt fix cap.</li>
+    <li>Appended Phase Summaries to the plan and wrote each next-phase hand-off.</li>
+    <li>Finished with <code>03-Implementation/summary.md</code>, manifest update, and a reconciled Deferreds ledger.</li>
+  </ul>
+</section>
+
+<section class="sec" id="qref">
+  <div class="sec-tag">At a glance</div>
+  <h2>Quick reference</h2>
+  <div class="qref reveal">
+    <div class="qh">deep-implement</div>
+    <dl>
+      <dt>Input</dt><dd>A finished (ideally reviewed) <code>01-Plan/plan.md</code></dd>
+      <dt>Output</dt><dd>Source code + <code>03-Implementation/summary.md</code> + Phase Summaries in the plan</dd>
+      <dt>Fix cap</dt><dd>2 attempts, then a blocker report</dd>
+      <dt>Hard rules</dt><dd>Only build what the plan specifies; never commit on main/develop; never commit failing code</dd>
+      <dt>Hand-off to</dt><dd><a href="deep-code-review.html">/deep-code-review</a></dd>
+    </dl>
+  </div>
+</section>
+
+<div class="epnav">
+  <a href="deep-plan-review.html"><span class="dir">← Previous</span><span class="ttl">deep-plan-review</span><span class="cmd">/deep-plan-review</span></a>
+  <a class="next" href="deep-code-review.html"><span class="dir">Next episode →</span><span class="ttl">deep-code-review</span><span class="cmd">/deep-code-review</span></a>
+</div>
+
+</main>
+</div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>Episode 3 of 6 · deep-implement · Execute</span>
+    <span><a href="index.html">All episodes</a></span>
+  </div>
+</footer>
+
+<script src="assets/series.js"></script>
+</body>
+</html>

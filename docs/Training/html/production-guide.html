@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video Production Guide — Deep Skills Training</title>
+<meta name="description" content="Turn the Deep Skills curriculum into a video series: an episode-by-episode plan with runtimes, on-screen visuals, narration beats, and a recurring visual language.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="theme-code">
+<div id="progress"></div>
+<div class="glow a"></div><div class="glow b"></div>
+
+<nav class="top">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="dot"></span> Deep Skills <span class="muted" style="font-weight:400">/ Production guide</span></a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <div class="navlinks">
+      <a href="index.html">Overview</a>
+      <a href="#approach">Approach</a>
+      <a href="#language">Visual language</a>
+      <a href="#episodes">Episode plan</a>
+      <a href="#tips">Filming tips</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero wrap narrow">
+  <div class="ep-badge"><span class="pill">FOR PRODUCERS</span><span class="label">Make the video</span></div>
+  <h1>Video <span class="grad">production guide</span></h1>
+  <p class="kicker">This curriculum is built to be narrated. Here's how to turn the six pages into a video series — a recurring structure, suggested runtimes, the on-screen visuals each segment needs, and the narration beats that carry each episode.</p>
+</section>
+
+<div class="wrap"><div class="layout">
+
+<aside class="toc">
+  <div class="tt">On this page</div>
+  <a href="#approach">The approach</a>
+  <a href="#structure">Episode structure</a>
+  <a href="#language">Visual language</a>
+  <a href="#episodes">Episode-by-episode</a>
+  <a href="#tips">Filming tips</a>
+</aside>
+
+<main>
+
+<section class="sec tight" id="approach">
+  <div class="sec-tag">The thesis</div>
+  <h2>Teach the “why,” demonstrate the “how”</h2>
+  <p class="lead">The hard part of these skills isn't the commands — it's the <b>judgment</b>: when to drill vs break out, when a finding is real, why a green test can lie. Each episode should spend its first third on the <i>idea</i> (a recurring principle made concrete), its middle on a <b>live screen-capture run</b>, and its last third on the <b>design decisions</b> that explain why the skill nudges you the way it does.</p>
+  <div class="callout video">
+    <span class="t">The one-line hook for the whole series</span>
+    <p>“Four AI agents that each do exactly one job — and refuse to do the others — turn a feature from idea into verified code, where any one of them could be picked up cold by a stranger.”</p>
+  </div>
+</section>
+
+<section class="sec" id="structure">
+  <div class="sec-tag">Repeatable</div>
+  <h2>A five-beat structure for every skill episode</h2>
+  <ol class="steps">
+    <li><h4>Cold open — the failure it prevents (0:00–0:45)</h4><p>Open on the bug this skill exists to catch. Show the symptom first (the button that double-fires, the green test that lied), then name the skill as the fix.</p></li>
+    <li><h4>The mental model (0:45–2:30)</h4><p>State which of the four recurring principles this episode makes concrete. Use the panel quote from the skill page verbatim — it's written to be read aloud.</p></li>
+    <li><h4>Live run (2:30–7:00)</h4><p>Screen-capture the skill on a small real feature. Narrate the decisions, not the keystrokes. Pause on each artifact as it's written.</p></li>
+    <li><h4>Why it's built this way (7:00–10:00)</h4><p>Pull 3–4 of the design decisions from the skill page. For each: the choice, the rejected alternative, the reason. This is the segment that separates a tutorial from a course.</p></li>
+    <li><h4>Mistakes &amp; the checklist (10:00–11:30)</h4><p>Run the “common mistakes” as quick on-screen cards, then the mastery checklist as the takeaway. End on the hand-off to the next skill.</p></li>
+  </ol>
+</section>
+
+<section class="sec" id="language">
+  <div class="sec-tag">Keep it consistent</div>
+  <h2>A recurring visual language</h2>
+  <div class="grid c2">
+    <div class="card reveal"><span class="k">COLOR PER SKILL</span><h4>One hue per episode</h4><p>Plan = <span style="color:#6ea8ff">blue</span>, Plan-review = <span style="color:#a98bff">purple</span>, Implement = <span style="color:#5fd0a0">green</span>, Code-review = <span style="color:#ffb24d">amber</span>, Roadmap = <span style="color:#ff8fb0">pink</span>. The HTML pages already use these — match lower-thirds and title cards to them.</p></div>
+    <div class="card reveal"><span class="k">THE RELAY</span><h4>The pipeline bar, always on screen</h4><p>Keep the four-stage relay (produce → critique → execute → verify) as a persistent header strip, highlighting the current stage. It orients the viewer in the loop at all times.</p></div>
+    <div class="card reveal"><span class="k">THE ARTIFACT TREE</span><h4>Show where output lands</h4><p>Every time a skill writes a file, cut to the <code>.deep-skills/&lt;effort&gt;/</code> tree and highlight the new file. Reinforces that the artifacts <i>are</i> the product.</p></div>
+    <div class="card reveal"><span class="k">EVIDENCE CALLOUTS</span><h4>Cite on screen</h4><p>When the narration claims something, flash the <code>path:line</code> or the rule it comes from. The series preaches evidence — the video should practice it.</p></div>
+  </div>
+</section>
+
+<section class="sec" id="episodes">
+  <div class="sec-tag">The shot list</div>
+  <h2>Episode-by-episode plan</h2>
+
+  <!-- EP 0 -->
+  <h3>Episode 0 — Series overview <span class="muted" style="font-weight:400;font-size:.6em">· ~8 min</span></h3>
+  <div class="chips">
+    <span class="chip"><span class="d"></span> Hook + the one loop</span>
+    <span class="chip"><span class="d"></span> Four principles</span>
+    <span class="chip"><span class="d"></span> Artifact tree</span>
+    <span class="chip"><span class="d"></span> Deep-Learn teaser</span>
+  </div>
+  <p><b>Goal:</b> sell the whole system before any one skill. <b>Visuals:</b> the relay diagram animating left-to-right; the four-principle cards; the artifact tree filling in stage by stage. <b>Narration beat:</b> end on the capstone test — “a teammate can open only your <code>.deep-skills/</code> directory and reconstruct everything.” <b>Source page:</b> <a href="index.html">Overview</a>.</p>
+
+  <!-- EP 1 -->
+  <h3>Episode 1 — deep-plan <span class="muted" style="font-weight:400;font-size:.6em">· ~11 min · blue</span></h3>
+  <div class="chips">
+    <span class="chip"><span class="d" style="background:#6ea8ff"></span> Cold open: a plan that needs the chat to make sense</span>
+    <span class="chip"><span class="d" style="background:#6ea8ff"></span> Live: framing → explore → questions → contract</span>
+  </div>
+  <p><b>Money shot:</b> producing just the restatement + three non-goals + effort name, then <i>stopping</i> — the discipline of the most-skipped step. <b>Decisions to feature:</b> planning-only boundary, /drill vs /breakout, the Data-Flow Contract (show a row you can't fill without finding the bug). <b>Source:</b> <a href="deep-plan.html">Episode 1</a>.</p>
+
+  <!-- EP 2 -->
+  <h3>Episode 2 — deep-plan-review <span class="muted" style="font-weight:400;font-size:.6em">· ~9 min · purple</span></h3>
+  <div class="chips">
+    <span class="chip"><span class="d" style="background:#a98bff"></span> Cold open: the planner can't see its own blind spot</span>
+    <span class="chip"><span class="d" style="background:#a98bff"></span> Live: brief fresh agents on two lenses</span>
+  </div>
+  <p><b>Money shot:</b> the briefing — show exactly what goes in (plan + lenses + preference sources) and that the planning transcript is deliberately left out. <b>Decisions:</b> independence/withhold-transcript, two lenses, multi-agent fan-out + synthesis. End on a clean lens called honestly. <b>Source:</b> <a href="deep-plan-review.html">Episode 2</a>.</p>
+
+  <!-- EP 3 -->
+  <h3>Episode 3 — deep-implement <span class="muted" style="font-weight:400;font-size:.6em">· ~12 min · green</span></h3>
+  <div class="chips">
+    <span class="chip"><span class="d" style="background:#5fd0a0"></span> Cold open: “green build, broken feature”</span>
+    <span class="chip"><span class="d" style="background:#5fd0a0"></span> Live: the per-phase loop, twice</span>
+  </div>
+  <p><b>Money shot:</b> the orchestrator spawning a fresh sub-agent per phase — and the two-attempt fix cap producing a blocker report instead of a third try. <b>Decisions:</b> orchestrator-not-author, new-failures-only gating, the contract probe + “green ≠ verified for external shapes.” <b>Source:</b> <a href="deep-implement.html">Episode 3</a>.</p>
+
+  <!-- EP 4 -->
+  <h3>Episode 4 — deep-code-review <span class="muted" style="font-weight:400;font-size:.6em">· ~14 min · amber</span></h3>
+  <div class="chips">
+    <span class="chip"><span class="d" style="background:#ffb24d"></span> Cold open: the happy path that doesn't reach the last mile</span>
+    <span class="chip"><span class="d" style="background:#ffb24d"></span> Live: a chain trace, hop by hop</span>
+    <span class="chip"><span class="d" style="background:#ffb24d"></span> Live: --triage as a separate step</span>
+  </div>
+  <p><b>Money shot:</b> walking a promised behavior down the canonical chain and finding the hop where it breaks — with evidence at every hop. <b>Decisions:</b> review ≠ triage / findings stay open, the 8-finder fleet, the sev ≥5 verification floor, the model-tier discipline (tell the Haiku story — zero findings on a diff with two known Criticals). This is the flagship episode; give it room. <b>Source:</b> <a href="deep-code-review.html">Episode 4</a>.</p>
+
+  <!-- EP 5 -->
+  <h3>Episode 5 — The roadmap &amp; the loop <span class="muted" style="font-weight:400;font-size:.6em">· ~10 min · pink</span></h3>
+  <div class="chips">
+    <span class="chip"><span class="d" style="background:#ff8fb0"></span> Cross-cutting decisions</span>
+    <span class="chip"><span class="d" style="background:#ff8fb0"></span> deep-bug-fix &amp; deep-docs</span>
+    <span class="chip"><span class="d" style="background:#ff8fb0"></span> Deep-Learn, end to end</span>
+  </div>
+  <p><b>Goal:</b> zoom out. Show the eight cross-cutting decisions as the “grammar” of the series, then preview the two unbuilt skills and trace one bug class through the full Deep-Learn loop (review finds it → card authored → upstream skills prevent it). <b>Source:</b> <a href="roadmap.html">Bonus episode</a>.</p>
+</section>
+
+<section class="sec" id="tips">
+  <div class="sec-tag">Practical</div>
+  <h2>Filming &amp; scripting tips</h2>
+  <div class="grid c2">
+    <div class="card reveal"><span class="k">SCRIPT FROM THE PAGES</span><h4>The prose is camera-ready</h4><p>The panel quotes, the “why this choice” lines, and the callouts are written in spoken cadence. Lift them as narration; don't paraphrase into something flatter.</p></div>
+    <div class="card reveal"><span class="k">USE A REAL FEATURE</span><h4>Dogfood on camera</h4><p>Run the live segments on one small real feature carried across all four episodes, so viewers see the same effort directory grow stage by stage — the capstone made visible.</p></div>
+    <div class="card reveal"><span class="k">NARRATE JUDGMENT</span><h4>Decisions, not keystrokes</h4><p>Viewers can't learn “press enter.” They can learn “I'm reaching for breakout here because this tangent would flood my context.” Voice the choice every time.</p></div>
+    <div class="card reveal"><span class="k">RECAP THE LOOP</span><h4>Bookend with the relay</h4><p>Open and close each episode on the pipeline strip with the current stage lit. By Episode 4, the viewer should feel the loop in their bones.</p></div>
+    <div class="card reveal"><span class="k">EVIDENCE ON SCREEN</span><h4>Show your sources</h4><p>When you state a rule (“never Haiku, any tier”), flash where it lives. The series is about evidence — model it.</p></div>
+    <div class="card reveal"><span class="k">KEEP THE BOUNDARIES SHARP</span><h4>Show a skill refusing</h4><p>One of the most memorable shots: ask a skill to cross its boundary (ask deep-plan to write code) and show it <i>declining</i> and pointing to the right sibling. Separation of concerns, dramatized.</p></div>
+  </div>
+  <div class="callout note">
+    <span class="t">Total series runtime</span>
+    <p>Roughly <b>64 minutes</b> across six episodes (8 + 11 + 9 + 12 + 14 + 10). Comfortable for a single-sitting course or a weekly drop. Trim the live segments first if you need a tighter cut — the “why” segments are the differentiator and should survive.</p>
+  </div>
+</section>
+
+<div class="epnav">
+  <a href="roadmap.html"><span class="dir">← Previous</span><span class="ttl">The roadmap skills</span><span class="cmd">deep-bug-fix · deep-docs</span></a>
+  <a class="next" href="index.html"><span class="dir">Back to →</span><span class="ttl">Series overview</span><span class="cmd">Start from the top</span></a>
+</div>
+
+</main>
+</div></div>
+
+<footer>
+  <div class="wrap">
+    <span>Video production guide · Deep Skills Training Series</span>
+    <span><a href="index.html">All episodes</a></span>
+  </div>
+</footer>
+
+<script src="assets/series.js"></script>
+</body>
+</html>
