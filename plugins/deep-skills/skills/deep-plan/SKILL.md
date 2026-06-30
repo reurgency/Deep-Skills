@@ -64,8 +64,10 @@ Launch up to 3 `Explore` agents in parallel to find: reusable patterns/utilities
 Emit questions per the chosen cadence. Build each question from a `templates/questions/*.json` format and render via `AskUserQuestion`. Keep questions decision-relevant — skip anything you can answer yourself from exploration. Honor `/drill` and `/breakout` mid-round without losing your place.
 
 ### 5. Pre-write nudge
-Before writing anything, ask plainly:
-> *Want a `/gaps`, `/risks`, or `/constraints` pass before I write the plan?*
+**Always ask this before writing — it is a mandatory step at the end of every plan session, never skipped.** Ask plainly, in natural language (no slash required, so it works for users on Copilot/Codex too):
+> *Before I write the plan: tell me to "run gaps", "run risks", or "run constraints" pass first? I can run any, all, or none (and repeatably). Or ask me what those commands can provide.*
+
+Follow the ask with a one-line **recommendation if pertinent** (e.g. "I'd suggest a gaps pass — there are a couple of unresolved seams worth surfacing first"). If nothing warrants one, omit it.
 
 Honor any, all, or none — and repeatably (e.g. two gap rounds). Only proceed to writing when the user is ready.
 
