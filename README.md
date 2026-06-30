@@ -22,6 +22,16 @@ One plugin, **`deep-skills`**, bundling **five** skills:
 | `/deep-code-review` | Multi-agent code review with severity-gated adversarial verification. |
 | `/deep-docs` | Context-window-aware, tiered, anchor-verified map of what a codebase has built — for agents crawling under a token budget. Documents, never decides. |
 
+## Learn the skills
+
+New to the Deep-\* series? Work through the **[Training Program](docs/Training/README.md)** —
+an overall curriculum plus a hands-on page for each skill
+([`/deep-plan`](docs/Training/deep-plan.md) ·
+[`/deep-plan-review`](docs/Training/deep-plan-review.md) ·
+[`/deep-implement`](docs/Training/deep-implement.md) ·
+[`/deep-code-review`](docs/Training/deep-code-review.md)) with objectives, exercises, and
+mastery checklists.
+
 ## Install
 
 ```bash
