@@ -14,10 +14,10 @@ When working in a worktree (path contains `/trees/`), **code changes stay in the
 
 - **Autonomous:** after a phase passes validation, commit a checkpoint. Only ever commit green code.
 - **Collaborative:** commit only when the user asks.
-- **Message:** conventional `type(scope): <phase title>` (`feat`/`fix`/`refactor`/`doc`/`chore`), matching repo history. End every commit message with the required trailer:
+- **Message:** conventional `type(scope): <phase title>` (`feat`/`fix`/`refactor`/`doc`/`chore`), matching repo history. End every commit message with the host-aware attribution trailer (`Co-Authored-By: <agent-name> <email>` — per-host defaults in `references/host-affordances.md`; on Claude Code, `Co-Authored-By: Claude <noreply@anthropic.com>`):
 
   ```
-  Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+  Co-Authored-By: Claude <noreply@anthropic.com>
   ```
 - Never `git push` or force-push unless the user explicitly asks.
 

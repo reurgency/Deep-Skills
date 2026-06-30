@@ -4,6 +4,8 @@ Parallel review: one fresh agent per dimension, then a synthesis pass. Trades to
 
 ## Fan-out
 
+Before fan-out, read `references/model-map.md` and bind each dimension agent's model to its concrete host ID, set explicitly at launch (never an alias or host default) — the model-routing correctness guarantee in `references/host-affordances.md` applies to every fleet.
+
 Launch the dimension agents **in parallel** — one message, multiple `Agent` tool calls — each with the plan text, its single dimension brief, codebase read access, and the user-preference pointers. None of them gets the planning transcript.
 
 | Agent | Dimension brief |

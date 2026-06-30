@@ -1,5 +1,5 @@
 {
-  "_comment": "Boolean decision plus required reasoning. Render as a two-option AskUserQuestion (Yes/No); capture the user's explanation alongside the choice. requireExplanation gates whether the rationale is mandatory.",
+  "_comment": "Boolean decision plus required reasoning. Render as a two-option structured question (Yes/No); capture the user's explanation alongside the choice. requireExplanation gates whether the rationale is mandatory.",
   "questionType": "yes-no-explain",
   "question": "",
   "context": "",

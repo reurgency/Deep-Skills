@@ -17,7 +17,7 @@ Before you start, load this phase's active directive cards — learned, human-ve
 scripts/load-active-cards.sh deep-implement
 ```
 
-**Treat every directive it prints as a hard requirement for this run**, applying the section addressed to your phase. If it prints "no active directive cards," proceed normally. Cards are human-gated — never edit a card or this skill to turn one off; toggle with `directives/toggle.sh <ID> off` (see the registry's `directives/README.md`).
+**Treat every directive it prints as a hard requirement for this run**, applying the section addressed to your phase. If it prints "no active directive cards," proceed normally. Cards are human-gated — never edit a card or this skill to turn one off; toggle with `directives/toggle.sh <ID> off` (see the registry's `directives/README.md`). On a host without a reliable shell, apply the cards by hand instead — read the directives registry's `cards/active/` and apply each card whose `owner_phases` lists this phase as an exact token (see `references/host-affordances.md`).
 
 ## The deep-* series (separation of concerns)
 
@@ -33,10 +33,12 @@ scripts/load-active-cards.sh deep-implement
 
 ## Inputs & flags
 
+Every flag is **natural-language-first** — the plain-language trigger is the primary path (users on Copilot/Codex have no CLI flags); the `--flag` is a convenience layered on top. Always accept the natural-language form.
+
 - **plan** — explicit path argument → plan in context → most recent `.deep-skills/*/01-Plan/plan.md` (see `references/artifact-structure.md`; pre-retrofit plans remain reachable via explicit path). Read it fully, including the **Phase Summaries** appendix and **Deferreds** ledger.
-- `--autonomous` / `--collaborative` — execution mode. If omitted on a multi-phase plan, **ask** (see `references/execution-modes.md`).
-- `--worktree` — isolate work in a git worktree via `/create_worktree`. Default: **work in the current branch** (see `references/commit-and-handoff.md`).
-- `--parallel` — opt-in parallel phase execution, **only** when phases are provably independent (see `references/phase-execution.md`). Never parallelize without this flag.
+- **Run autonomously / unattended** (`--autonomous`) or **check in with me at each phase** (`--collaborative`) — execution mode. If omitted on a multi-phase plan, **ask** (see `references/execution-modes.md`).
+- **Work in an isolated worktree** (`--worktree`) — isolate work in a git worktree via `/create_worktree`. Default: **work in the current branch** (see `references/commit-and-handoff.md`).
+- **Run independent phases in parallel** (`--parallel`) — opt-in parallel phase execution, **only** when phases are provably independent (see `references/phase-execution.md`). Never parallelize unless this is explicitly requested.
 
 ## Reuse, don't reinvent
 
@@ -70,7 +72,7 @@ If validation fails, the phase agent fixes and re-validates. **Cap: 2 attempts.*
 
 ### 6. Commit / gate (mode-dependent)
 - **Collaborative:** present the diff + validation result + phase summary; await approve / request-fix. Commit only if the user wants.
-- **Autonomous:** on green validation, **commit a per-phase checkpoint** (conventional message + `Co-Authored-By` trailer), append the phase summary, write the next-phase hand-off, continue.
+- **Autonomous:** on green validation, **commit a per-phase checkpoint** (conventional message + the host-aware `Co-Authored-By` trailer — see `references/commit-and-handoff.md`), append the phase summary, write the next-phase hand-off, continue.
 
 ### 7. Summarize & hand off
 After each phase: append a summary to the plan's **Phase Summaries** appendix and write a slim next-phase hand-off (`templates/phase-handoff.md`). Phase Summaries still live in the plan document — `03-Implementation/summary.md` does not replace them.

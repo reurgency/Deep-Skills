@@ -1,10 +1,12 @@
 # In-session commands
 
-The user can type these at any point during a `/deep-plan` session. Each thin command file in `.claude/commands/` injects a one-line trigger; the real behavior lives here so it works whether typed as a slash command or recognized as a keyword. After servicing any command, **return to exactly where you were** in the session.
+The user can type these at any point during a `/deep-plan` session. The behavior lives in this doc. On Claude Code, thin command files in `.claude/commands/` give `/slash` shortcuts that inject a one-line trigger; on other hosts these same behaviors are invoked by **keyword / natural language** (e.g. *'run gaps'*). It works whether typed as a slash command or recognized as a keyword. After servicing any command, **return to exactly where you were** in the session.
 
 ---
 
 ## `/drill <instructions>`
+
+*Natural-language trigger: say 'drill into X' / 'dig deeper on this.'*
 
 Deepen the **current question inside this session** — shared context, full history.
 
@@ -17,6 +19,8 @@ Use when the user wants to poke at the answer right here. It costs main-session 
 ---
 
 ## `/breakout <instructions>`
+
+*Natural-language trigger: say 'break out Y' / 'send a fresh subagent to investigate Y.'*
 
 Split off an **isolated fresh subagent** so the investigation does **not** bloat or block the main session. The away-team to `/drill`'s in-room discussion.
 
@@ -36,6 +40,8 @@ Use when you want a focused investigation without spending main-session context.
 
 ## `/gaps`
 
+*Natural-language trigger: say 'run gaps' / 'check for gaps.'*
+
 Run a **gap-analysis round** on the current plan/answers. Repeatable.
 
 For each finding, classify it (model on the repo's gap schema):
@@ -44,17 +50,21 @@ For each finding, classify it (model on the repo's gap schema):
 - **severity** — high / medium / low.
 - **assumption** — what you'd assume if unanswered.
 
-Turn high/medium findings into follow-up questions (rendered via `AskUserQuestion`). Fold answers back into the plan.
+Turn high/medium findings into follow-up questions (rendered via the host's structured-question tool — see `references/host-affordances.md`). Fold answers back into the plan.
 
 ---
 
 ## `/risks`
+
+*Natural-language trigger: say 'run risks' / 'assess the risks.'*
 
 Produce a **risk assessment** of the emerging plan. For each risk: description, likelihood, impact, and a mitigation or fallback. Flag anything that warrants a spike. Record material risks in the plan's status header / a Risks note.
 
 ---
 
 ## `/constraints`
+
+*Natural-language trigger: say 'run constraints' / 'check the constraints.'*
 
 Two moves in one:
 1. **Suggest** likely constraints the user may not have stated — performance, compatibility/back-compat, security, scope boundaries, deadlines, platform/runtime, data/privacy.
@@ -66,4 +76,4 @@ Fold every accepted constraint into the plan (Context or a Constraints section) 
 
 ## `/columbo`
 
-The existing repo command (`.claude/commands/columbo.md`), reused in place. Re-read the written plan as a fresh agent with zero prior context and audit for unstated assumptions, undefined terms, missing paths/commands, ambiguous steps, and implicit ordering. If a fresh agent couldn't succeed, list what's missing and fix it in the plan. Offer this as the final step before hand-off.
+On Claude Code this reuses the existing repo command (`.claude/commands/columbo.md`); on other hosts, invoke it by saying *'run a columbo pass'* / *'do a fresh-agent completeness audit.'* Re-read the written plan as a fresh agent with zero prior context and audit for unstated assumptions, undefined terms, missing paths/commands, ambiguous steps, and implicit ordering. If a fresh agent couldn't succeed, list what's missing and fix it in the plan. Offer this as the final step before hand-off.

@@ -17,7 +17,7 @@ Before you start, load this phase's active directive cards — learned, human-ve
 scripts/load-active-cards.sh deep-plan
 ```
 
-**Treat every directive it prints as a hard requirement for this run**, applying the section addressed to your phase. If it prints "no active directive cards," proceed normally. Cards are human-gated — never edit a card or this skill to turn one off; toggle with `directives/toggle.sh <ID> off` (see the registry's `directives/README.md`).
+**Treat every directive it prints as a hard requirement for this run**, applying the section addressed to your phase. If it prints "no active directive cards," proceed normally. Cards are human-gated — never edit a card or this skill to turn one off; toggle with `directives/toggle.sh <ID> off` (see the registry's `directives/README.md`). On a host without a reliable shell, apply the cards by hand instead — read the directives registry's `cards/active/` and apply each card whose `owner_phases` lists this phase as an exact token (see `references/host-affordances.md`).
 
 ## The deep-* series (separation of concerns)
 
@@ -44,7 +44,7 @@ The user may type any of these at any point. Service the command, then return to
 | `/constraints` | Suggest likely constraints AND ask the user for their own; fold accepted ones into the plan. |
 | `/columbo` | Fresh-agent "one more thing" completeness gut check on the written plan. |
 
-If a user types one of these without the leading slash but clearly means it, treat it the same way.
+These in-session commands are natural-language-first — say e.g. *'run a columbo pass,' 'drill into X,' 'break out Y,' 'check for gaps/risks/constraints'*; the `/slash` forms are conveniences on hosts that have them. If a user types one of these without the leading slash but clearly means it, treat it the same way.
 
 ## Session workflow (interruptible state machine)
 
@@ -61,7 +61,7 @@ State scope, explicit **non-goals**, and the assumptions you're making. Get a qu
 Launch up to 3 `Explore` agents in parallel to find: reusable patterns/utilities, integration points, data models, and the files that will be touched. **Reuse before inventing** — prefer existing functions over new code, and name them with paths. Do not edit anything in this phase.
 
 ### 4. Question rounds
-Emit questions per the chosen cadence. Build each question from a `templates/questions/*.json` format and render via `AskUserQuestion`. Keep questions decision-relevant — skip anything you can answer yourself from exploration. Honor `/drill` and `/breakout` mid-round without losing your place.
+Emit questions per the chosen cadence. Build each question from a `templates/questions/*.json` format and render via the host's structured-question tool (see `references/host-affordances.md`). Keep questions decision-relevant — skip anything you can answer yourself from exploration. Honor `/drill` and `/breakout` mid-round without losing your place.
 
 ### 5. Pre-write nudge
 **Always ask this before writing — it is a mandatory step at the end of every plan session, never skipped.** Ask plainly, in natural language (no slash required, so it works for users on Copilot/Codex too):

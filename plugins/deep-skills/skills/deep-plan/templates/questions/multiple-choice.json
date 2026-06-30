@@ -1,5 +1,5 @@
 {
-  "_comment": "Pick from defined options. Set allowMultiple true for multi-select. Each option -> an AskUserQuestion option (label + description). Strip _* keys before rendering.",
+  "_comment": "Pick from defined options. Set allowMultiple true for multi-select. Each option -> a structured-question option (label + description). Strip _* keys before rendering.",
   "questionType": "multiple-choice",
   "question": "",
   "context": "",

@@ -9,6 +9,6 @@
 - **Suspected cause:** <best hypothesis>
 - **Files in flight:** <created/modified so far>
 - **To unblock, a human needs to:** <the specific decision or fix required>
-- **Notified:** <PushNotification sent? y/n> · <hook fired? y/n>
+- **Notified:** <notification emitted? y/n> · <hook fired? y/n>
 
 <!-- Autonomous mode stops here — it does NOT proceed to later phases past a blocker. -->
