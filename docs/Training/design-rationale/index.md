@@ -22,12 +22,11 @@
 | `/deep-implement` | built | [deep-implement.md](deep-implement.md) | The only skill that writes source — phase by phase, bounded fix loops, checkpoints. |
 | `/deep-code-review` | built | [deep-code-review.md](deep-code-review.md) | Multi-agent, evidence-gated review (split from triage) that catches the last mile. |
 | `/deep-bug-fix` | **design outline** | [deep-bug-fix.md](deep-bug-fix.md) | Diagnosis-first remediation under regression risk — clustering, proof-of-fix, containment. *(5th skill; design note only.)* |
-| `/deep-docs` | **planned** | [deep-docs.md](deep-docs.md) | Context-window-aware orientation layer — three loadable tiers, every claim anchored. *(6th skill; plan resolved, not built.)* |
+| `/deep-docs` | built | [deep-docs.md](deep-docs.md) | Context-window-aware orientation layer — three loadable tiers, every claim anchored. *(Built — and the reference implementation for the cross-host portability principle, §8.)* |
 
-> **Stage matters.** The four built skills' rationale is anchored to live skill files + git history.
-> `deep-bug-fix` is anchored to its design note (`docs/roadmap/DEEP-BUG-FIX-DESIGN.md`) and
-> `deep-docs` to its plan (`.deep-skills/deep-docs/01-Plan/plan.md`) — both have open questions still
-> unresolved *by design*, flagged on their pages, not papered over.
+> **Stage matters.** The five built skills' rationale is anchored to live skill files + git history.
+> `deep-bug-fix` is anchored to its design note (`docs/roadmap/DEEP-BUG-FIX-DESIGN.md`) — its open
+> questions are unresolved *by design*, flagged on its page, not papered over.
 
 ---
 
@@ -97,11 +96,13 @@ window into rejected alternatives.
 ### 8. Natural-language invocation is the primary path (the portability principle)
 The series must be drivable by users on GitHub Copilot or Codex, who have neither slash-commands nor
 a CLI-flag convention — so natural-language invocation is primary and `--flags` are a convenience on
-top. `deep-docs` is built as the reference implementation; retrofitting the four older skills is a
-tracked follow-up sweep (memory `deep-skills-cross-assistant-portability`;
-`.deep-skills/deep-docs/01-Plan/plan.md:21,227-229`). One concrete wart this surfaces — the false
-`.claude/commands/` references in `deep-plan/references/in-session-commands.md` — is flagged on the
-deep-plan page.
+top. `deep-docs` was built as the reference implementation; the retrofit of the four older skills
+**shipped** — every flag and the six in-session commands gained a natural-language trigger, and the
+non-portable UX surface (questions, notifications, model routing, attribution) was neutralized once
+in `references/host-affordances.md` + `references/model-map.md`, with per-host install via
+`plugins/deep-skills/HOSTS.md` (memory `deep-skills-cross-assistant-portability`). One concrete wart
+this surfaced — the `.claude/commands/` references in `deep-plan/references/in-session-commands.md` —
+was **clarified** (Claude-Code slash shortcut vs. keyword/NL invocation on other hosts), not deleted.
 
 ---
 

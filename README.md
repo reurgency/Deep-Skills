@@ -1,6 +1,6 @@
 # Deep Skills
 
-A Claude Code plugin marketplace for the **Deep-\*** series — a steerable, fresh-agent-resumable workflow that takes a feature from idea to verified code:
+A **cross-assistant** plugin marketplace for the **Deep-\*** series — one set of skills that installs natively on **Claude Code, Codex, Cursor, and GitHub Copilot** (see [`plugins/deep-skills/HOSTS.md`](plugins/deep-skills/HOSTS.md)). A steerable, fresh-agent-resumable workflow that takes a feature from idea to verified code:
 
 ```
 /deep-plan  ──▶  /deep-plan-review  ──▶  /deep-implement  ──▶  /deep-code-review  ──▶  /deep-docs
@@ -34,15 +34,26 @@ mastery checklists.
 
 ## Install
 
-```bash
-# 1. Add this marketplace (from GitHub once published, or a local path while developing)
-/plugin marketplace add reU/Deep-Skills          # or: /plugin marketplace add /path/to/Deep-Skills
+The same skills install natively on each host. Full commands, the capability matrix, and per-host caveats live in **[`plugins/deep-skills/HOSTS.md`](plugins/deep-skills/HOSTS.md)**.
 
-# 2. Install the bundle
+| Host | Skills | Parallel fan-out | Per-agent model | Install |
+|---|---|---|---|---|
+| **Claude Code** | ✓ | ✓ | ✓ | `/plugin marketplace add reU/Deep-Skills` → `/plugin install deep-skills@deep-skills-by-reu` |
+| **Codex** | ✓ | ✓ | ✓ | `codex plugin marketplace add reU/Deep-Skills` → `/plugins` → install ¹ |
+| **Cursor** | ✓ | ✓ | ✓ | `/add-plugin deep-skills` (or Customize → Marketplace) ¹ |
+| **Copilot CLI** | ✓ | gate ² | ✓ | `copilot plugin marketplace add reU/Deep-Skills` → `copilot plugin install deep-skills@deep-skills-by-reu` |
+| **Copilot / VS Code** | ✓ | ⚠ sequential ² | ✓ | file-based: set `chat.agentSkillsLocations` → `plugins/deep-skills/skills` (no marketplace) |
+
+```bash
+# Claude Code (reference host)
+/plugin marketplace add reU/Deep-Skills          # or: /plugin marketplace add /path/to/Deep-Skills
 /plugin install deep-skills@deep-skills-by-reu
 ```
 
 Update later with `/plugin marketplace update deep-skills-by-reu`.
+
+¹ Manifest authored; the empirical capability gate (install + run a full cycle, confirm fan-out + model binding) is **pending** — see `HOSTS.md`. Fast-moving schema/command details are marked **RE-VERIFY** there.
+² VS Code Copilot's docs show only **sequential** handoffs. If the gate confirms no parallel fan-out, the single-agent skills (`deep-plan`, `deep-implement`, `deep-docs`) run fully and the fleet skills (`deep-code-review`, `deep-plan-review`) route to a single-agent fallback on that host only.
 
 ## Repo layout
 
@@ -52,14 +63,18 @@ Deep-Skills/
 │   └── marketplace.json            # marketplace catalog (offers the deep-skills plugin)
 ├── plugins/
 │   └── deep-skills/
-│       ├── .claude-plugin/
-│       │   └── plugin.json         # plugin manifest
-│       └── skills/                 # auto-discovered
-│           ├── deep-plan/          # SKILL.md + references/ + templates/
-│           ├── deep-plan-review/
-│           ├── deep-implement/
-│           ├── deep-code-review/
-│           └── deep-docs/
+│       ├── .claude-plugin/plugin.json   # Claude Code manifest
+│       ├── .codex-plugin/plugin.json    # Codex manifest        ┐ thin per-host manifests,
+│       ├── .cursor-plugin/plugin.json   # Cursor manifest       ┘ one shared skills/ tree
+│       ├── HOSTS.md                # per-host install + capability matrix + maintainer rules
+│       ├── skills/                 # auto-discovered (the single source of truth)
+│       │   ├── deep-plan/          # SKILL.md + references/ + scripts/ + templates/
+│       │   ├── deep-plan-review/
+│       │   ├── deep-implement/
+│       │   ├── deep-code-review/
+│       │   └── deep-docs/
+│       └── directives/             # Deep-Learn registry — sibling of skills/ so the
+│                                   #   self-locating loader resolves it on every host
 ├── docs/
 │   └── roadmap/                    # self-learning directive-loop design notes
 └── README.md
