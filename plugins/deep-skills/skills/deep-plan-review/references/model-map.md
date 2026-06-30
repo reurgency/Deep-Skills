@@ -19,7 +19,7 @@ This is not a model blacklist; it is that **nothing here is small-model-appropri
 | Orchestrator (= ceiling) | main | mid | cheap |
 |---|---|---|---|
 | **Anthropic — Fable 5** | Fable 5 (`claude-fable-5`) | Opus 4.8 (`claude-opus-4-8`) | Sonnet 4.6 (`claude-sonnet-4-6`) |
-| **Anthropic — Opus 4.8** | Opus 4.8 (`claude-opus-4-8`) | Sonnet 4.6 (`claude-sonnet-4-6`) | Sonnet 4.6 (`claude-sonnet-4-6`) |
+| **Anthropic — Opus 4.8** | Opus 4.8 (`claude-opus-4-8`) | Opus 4.8 (`claude-opus-4-8`) | Sonnet 4.6 (`claude-sonnet-4-6`) |
 | **Anthropic — Sonnet 4.6** (restricted shop) | Sonnet 4.6 (`claude-sonnet-4-6`) | Sonnet 4.6 (`claude-sonnet-4-6`) | Sonnet 4.6 (`claude-sonnet-4-6`) |
 | **OpenAI — GPT-5.5** | GPT-5.5 | GPT-5.4 | GPT-5.4 |
 | **OpenAI — GPT-5.4** (restricted shop) | GPT-5.4 | GPT-5.4 | GPT-5.4 |
