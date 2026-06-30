@@ -1,7 +1,11 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "deep-skills-by-reu",
-  "description": "The Deep-* series — a planning → review → implementation → code-review workflow for Claude Code, with a self-improving directive loop.",
+  "description": "The Deep-* series — a planning → review → implementation → code-review workflow for Claude Code, Codex, Cursor, and GitHub Copilot, with a self-improving directive loop.",
+  "metadata": {
+    "description": "The Deep-* series — a planning → review → implementation → code-review workflow for Claude Code, Codex, Cursor, and GitHub Copilot, with a self-improving directive loop.",
+    "version": "0.1.0"
+  },
   "owner": {
     "name": "reU",
     "email": "boothe.jeff@gmail.com"
@@ -10,6 +14,7 @@
     {
       "name": "deep-skills",
       "source": "./plugins/deep-skills",
+      "version": "0.1.0",
       "description": "Bundles /deep-plan, /deep-plan-review, /deep-implement, and /deep-code-review — the full Deep-* workflow as one coherent install.",
       "category": "workflow",
       "keywords": ["planning", "code-review", "implementation", "multi-agent", "workflow"]
