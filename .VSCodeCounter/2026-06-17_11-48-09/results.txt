@@ -1,0 +1,129 @@
+Date : 2026-06-17 11:48:09
+Directory : /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills
+Total : 62 files,  4631 codes, 137 comments, 1069 blanks, all 5837 lines
+
+Languages
++--------------+------------+------------+------------+------------+------------+
+| language     | files      | code       | comment    | blank      | total      |
++--------------+------------+------------+------------+------------+------------+
+| HTML         |          3 |      1,976 |         22 |        152 |      2,150 |
+| Markdown     |         44 |      1,636 |         55 |        779 |      2,470 |
+| JSON         |          7 |        666 |          0 |          7 |        673 |
+| Skill        |          4 |        220 |          3 |        104 |        327 |
+| Shell Script |          4 |        133 |         57 |         27 |        217 |
++--------------+------------+------------+------------+------------+------------+
+
+Directories
++------------------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                                                     | files      | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                                                        |         62 |      4,631 |        137 |      1,069 |      5,837 |
+| . (Files)                                                                                                                                |          1 |         47 |          0 |         17 |         64 |
+| .claude-plugin                                                                                                                           |          1 |         18 |          0 |          1 |         19 |
+| docs                                                                                                                                     |         14 |      3,109 |         22 |        370 |      3,501 |
+| docs/benchmarks                                                                                                                          |         11 |      2,846 |         22 |        278 |      3,146 |
+| docs/benchmarks (Files)                                                                                                                  |          5 |      1,578 |         10 |        146 |      1,734 |
+| docs/benchmarks/code-review-design                                                                                                       |          2 |        574 |         12 |         91 |        677 |
+| docs/benchmarks/pr65-v4-findings                                                                                                         |          4 |        694 |          0 |         41 |        735 |
+| docs/benchmarks/pr65-v4-findings/00-Manifest                                                                                             |          1 |          8 |          0 |          3 |         11 |
+| docs/benchmarks/pr65-v4-findings/04-Code-Review                                                                                          |          3 |        686 |          0 |         38 |        724 |
+| docs/roadmap                                                                                                                             |          3 |        263 |          0 |         92 |        355 |
+| plugins                                                                                                                                  |         46 |      1,457 |        115 |        681 |      2,253 |
+| plugins/deep-skills                                                                                                                      |         46 |      1,457 |        115 |        681 |      2,253 |
+| plugins/deep-skills/.claude-plugin                                                                                                       |          1 |         13 |          0 |          1 |         14 |
+| plugins/deep-skills/directives                                                                                                           |          4 |        138 |         15 |         51 |        204 |
+| plugins/deep-skills/directives (Files)                                                                                                   |          3 |         91 |         15 |         33 |        139 |
+| plugins/deep-skills/directives/cards                                                                                                     |          1 |         47 |          0 |         18 |         65 |
+| plugins/deep-skills/directives/cards/active                                                                                              |          1 |         47 |          0 |         18 |         65 |
+| plugins/deep-skills/skills                                                                                                               |         41 |      1,306 |        100 |        629 |      2,035 |
+| plugins/deep-skills/skills/deep-code-review                                                                                              |         13 |        565 |         39 |        292 |        896 |
+| plugins/deep-skills/skills/deep-code-review (Files)                                                                                      |          1 |         64 |          3 |         32 |         99 |
+| plugins/deep-skills/skills/deep-code-review/references                                                                                   |          9 |        407 |          0 |        226 |        633 |
+| plugins/deep-skills/skills/deep-code-review/templates                                                                                    |          3 |         94 |         36 |         34 |        164 |
+| plugins/deep-skills/skills/deep-implement                                                                                                |         10 |        247 |         17 |        118 |        382 |
+| plugins/deep-skills/skills/deep-implement (Files)                                                                                        |          1 |         50 |          0 |         24 |         74 |
+| plugins/deep-skills/skills/deep-implement/references                                                                                     |          6 |        149 |          0 |         81 |        230 |
+| plugins/deep-skills/skills/deep-implement/scripts                                                                                        |          1 |         32 |         14 |          6 |         52 |
+| plugins/deep-skills/skills/deep-implement/templates                                                                                      |          2 |         16 |          3 |          7 |         26 |
+| plugins/deep-skills/skills/deep-plan                                                                                                     |         11 |        297 |         14 |        130 |        441 |
+| plugins/deep-skills/skills/deep-plan (Files)                                                                                             |          1 |         63 |          0 |         27 |         90 |
+| plugins/deep-skills/skills/deep-plan-review                                                                                              |          7 |        197 |         30 |         89 |        316 |
+| plugins/deep-skills/skills/deep-plan-review (Files)                                                                                      |          1 |         43 |          0 |         21 |         64 |
+| plugins/deep-skills/skills/deep-plan-review/references                                                                                   |          4 |        104 |          0 |         52 |        156 |
+| plugins/deep-skills/skills/deep-plan-review/scripts                                                                                      |          1 |         32 |         14 |          6 |         52 |
+| plugins/deep-skills/skills/deep-plan-review/templates                                                                                    |          1 |         18 |         16 |         10 |         44 |
+| plugins/deep-skills/skills/deep-plan/references                                                                                          |          4 |        113 |          0 |         59 |        172 |
+| plugins/deep-skills/skills/deep-plan/scripts                                                                                             |          1 |         32 |         14 |          6 |         52 |
+| plugins/deep-skills/skills/deep-plan/templates                                                                                           |          5 |         89 |          0 |         38 |        127 |
+| plugins/deep-skills/skills/deep-plan/templates (Files)                                                                                   |          1 |         36 |          0 |         24 |         60 |
+| plugins/deep-skills/skills/deep-plan/templates/questions                                                                                 |          4 |         53 |          0 |         14 |         67 |
++------------------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++------------------------------------------------------------------------------------------------------------------------------------------+--------------+------------+------------+------------+------------+
+| filename                                                                                                                                 | language     | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------------------------------------------------------+--------------+------------+------------+------------+------------+
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/.claude-plugin/marketplace.json                                                 | JSON         |         18 |          0 |          1 |         19 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/README.md                                                                       | Markdown     |         47 |          0 |         17 |         64 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/benchmarks/3-way-comparison.html                                           | HTML         |      1,095 |          0 |         78 |      1,173 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/benchmarks/README.md                                                       | Markdown     |         19 |          0 |          5 |         24 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/benchmarks/Run-Notes.md                                                    | Markdown     |         19 |          0 |         11 |         30 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/benchmarks/code-review-design/Design-Notes.md                              | Markdown     |         70 |          0 |         45 |        115 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/benchmarks/code-review-design/index.html                                   | HTML         |        504 |         12 |         46 |        562 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/benchmarks/comparisons.md                                                  | Markdown     |         68 |          0 |         24 |         92 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/benchmarks/pr65-fab5-solo-review.html                                      | HTML         |        377 |         10 |         28 |        415 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/benchmarks/pr65-v4-findings/00-Manifest/manifest.md                        | Markdown     |          8 |          0 |          3 |         11 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/benchmarks/pr65-v4-findings/04-Code-Review/certificate.md                  | Markdown     |         24 |          0 |         10 |         34 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/benchmarks/pr65-v4-findings/04-Code-Review/findings.json                   | JSON         |        569 |          0 |          1 |        570 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/benchmarks/pr65-v4-findings/04-Code-Review/report.md                       | Markdown     |         93 |          0 |         27 |        120 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/roadmap/DATA-FLOW-CONTRACT.md                                              | Markdown     |         26 |          0 |         15 |         41 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/roadmap/DEEP-BUG-FIX-DESIGN.md                                             | Markdown     |         86 |          0 |         43 |        129 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/roadmap/DESIGN-OUTLINE.md                                                  | Markdown     |        151 |          0 |         34 |        185 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/.claude-plugin/plugin.json                                  | JSON         |         13 |          0 |          1 |         14 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/directives/README.md                                        | Markdown     |         39 |          0 |         18 |         57 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/directives/cards/active/DLC-001.md                          | Markdown     |         47 |          0 |         18 |         65 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/directives/taxonomy.md                                      | Markdown     |         15 |          0 |          6 |         21 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/directives/toggle.sh                                        | Shell Script |         37 |         15 |          9 |         61 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/SKILL.md                            | Skill        |         64 |          3 |         32 |         99 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/references/artifact-structure.md    | Markdown     |         40 |          0 |         19 |         59 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/references/browser-verification.md  | Markdown     |         23 |          0 |         13 |         36 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/references/deterministic-prepass.md | Markdown     |         35 |          0 |         23 |         58 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/references/dimensions.md            | Markdown     |         48 |          0 |         30 |         78 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/references/findings-and-severity.md | Markdown     |         46 |          0 |         21 |         67 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/references/last-mile.md             | Markdown     |         35 |          0 |         21 |         56 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/references/multi-agent.md           | Markdown     |        100 |          0 |         54 |        154 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/references/review-lenses.md         | Markdown     |         41 |          0 |         23 |         64 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/references/scope-resolution.md      | Markdown     |         39 |          0 |         22 |         61 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/templates/certificate.md            | Markdown     |         21 |          7 |         11 |         39 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/templates/finding.json              | JSON         |         34 |          0 |          1 |         35 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/templates/report.md                 | Markdown     |         39 |         29 |         22 |         90 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-implement/SKILL.md                              | Skill        |         50 |          0 |         24 |         74 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-implement/references/artifact-structure.md      | Markdown     |         40 |          0 |         19 |         59 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-implement/references/commit-and-handoff.md      | Markdown     |         32 |          0 |         17 |         49 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-implement/references/execution-modes.md         | Markdown     |         22 |          0 |         11 |         33 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-implement/references/notifications.md           | Markdown     |         16 |          0 |          8 |         24 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-implement/references/phase-execution.md         | Markdown     |         19 |          0 |         13 |         32 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-implement/references/validation.md              | Markdown     |         20 |          0 |         13 |         33 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-implement/scripts/load-active-cards.sh          | Shell Script |         32 |         14 |          6 |         52 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-implement/templates/blocker-report.md           | Markdown     |          9 |          2 |          4 |         15 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-implement/templates/phase-handoff.md            | Markdown     |          7 |          1 |          3 |         11 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan-review/SKILL.md                            | Skill        |         43 |          0 |         21 |         64 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan-review/references/artifact-structure.md    | Markdown     |         40 |          0 |         19 |         59 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan-review/references/findings-format.md       | Markdown     |         23 |          0 |         10 |         33 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan-review/references/multi-agent.md           | Markdown     |         20 |          0 |         12 |         32 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan-review/references/review-dimensions.md     | Markdown     |         21 |          0 |         11 |         32 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan-review/scripts/load-active-cards.sh        | Shell Script |         32 |         14 |          6 |         52 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan-review/templates/review-report.md          | Markdown     |         18 |         16 |         10 |         44 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan/SKILL.md                                   | Skill        |         63 |          0 |         27 |         90 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan/references/artifact-structure.md           | Markdown     |         40 |          0 |         19 |         59 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan/references/in-session-commands.md          | Markdown     |         43 |          0 |         27 |         70 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan/references/phase-structuring.md            | Markdown     |         19 |          0 |          9 |         28 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan/references/question-cadence.md             | Markdown     |         11 |          0 |          4 |         15 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan/scripts/load-active-cards.sh               | Shell Script |         32 |         14 |          6 |         52 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan/templates/plan-template.md                 | Markdown     |         36 |          0 |         24 |         60 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan/templates/questions/_README.md             | Markdown     |         21 |          0 |         11 |         32 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan/templates/questions/multiple-choice.json   | JSON         |         12 |          0 |          1 |         13 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan/templates/questions/open-ended.json        | JSON         |          8 |          0 |          1 |          9 |
+| /Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan/templates/questions/yes-no-explain.json    | JSON         |         12 |          0 |          1 |         13 |
+| Total                                                                                                                                    |              |      4,631 |        137 |      1,069 |      5,837 |
++------------------------------------------------------------------------------------------------------------------------------------------+--------------+------------+------------+------------+------------+

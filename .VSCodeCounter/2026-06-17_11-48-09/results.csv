@@ -1,0 +1,64 @@
+"filename", "language", "Markdown", "JSON", "HTML", "Shell Script", "Skill", "comment", "blank", "total"
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/.claude-plugin/marketplace.json", "JSON", 0, 18, 0, 0, 0, 0, 1, 19
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/README.md", "Markdown", 47, 0, 0, 0, 0, 0, 17, 64
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/benchmarks/3-way-comparison.html", "HTML", 0, 0, 1095, 0, 0, 0, 78, 1173
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/benchmarks/README.md", "Markdown", 19, 0, 0, 0, 0, 0, 5, 24
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/benchmarks/Run-Notes.md", "Markdown", 19, 0, 0, 0, 0, 0, 11, 30
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/benchmarks/code-review-design/Design-Notes.md", "Markdown", 70, 0, 0, 0, 0, 0, 45, 115
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/benchmarks/code-review-design/index.html", "HTML", 0, 0, 504, 0, 0, 12, 46, 562
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/benchmarks/comparisons.md", "Markdown", 68, 0, 0, 0, 0, 0, 24, 92
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/benchmarks/pr65-fab5-solo-review.html", "HTML", 0, 0, 377, 0, 0, 10, 28, 415
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/benchmarks/pr65-v4-findings/00-Manifest/manifest.md", "Markdown", 8, 0, 0, 0, 0, 0, 3, 11
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/benchmarks/pr65-v4-findings/04-Code-Review/certificate.md", "Markdown", 24, 0, 0, 0, 0, 0, 10, 34
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/benchmarks/pr65-v4-findings/04-Code-Review/findings.json", "JSON", 0, 569, 0, 0, 0, 0, 1, 570
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/benchmarks/pr65-v4-findings/04-Code-Review/report.md", "Markdown", 93, 0, 0, 0, 0, 0, 27, 120
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/roadmap/DATA-FLOW-CONTRACT.md", "Markdown", 26, 0, 0, 0, 0, 0, 15, 41
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/roadmap/DEEP-BUG-FIX-DESIGN.md", "Markdown", 86, 0, 0, 0, 0, 0, 43, 129
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/docs/roadmap/DESIGN-OUTLINE.md", "Markdown", 151, 0, 0, 0, 0, 0, 34, 185
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/.claude-plugin/plugin.json", "JSON", 0, 13, 0, 0, 0, 0, 1, 14
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/directives/README.md", "Markdown", 39, 0, 0, 0, 0, 0, 18, 57
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/directives/cards/active/DLC-001.md", "Markdown", 47, 0, 0, 0, 0, 0, 18, 65
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/directives/taxonomy.md", "Markdown", 15, 0, 0, 0, 0, 0, 6, 21
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/directives/toggle.sh", "Shell Script", 0, 0, 0, 37, 0, 15, 9, 61
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/SKILL.md", "Skill", 0, 0, 0, 0, 64, 3, 32, 99
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/references/artifact-structure.md", "Markdown", 40, 0, 0, 0, 0, 0, 19, 59
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/references/browser-verification.md", "Markdown", 23, 0, 0, 0, 0, 0, 13, 36
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/references/deterministic-prepass.md", "Markdown", 35, 0, 0, 0, 0, 0, 23, 58
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/references/dimensions.md", "Markdown", 48, 0, 0, 0, 0, 0, 30, 78
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/references/findings-and-severity.md", "Markdown", 46, 0, 0, 0, 0, 0, 21, 67
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/references/last-mile.md", "Markdown", 35, 0, 0, 0, 0, 0, 21, 56
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/references/multi-agent.md", "Markdown", 100, 0, 0, 0, 0, 0, 54, 154
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/references/review-lenses.md", "Markdown", 41, 0, 0, 0, 0, 0, 23, 64
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/references/scope-resolution.md", "Markdown", 39, 0, 0, 0, 0, 0, 22, 61
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/templates/certificate.md", "Markdown", 21, 0, 0, 0, 0, 7, 11, 39
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/templates/finding.json", "JSON", 0, 34, 0, 0, 0, 0, 1, 35
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-code-review/templates/report.md", "Markdown", 39, 0, 0, 0, 0, 29, 22, 90
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-implement/SKILL.md", "Skill", 0, 0, 0, 0, 50, 0, 24, 74
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-implement/references/artifact-structure.md", "Markdown", 40, 0, 0, 0, 0, 0, 19, 59
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-implement/references/commit-and-handoff.md", "Markdown", 32, 0, 0, 0, 0, 0, 17, 49
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-implement/references/execution-modes.md", "Markdown", 22, 0, 0, 0, 0, 0, 11, 33
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-implement/references/notifications.md", "Markdown", 16, 0, 0, 0, 0, 0, 8, 24
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-implement/references/phase-execution.md", "Markdown", 19, 0, 0, 0, 0, 0, 13, 32
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-implement/references/validation.md", "Markdown", 20, 0, 0, 0, 0, 0, 13, 33
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-implement/scripts/load-active-cards.sh", "Shell Script", 0, 0, 0, 32, 0, 14, 6, 52
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-implement/templates/blocker-report.md", "Markdown", 9, 0, 0, 0, 0, 2, 4, 15
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-implement/templates/phase-handoff.md", "Markdown", 7, 0, 0, 0, 0, 1, 3, 11
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan-review/SKILL.md", "Skill", 0, 0, 0, 0, 43, 0, 21, 64
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan-review/references/artifact-structure.md", "Markdown", 40, 0, 0, 0, 0, 0, 19, 59
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan-review/references/findings-format.md", "Markdown", 23, 0, 0, 0, 0, 0, 10, 33
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan-review/references/multi-agent.md", "Markdown", 20, 0, 0, 0, 0, 0, 12, 32
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan-review/references/review-dimensions.md", "Markdown", 21, 0, 0, 0, 0, 0, 11, 32
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan-review/scripts/load-active-cards.sh", "Shell Script", 0, 0, 0, 32, 0, 14, 6, 52
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan-review/templates/review-report.md", "Markdown", 18, 0, 0, 0, 0, 16, 10, 44
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan/SKILL.md", "Skill", 0, 0, 0, 0, 63, 0, 27, 90
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan/references/artifact-structure.md", "Markdown", 40, 0, 0, 0, 0, 0, 19, 59
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan/references/in-session-commands.md", "Markdown", 43, 0, 0, 0, 0, 0, 27, 70
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan/references/phase-structuring.md", "Markdown", 19, 0, 0, 0, 0, 0, 9, 28
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan/references/question-cadence.md", "Markdown", 11, 0, 0, 0, 0, 0, 4, 15
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan/scripts/load-active-cards.sh", "Shell Script", 0, 0, 0, 32, 0, 14, 6, 52
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan/templates/plan-template.md", "Markdown", 36, 0, 0, 0, 0, 0, 24, 60
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan/templates/questions/_README.md", "Markdown", 21, 0, 0, 0, 0, 0, 11, 32
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan/templates/questions/multiple-choice.json", "JSON", 0, 12, 0, 0, 0, 0, 1, 13
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan/templates/questions/open-ended.json", "JSON", 0, 8, 0, 0, 0, 0, 1, 9
+"/Users/jeffboothe/c/dev/AI/CC-Plugins-by-reU/Deep-Skills/plugins/deep-skills/skills/deep-plan/templates/questions/yes-no-explain.json", "JSON", 0, 12, 0, 0, 0, 0, 1, 13
+"Total", "-", 1636, 666, 1976, 133, 220, 137, 1069, 5837
