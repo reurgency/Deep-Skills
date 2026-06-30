@@ -25,10 +25,10 @@ The three tiers (**main**, **mid**, **cheap**) are abstract — they bind to con
 
 Two binding rules:
 
-1. **The main tier IS the orchestrator's model — never anything smaller.** When the orchestrator runs above the map's reference orchestrator, every tier the map would route to main *or* mid stays on the orchestrator's model; only the cheap tier drops below it. Tiers never resolve downward past what the map binds.
-2. **The host's smallest tier (on Claude Code, Haiku) is NEVER used in this pipeline — any tier, any stage, any agent.** Not finders, not verifiers, not synthesis helpers. A calibration run whose main-tier lenses silently routed to Haiku produced 0 Blockers and 0 Majors on a diff with two known Criticals — that tier's output in this pipeline is worse than no output, because it ships false confidence.
+1. **The main tier IS the orchestrator's (ceiling) model — never anything smaller.** The ceiling is the orchestrator's own model — the strongest the user can access. Tiers resolve **downward from the ceiling, never upward**, and **collapse up to it** when no cheaper reasoning model exists (a restricted Sonnet-4.6 ceiling binds main = mid = cheap = Sonnet 4.6 — see `references/model-map.md`).
+2. **All three tiers are reasoning tiers — the host's small/utility models (on Claude Code, Haiku) never appear here, any tier, any stage, any agent.** Not because a model name is banned, but because every task in this pipeline — finding, verifying, synthesizing — is reasoning work, so a small model is never the right tool. A calibration run whose finders silently routed to Haiku produced 0 Blockers and 0 Majors on a diff with two known Criticals — output worse than none, because it ships false confidence.
 
-**Set the model explicitly on every agent launch** (the Agent tool's `model` parameter / per-agent model setting) — never rely on inheritance or a default. That is exactly how the Haiku mis-route happened: tier labels like "main model" were left to implicit resolution. Before launching the fleet, resolve each tier to its concrete **full model ID** via `references/model-map.md` and use those IDs in every launch. If any agent's transcript or first response shows it running on a model below its assigned tier — above all the host's smallest tier — its output is invalid: discard it and relaunch that agent with the model set explicitly.
+**Set the model explicitly on every agent launch** (the Agent tool's `model` parameter / per-agent model setting) — never rely on inheritance or a default. That is exactly how the Haiku mis-route happened: tier labels like "main model" were left to implicit resolution. Before launching the fleet, resolve each tier to its concrete **full model ID** via `references/model-map.md` and use those IDs in every launch. If any agent's transcript or first response shows it running on a model below its assigned (ceiling-relative) tier, its output is invalid: discard it and relaunch that agent with the model set explicitly.
 
 Eight independent finder passes, each a **fresh, read-only agent with exactly one lens**, model-tiered by what calibration showed each lens actually catches:
 
@@ -74,7 +74,7 @@ The test for both directions is the same question: *how many independent fixes d
 
 **Verifiers are model-tiered by what their verdict gates.** In the second baseline, every sev-5 verification ended in a demotion or refutation — knocking down floor-gaming marginal findings is pattern-checking work a cheap model does well; the expensive skeptic is reserved for candidates whose confirmation would gate the merge:
 
-- **Sev 5 candidates → cheap-tier verifier (Sonnet — never Haiku).** If a cheap verifier *confirms* a sev-5 **and raises** its severity to ≥6, the raise doesn't stand on its own — a main-tier verifier re-checks before synthesis accepts it.
+- **Sev 5 candidates → `cheap`-tier verifier** (the cheapest *reasoning* model, e.g. Sonnet at an Opus/Fable ceiling — never a small model; resolve via `references/model-map.md`). If a cheap verifier *confirms* a sev-5 **and raises** its severity to ≥6, the raise doesn't stand on its own — a main-tier verifier re-checks before synthesis accepts it.
 - **Sev ≥6 candidates → main-tier verifier** (the orchestrator's model, per `references/model-map.md` — set explicitly at launch).
 
 **One streamed wave, not batched waves.** Verifiers launch as candidates clear Stage B, as a rolling window under the ≤8 concurrency cap — never accumulated into discrete waves with barriers between them (the second baseline's two-wave barrier idled the fleet between waves). Each verifier's prompt carries its Stage 0 fact pre-harvest.
@@ -126,7 +126,7 @@ The multi-agent run ends at the assembled report, exactly like the default flow 
 
 `--mega` runs the **same pipeline** with the cost/accuracy dials at the measured-baseline maximum. For release gates and pre-merge reviews of large, risky work where the user explicitly accepts roughly double the default's wall clock and rate-limit footprint:
 
-- **All eight finder passes on the main tier** — the orchestrator's model, resolved per `references/model-map.md` and set explicitly per launch (`quality` may stay on the cheap tier, but its sev ≤4 cap is lifted — it proposes severities normally). The Haiku ban holds here too.
+- **All eight finder passes on the main tier** — the orchestrator's model, resolved per `references/model-map.md` and set explicitly per launch (`quality` may stay on the cheap tier, but its sev ≤4 cap is lifted — it proposes severities normally). Small models stay out here too — every pass still reasons.
 - **All verification on the main tier**, floor still sev ≥5; the sev-5 cheap-tier routing does not apply.
 - **Stage 0 stays fully scripted** (chunking, parallel pre-pass, fact harvest), and Stage D stays script-assembled — determinism trades no accuracy, so the thorough tier keeps it.
 

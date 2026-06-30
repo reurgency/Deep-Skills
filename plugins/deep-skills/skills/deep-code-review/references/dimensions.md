@@ -62,7 +62,7 @@ Method — all four steps, per value:
 
 **Asks:** is this change clean code by *this* project's standards — no rebuilt wheels, no dead weight, no avoidable work, no broken conventions?
 
-One pass covering four facets. This is pattern-matching work — run it on the **cheap model tier** (never the host's smallest tier — on Claude, Haiku) — resolve the concrete ID via `references/model-map.md` per the fleet in `references/multi-agent.md`; calibration showed these facets produce almost exclusively nit-tier findings, so they share one budget rather than four.
+One pass covering four facets. This is pattern-matching work — run it on the **`cheap` tier** (the cheapest *reasoning* model — never a small/utility model like Haiku; all tiers reason) — resolve the concrete ID via `references/model-map.md` per the fleet in `references/multi-agent.md`; calibration showed these facets produce almost exclusively nit-tier findings, so they share one budget rather than four.
 
 **Severity cap: this pass proposes nothing above sev 4** (default configuration; the cap is lifted under `--mega`). A candidate it believes rates higher is filed at 4 with a `note: believed-higher (N)` — synthesis may promote it into verification when it looks load-bearing. The cap exists because quality candidates filed at the sev-5 verification floor consistently died under verification, making their refutation this pass's main downstream cost; its findings therefore never trigger verifiers on their own.
 

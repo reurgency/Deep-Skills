@@ -19,7 +19,7 @@ Independently review implemented code with fresh agents, evidence-gated findings
 
 - Default one-agent-four-lenses (Correctness, Last-Mile, Plan-Conformance, Coherence) — `plugins/deep-skills/skills/deep-code-review/references/review-lenses.md:1 (Review lenses)`
 - Last-mile hop-by-hop chain trace — `plugins/deep-skills/skills/deep-code-review/references/last-mile.md:69 (synthesis rule)`
-- Multi-agent 5-stage pipeline + model tiers (Haiku ban) — `plugins/deep-skills/skills/deep-code-review/references/multi-agent.md:36 (Haiku is NEVER used in this pipeline — any tier, any stage, any agent)`
+- Multi-agent 5-stage pipeline + model tiers (reasoning tiers only) — `plugins/deep-skills/skills/deep-code-review/references/multi-agent.md:29 (All three tiers are reasoning tiers — the host's small/utility models never appear here)`
 - Findings record (evidence-required) — `plugins/deep-skills/skills/deep-code-review/templates/finding.json:1`
 
 ## Invariants
@@ -29,7 +29,7 @@ Independently review implemented code with fresh agents, evidence-gated findings
 - Print resolved scope, ask on ambiguity — `plugins/deep-skills/skills/deep-code-review/SKILL.md:24 (1. Resolve scope — and state it)`
 - Evidence required on every finding — `plugins/deep-skills/skills/deep-code-review/references/findings-and-severity.md:15 (REQUIRED, no exceptions)`
 - No cited chain ⇒ no finding (last-mile synthesis rule) — `plugins/deep-skills/skills/deep-code-review/references/last-mile.md:69 (synthesis rule)`
-- Haiku never used at any tier — `plugins/deep-skills/skills/deep-code-review/references/multi-agent.md:36 (Haiku is NEVER used in this pipeline — any tier, any stage, any agent)`
+- Small/utility models never used (all reasoning tiers) — `plugins/deep-skills/skills/deep-code-review/references/multi-agent.md:29 (All three tiers are reasoning tiers — the host's small/utility models never appear here)`
 - Never read .env/secrets — `plugins/deep-skills/skills/deep-code-review/references/deterministic-prepass.md:25 (NEVER read `.env`)`
 
 ## Data-flow summary
@@ -47,7 +47,7 @@ Independently review implemented code with fresh agents, evidence-gated findings
 | print resolved scope, ask on ambiguity | `plugins/deep-skills/skills/deep-code-review/SKILL.md:24 (1. Resolve scope — and state it)` |
 | four default lenses | `plugins/deep-skills/skills/deep-code-review/references/review-lenses.md:1 (Review lenses)` |
 | no cited chain ⇒ no finding | `plugins/deep-skills/skills/deep-code-review/references/last-mile.md:69 (synthesis rule)` |
-| tiers + Haiku never | `plugins/deep-skills/skills/deep-code-review/references/multi-agent.md:36 (Haiku is NEVER used in this pipeline — any tier, any stage, any agent)` |
+| tiers + reasoning-only | `plugins/deep-skills/skills/deep-code-review/references/multi-agent.md:29 (All three tiers are reasoning tiers — the host's small/utility models never appear here)` |
 | finder budget + severity floor | `plugins/deep-skills/skills/deep-code-review/references/dimensions.md:17 (Overgenerate — within budget, above the nit floor)` |
 | evidence on every finding | `plugins/deep-skills/skills/deep-code-review/references/findings-and-severity.md:15 (REQUIRED, no exceptions)` |
 | secrets rule | `plugins/deep-skills/skills/deep-code-review/references/deterministic-prepass.md:25 (NEVER read `.env`)` |

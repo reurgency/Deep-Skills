@@ -14,7 +14,7 @@ That is exactly why every per-host manifest lives **inside `plugins/deep-skills/
 
 ## Model-tier routing is portable, and required
 
-Every host below supports **per-agent model selection** in its subagent/agent definition. The fleets (`deep-code-review`, `deep-plan-review`) **must** bind each agent's model from that skill's `references/model-map.md` before fan-out — a correctness guarantee, not an affordance (see `references/host-affordances.md`). Each non-Claude host needs its **own** `model-map.md` mapping the abstract tiers (main/mid/cheap) to that host's concrete model IDs; the Claude map ships today. **A host that cannot bind per-agent models routes its fleets to a single-agent fallback for that host only** (see the matrix).
+Every host below supports **per-agent model selection** in its subagent/agent definition. The fleets (`deep-code-review`, `deep-plan-review`) **must** bind each agent's model from that skill's `references/model-map.md` before fan-out — a correctness guarantee, not an affordance (see `references/host-affordances.md`). The map is **host-agnostic**: one `model-map.md` per fleet, keyed by the **orchestrator's own model** (which determines both the family — Anthropic / OpenAI / … — and the ceiling), so the same file resolves on every host; no per-host copies. All three tiers (main/mid/cheap) are **reasoning** tiers — `cheap` is the cheapest *reasoning* model, never a small/utility one (Haiku, GPT-mini/nano), which are never required in this series. The ceiling is the user's selected model, so a restricted shop whose best model is normally a mid grade (Sonnet 4.6, GPT-5.4) runs `main` = `mid` = `cheap` at that ceiling. **A host that cannot bind per-agent models routes its fleets to a single-agent fallback for that host only** (see the matrix).
 
 ## Capability matrix (from official docs; ✓ = documented, ⚠ = degrade, gate = verify empirically)
 
@@ -76,12 +76,12 @@ The VS Code editor has **no skills marketplace** — point it at this repo's ski
 
 ## Maintainer rules (the standalone / single-source contract)
 
-1. **One source of truth.** Skill bodies are shared across all hosts. Never fork a `SKILL.md` or `references/*` per host — fix it once, it ships everywhere. The only per-host files are the manifest dirs (`.claude-plugin/`, `.codex-plugin/`, `.cursor-plugin/`) and per-host `model-map.md` copies.
+1. **One source of truth.** Skill bodies are shared across all hosts. Never fork a `SKILL.md` or `references/*` per host — fix it once, it ships everywhere. The only per-host files are the manifest dirs (`.claude-plugin/`, `.codex-plugin/`, `.cursor-plugin/`). `model-map.md` is **not** forked per host — it is one host-agnostic file keyed by the orchestrator's model.
 2. **Byte-identical shared files (standalone rule).** Any edit to a shared file is applied **identically** across every skill that carries it, then the consistency sweep re-run (`cmp` each copy pairwise against the canonical):
    - `scripts/load-active-cards.sh` — the **4** loader-bearing skills (`deep-plan`, `deep-plan-review`, `deep-implement`, `deep-docs`). `deep-code-review` has no `scripts/` dir and is exempt.
    - `references/artifact-structure.md` — all **5** skills.
    - `references/host-affordances.md` — all **5** skills.
-   - `references/model-map.md` — the **2** fleet skills (`deep-code-review`, `deep-plan-review`); per host.
+   - `references/model-map.md` — the **2** fleet skills (`deep-code-review`, `deep-plan-review`); one host-agnostic file, byte-identical across both fleets.
 3. **Every change must work on all hosts.** No edit may assume a Claude-only affordance at a call site — route optional affordances through `host-affordances.md`; keep model routing bound through `model-map.md`.
 4. **Never touch frontmatter casually.** `name:`/`description:` drive auto-load/discovery on every host. Changing them changes invocation everywhere.
 5. **Run the M3 gate before committing a new host.** Manifest authored ≠ host supported. Install, run a real cycle, confirm fan-out + model binding + directive-registry load, then update the matrix above.

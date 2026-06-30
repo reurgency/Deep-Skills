@@ -8,7 +8,7 @@
 
 ## The flow it traces
 
-The escalated (`--multi-agent`/`--mega`) path is a real cross-layer pipeline: deterministic setup feeds a fleet of finder agents, whose candidate findings are deduplicated, adversarially verified, and synthesized into one report — with model-tier routing throughout and a hard Haiku ban.
+The escalated (`--multi-agent`/`--mega`) path is a real cross-layer pipeline: deterministic setup feeds a fleet of finder agents, whose candidate findings are deduplicated, adversarially verified, and synthesized into one report — with model-tier routing throughout (all reasoning tiers; small/utility models never appear).
 
 ## Hop-by-hop
 
@@ -18,7 +18,7 @@ The escalated (`--multi-agent`/`--mega`) path is a real cross-layer pipeline: de
 
 3. **Finder fleet (overgenerate within budget)** — fresh-eyes finders run the four lenses (Correctness, Last-Mile, Plan-Conformance, Coherence), overgenerating candidates within a finder budget and severity floor. No implementation transcript reaches them. — `plugins/deep-skills/skills/deep-code-review/references/review-lenses.md:1 (Review lenses)` · `plugins/deep-skills/skills/deep-code-review/references/dimensions.md:17 (Overgenerate — within budget, above the nit floor)` · `plugins/deep-skills/skills/deep-code-review/SKILL.md:12 (Core principle)`
 
-4. **Model-tier routing (Haiku ban)** — each pipeline stage is routed to a model tier; **load-bearing invariant:** Haiku is never used at any tier. — `plugins/deep-skills/skills/deep-code-review/references/multi-agent.md:36 (Haiku is NEVER used in this pipeline — any tier, any stage, any agent)`
+4. **Model-tier routing (reasoning tiers only)** — each pipeline stage is routed to a model tier, all of which are reasoning tiers; **load-bearing invariant:** small/utility models (Claude: Haiku) never appear, since every task reasons. — `plugins/deep-skills/skills/deep-code-review/references/multi-agent.md:29 (All three tiers are reasoning tiers — the host's small/utility models never appear here)`
 
 5. **Dedup + adversarial verification** — candidates are deduplicated and each survivor is adversarially verified; evidence is required on every finding. For last-mile findings the rule is strict: no cited hop-by-hop chain ⇒ no finding. — `plugins/deep-skills/skills/deep-code-review/references/findings-and-severity.md:15 (REQUIRED, no exceptions)` · `plugins/deep-skills/skills/deep-code-review/references/last-mile.md:69 (synthesis rule)`
 
