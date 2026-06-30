@@ -1,6 +1,7 @@
 ---
 name: deep-implement
 description: Execute a finished, reviewed plan phase-by-phase — implement → validate → fix → commit → hand-off — in collaborative or autonomous mode. Use after /deep-plan (and ideally /deep-plan-review), typically just before the user enables bypass-permissions. Triggers on /deep-implement and on requests to build/execute a plan. Consumes a deep-plan artifact; it is the only deep-* skill that writes source code.
+argument-hint: plan path, or Enter for latest · --autonomous · --worktree
 ---
 
 # DeepImplement

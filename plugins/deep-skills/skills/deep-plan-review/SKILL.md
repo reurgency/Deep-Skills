@@ -1,6 +1,7 @@
 ---
 name: deep-plan-review
 description: Independently review a finished plan with fresh, codebase-aware agents — catching misalignment with the user's taste/preferences/decisions and with codebase best-practices, patterns, duplicate or overlapping behavior, and conflicts. Use after /deep-plan and before /deep-implement, or whenever the user wants a plan reviewed. Triggers on /deep-plan-review and on requests to review/critique a plan. Replaces the long manual review pass after planning. Reviews the plan only — it does not implement.
+argument-hint: path to plan, or Enter for latest · --multi-agent
 ---
 
 # DeepPlanReview

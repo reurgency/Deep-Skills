@@ -1,6 +1,7 @@
 ---
 name: deep-plan
 description: Run an interactive, steerable feature-planning session that produces a self-contained, fresh-agent-resumable plan artifact. Use when the user wants to plan a feature, run a planning session, "deep plan" something, or before handing work to /deep-implement. Triggers on /deep-plan and on requests to plan a feature, design an approach, or scope work before building. Planning only — it does not implement.
+argument-hint: describe feature/task to plan
 ---
 
 # DeepPlan

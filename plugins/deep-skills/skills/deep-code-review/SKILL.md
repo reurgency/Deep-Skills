@@ -1,6 +1,7 @@
 ---
 name: deep-code-review
 description: Independently review implemented code with fresh, evidence-driven agents — correctness bugs, last-mile functional gaps (UI that looks wired but isn't), plan conformance, and coherence — and produce a review report with every finding left open. Triage (fix/defer/reject) and routing accepted fixes into the plan for /deep-implement are a separate, opt-in step (--triage), so the review itself runs autonomously and never edits the plan. Use after /deep-implement, before merge, or on any branch/PR/diff. Triggers on /deep-code-review and on requests to deep-review code, a PR, a branch, or a diff. Reviews code only — it never edits application source.
+argument-hint: branch/PR/diff/folder, or Enter for current branch · --multi-agent · --triage
 ---
 
 # DeepCodeReview

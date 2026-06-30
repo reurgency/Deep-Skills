@@ -22,6 +22,52 @@ One plugin, **`deep-skills`**, bundling **five** skills:
 | `/deep-code-review` | Multi-agent code review with severity-gated adversarial verification. |
 | `/deep-docs` | Context-window-aware, tiered, anchor-verified map of what a codebase has built — for agents crawling under a token budget. Documents, never decides. |
 
+## Skill reference
+
+Everything you can pass each skill (at invocation) and everything you can say while it runs (mid-session).
+
+> **Natural-language-first.** Every `--flag` and `/command` below is a convenience on hosts that support them (Claude Code, Cursor). On **Copilot** and **Codex** you say the same thing in plain English — *"run a full multi-agent review,"* *"drill into the auth flow,"* *"refresh the docs."* The slash/flag form is never required.
+
+### Arguments & inline flags
+
+What each skill does with no argument, plus the flags it accepts at invocation.
+
+| Skill | Argument / flag | What it does |
+|---|---|---|
+| `/deep-plan` | <feature/task> | The argument is the feature to plan. Fully interactive; no inline flags. |
+| `/deep-plan-review` |  | Reviews the most recent plan (`.deep-skills/*/01-Plan/plan.md`); or pass an explicit plan path. |
+| | `--multi-agent` | Parallel review — one fresh agent per dimension, then a synthesis pass. |
+| `/deep-implement` |  | Implements the most recent plan; or pass an explicit plan path. |
+| | `--autonomous` / `--collaborative` | Run unattended end-to-end, or pause for approval at each phase. (Asks if omitted on a multi-phase plan.) |
+| | `--worktree` | Do the work in an isolated git worktree (default: the current branch). |
+| | `--parallel` | Run provably-independent phases concurrently (falls back to sequential otherwise). |
+| `/deep-code-review` |  | Reviews the current feature branch against the base it was cut from. |
+| | *PR / file or folder paths* | Pass `PR65`, `#65`, or a PR URL to review a PR; pass file or folder paths to scope the review. |
+| | `--multi-agent` | Full fleet review — eight model-tiered single-lens finders, adversarial verification of survivors, scripted synthesis into one report. |
+| | `--mega` | Maximum review — every finder/verifier on the top model, quality caps lifted (~2× cost; for release gates). |
+| | `--triage` | Opt-in pass over an existing review's findings (fix / defer / reject); routes accepted fixes into the plan. The only mode that edits the plan. |
+| | `--browser` | Live last-mile checks against an already-running dev server (never starts one; never reads `.env`). |
+| | `--security` | Reserved seam for a future `/deep-security` pass; inert until that skill ships. |
+| `/deep-docs` |  | Documents the whole repo — the full tiered, anchor-verified pipeline. |
+| | *\<path>* | Scope to a subsystem, or *"put the map under \<path>"* to relocate output from the default `docs/ai-map/`. |
+| | `--refresh` | Re-resolve anchors + diff the file-set, then regenerate only the stale/new subsystems (no git required). |
+
+### In-session commands
+
+Say these any time *while a skill is running*; it services the command and returns to where it was. `/deep-implement` and `/deep-docs` have none.
+
+| Skill | Command | What it does |
+|---|---|---|
+| `/deep-plan` | `/drill <note>` | Deepen the current question in-session (shared context), then resume. |
+| | `/breakout <note>` | Hand a compact briefing to an isolated fresh subagent; return only its distilled answer (protects main context). |
+| | `/gaps` | Run a gap-analysis round; surface gaps, conflicts, and assumptions as follow-up questions (repeatable). |
+| | `/risks` | Produce a risk assessment of the emerging plan. |
+| | `/constraints` | Suggest likely constraints and ask for yours; fold accepted ones into the plan. |
+| | `/columbo` | Fresh-agent "one more thing" completeness gut check on the written plan. |
+| `/deep-plan-review` | `/multi-agent` | Escalate the current review to parallel mode (same as the `--multi-agent` flag). |
+| | `/columbo` | Optional fresh-agent completeness check — *"could a fresh agent execute this plan?"* |
+| `/deep-code-review` | `/multi-agent` | Escalate the current review to the full fleet (same as the `--multi-agent` flag). |
+
 ## Learn the skills
 
 New to the Deep-\* series? Work through the **[Training Program](docs/Training/README.md)** —

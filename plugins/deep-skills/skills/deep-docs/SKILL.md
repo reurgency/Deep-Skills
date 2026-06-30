@@ -1,6 +1,7 @@
 ---
 name: deep-docs
 description: Generate context-window-aware, machine-readable documentation of what a codebase has built — a standing, queryable orientation map structured for progressive disclosure, with every claim anchored to file:line (symbol) and adversarially verified by fresh agents. Three independently-loadable tiers (tier-0 MAP.md + index.json always-loaded; tier-1 subsystem cards on touch; tier-2 deep references on demand) so a crawling agent loads only the slice its task needs. Use after /deep-implement, after /deep-code-review, or standalone on any repo to orient an agent. Triggers on /deep-docs and on requests to map, document, or generate an AI-readable map of a codebase. Documents only — it never edits application source.
+argument-hint: Enter to doc the repo · path to scope · --refresh
 ---
 
 # DeepDocs
