@@ -55,7 +55,7 @@ Every flag is **natural-language-first** — the plain-language trigger is the p
 - **Just fix them all / run unattended** (`--autonomous`) or **check in with me per cluster** (`--collaborative`) — execution mode. If omitted on a multi-cluster run, **ask** (see `references/execution-modes.md`).
 - **Fix it with a reproducing test** (`--reproduce`) — upgrade proof from static chain-trace to a dynamic red→green test: written **before** the fix, observed failing pre-fix and passing post-fix (the proof agent re-runs both directions itself), committed into the host suite riding the cluster's fix commit. Genuinely unreproducible ⇒ reported + chain-trace fallback, never a silent skip. Protocol: `references/proof-of-fix.md`.
 - **Fix in a worktree** (`--worktree`) — isolate fix work in a git worktree: prefer the host's worktree command when present, else plain `git worktree add`. Code + reproduction tests stay in the worktree branch; effort artifacts (fix-summary, manifest, findings statuses) go to the source branch root; at completion the branch is offered for merge/PR. Default stays current-branch. Rules: `references/commit-and-handoff.md`.
-- **Record the root cause** (`--learn`) — emit `round-N/root-causes.json` for the future Deep-Learn Pattern Ledger. **Lands in Phase 4** — if invoked today, say so; the confirmed causes are already human-readable in `fix-summary.md`.
+- **Record the root cause** (`--learn`) — emit `round-N/root-causes.json` (`templates/root-causes.json`): one proof-truthed record per proven cluster, `taxonomy_class` drawn from the shared `directives/taxonomy.md`, accumulated for the future Deep-Learn Pattern Ledger (Display-only today — no machine reader exists yet; humans read the same causes in `fix-summary.md`). Rules: `references/learn-record.md`.
 
 ## In-session commands
 
@@ -89,7 +89,7 @@ Per `references/containment.md`: extract changed symbols from the diff → disco
 Order per cluster, never reordered: **apply fix → proof verdict → containment → commit.** Collaborative: present fix + proof + containment; commit only if the user wants. Autonomous: on `fixed` + clean containment, commit the cluster — `fix(<scope>): <cause> — resolves CR-00X, CR-00Y` + host-aware attribution trailer (see `references/commit-and-handoff.md`). Nothing unproven ever ships.
 
 ### 8. Statuses & round artifacts
-On `fixed` (and only then): flip each of the cluster's findings `accepted → fixed` in `04-Code-Review/findings.json`, and append the cluster's record to `round-N/fix-summary.md` — confirmed cause explicitly compared against the review's hypothesis. Skipped/blocked clusters get an entry too; their statuses stay untouched.
+On `fixed` (and only then): flip each of the cluster's findings `accepted → fixed` in `04-Code-Review/findings.json`, and append the cluster's record to `round-N/fix-summary.md` — confirmed cause explicitly compared against the review's hypothesis (under `--learn`, also append the cluster's `root-causes.json` record per `references/learn-record.md`). Skipped/blocked clusters get an entry too; their statuses stay untouched.
 
 ### 9. Finish & hand off to re-review
 Update the manifest's `06 Bug Fix` row (link: `[06-Bug-Fix/](../06-Bug-Fix/)`). Report the round: clusters fixed / skipped / blocked, statuses flipped, commits made. In autonomous mode, **notify** completion (see `references/notifications.md`). Close by pointing at the loop's next step:

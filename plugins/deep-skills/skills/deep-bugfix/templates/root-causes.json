@@ -1,0 +1,25 @@
+{
+  "_template": "Shape of `.deep-skills/<effort>/06-Bug-Fix/round-N/root-causes.json` — written under --learn only (see references/learn-record.md). Annotations live in `_doc` keys here; real root-causes.json files omit every key starting with `_`. One record per cluster that closed with proof verdict `fixed`, appended incrementally as each cluster closes (same rhythm as fix-summary.md); unproven, regressed, and skipped clusters NEVER produce a record — cause data here is proof-truthed, not claimed. Display-only today: the machine reader (the Deep-Learn Distiller / Pattern Ledger) does not exist yet; humans read the same causes in fix-summary.md. Fields stay stable — this shape is the Ledger's future ingestion payload.",
+  "effort": "<effort-name>",
+  "round": 1,
+  "records": [
+    {
+      "_doc_cluster_id": "The cluster's id as diagnosis confirmed it (post split/merge), matching this round's scope.json and fix-summary.md",
+      "cluster_id": "CL-1",
+      "_doc_confirmed_cause": "The diagnose+fix agent's confirmed root cause — one sentence with the causal site as path:line. Sourced from independent diagnosis, never copied from the review's recommendation.",
+      "confirmed_cause": "Write path and runtime read path disagree: TrackService.saveTrack POSTs /api/tracks but no such route is registered — the runtime reader resolves /api/track-templates (apps/ui/src/app/tracks/track.service.ts:88)",
+      "_doc_review_hypothesis_upheld": "true | false — did the review's (or reporter's) cause-guess (the defects' recommendation_hypothesis, taken together) survive independent diagnosis? false when diagnosis rejected or materially corrected it. This is the overfitting signal the Pattern Ledger wants: across efforts it measures how often review-time cause-guesses hold up. null only when the cluster arrived with no hypothesis at all (a bare BF-* report) — nothing to uphold.",
+      "review_hypothesis_upheld": true,
+      "_doc_taxonomy_class": "One of the class slugs in the shared directives registry's taxonomy.md — the authoritative list (write-no-reader | deletion-parity | claim-vs-evidence | test-hygiene | reuse-dup at the time of this template; always read the live file). Never invent a slug; a confirmed cause that fits no listed class records null, with the gap noted in the cluster's fix-summary.md entry.",
+      "taxonomy_class": "write-no-reader",
+      "_doc_fix": "One-paragraph summary of the minimal fix — files changed (path:line) + what changed at the cause. The full human record (why minimal, what was deliberately not touched) lives in fix-summary.md.",
+      "fix": "Registered the POST /api/tracks route and wired it to the existing save handler (apps/api/src/routes/tracks.routes.ts:12) — the reader now resolves the source the writer writes",
+      "_doc_findings_resolved": "The ids of every defect the proof verdict covered — CR-* for review findings, BF-* for synthesized defects. Exactly the ids whose statuses flipped accepted → fixed (BF-* ids have no status; they are listed all the same).",
+      "findings_resolved": ["CR-001", "CR-002", "CR-003", "CR-004", "CR-005", "CR-006"],
+      "_doc_proof": "tier: chain-trace | red-green (red-green under --reproduce; a reported-unreproducible defect proven by fallback keeps the cluster tier it was actually proven at). verdict is always `fixed` here — only proven clusters emit records — but is carried explicitly so the Ledger never infers it.",
+      "proof": { "tier": "chain-trace", "verdict": "fixed" },
+      "_doc_provenance": "Where this record came from, self-contained so the Distiller can ingest records across efforts and rounds without the surrounding file: the effort name, the bug-fix round number, and `review` = the effort-relative path of the findings.json the resolved findings came from (null for standalone BF-* defects with no review).",
+      "provenance": { "effort": "<effort-name>", "round": 1, "review": "04-Code-Review/findings.json" }
+    }
+  ]
+}
