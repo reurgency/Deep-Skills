@@ -33,16 +33,13 @@ scripts/load-active-cards.sh deep-docs
 
 ## The deep-* series (separation of concerns)
 
-<!-- A quintet today (deep-plan, deep-plan-review, deep-implement, deep-code-review, deep-docs).
-     It becomes a sextet once deep-bug-fix ships — the series-wiring phase reconciles the count
-     and sweeps the reciprocal table edits into the sibling skills. -->
-
 | Skill | Job | This skill's boundary |
 |---|---|---|
 | `/deep-plan` | Frame → explore → question → write the plan (resumable phases + deferreds). | Out of scope here. |
 | `/deep-plan-review` | Independently review the finished plan with fresh agents. | Out of scope here. |
-| `/deep-implement` | Execute the plan: implement → validate → fix → commit → hand-off. The only skill that writes source. | Out of scope here. |
+| `/deep-implement` | Execute the plan: implement → validate → fix → commit → hand-off. The only skill that writes source as forward construction from a plan. | Out of scope here. |
 | `/deep-code-review` | Independently review implemented code; emit findings. | Out of scope here. |
+| `/deep-bugfix` | Remediate defects: cluster → diagnose → fix at the cause → prove → contain → commit. | Out of scope here. |
 | `/deep-docs` (you) | Map what's built: survey → tier → anchor → verify → index → place a standing `docs/ai-map/`. | **Documents, never decides — changes no code in the target repo.** Runs post-build (after implement/code-review) or standalone on any repo. |
 
 ## Default-mode workflow

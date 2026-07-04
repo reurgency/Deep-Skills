@@ -1,12 +1,12 @@
 ---
 name: deep-implement
-description: Execute a finished, reviewed plan phase-by-phase — implement → validate → fix → commit → hand-off — in collaborative or autonomous mode. Use after /deep-plan (and ideally /deep-plan-review), typically just before the user enables bypass-permissions. Triggers on /deep-implement and on requests to build/execute a plan. Consumes a deep-plan artifact; it is the only deep-* skill that writes source code.
+description: Execute a finished, reviewed plan phase-by-phase — implement → validate → fix → commit → hand-off — in collaborative or autonomous mode. Use after /deep-plan (and ideally /deep-plan-review), typically just before the user enables bypass-permissions. Triggers on /deep-implement and on requests to build/execute a plan. Consumes a deep-plan artifact; it is the only deep-* skill that writes source code as forward construction from a plan (/deep-bugfix writes source as remediation).
 argument-hint: plan path, or Enter for latest · --autonomous · --worktree
 ---
 
 # DeepImplement
 
-Execute a finished plan, phase by phase — the build step of the `deep-*` series: `/deep-plan` (produce) → `/deep-plan-review` (critique) → **`/deep-implement` (execute)** → `/deep-code-review` (verify) → `/deep-docs` (map).
+Execute a finished plan, phase by phase — the build step of the `deep-*` series: `/deep-plan` (produce) → `/deep-plan-review` (critique) → **`/deep-implement` (execute)** → `/deep-code-review` (verify) (→ `/deep-bugfix` (remediate) → re-review) → `/deep-docs` (map).
 
 You are the **orchestrator**. You do not write the code yourself by default — you spawn a fresh sub-agent per phase, validate its work, drive the fix loop, commit checkpoints, and hand off to the next phase. Reuse existing machinery; don't reinvent it.
 
@@ -22,14 +22,13 @@ scripts/load-active-cards.sh deep-implement
 
 ## The deep-* series (separation of concerns)
 
-<!-- Quintet today; becomes a sextet when deep-bug-fix ships — that skill's own series-wiring adds its row here. -->
-
 | Skill | Job | This skill's boundary |
 |---|---|---|
 | `/deep-plan` | Frame → explore → question → write the plan (resumable phases + deferreds). | Out of scope here. |
 | `/deep-plan-review` | Independently review the finished plan with fresh agents. | Out of scope here. |
-| `/deep-implement` (you) | Execute the plan: implement → validate → fix → commit → hand-off. The only skill that writes source. | Execute the plan phase-by-phase: implement → validate → fix → commit → hand-off. **The only skill that writes source.** |
+| `/deep-implement` (you) | Execute the plan: implement → validate → fix → commit → hand-off. The only skill that writes source as forward construction from a plan. | Execute the plan phase-by-phase: implement → validate → fix → commit → hand-off. **The only skill that writes source as forward construction from a plan.** Executing a review fix-phase here is the **fallback** remediation route — `/deep-bugfix` is the primary executor of accepted findings. |
 | `/deep-code-review` | Independently review implemented code; emit findings. | Out of scope here. |
+| `/deep-bugfix` | Remediate defects: cluster → diagnose → fix at the cause → prove → contain → commit. | Out of scope here — it writes source as remediation, the one job this skill hands off. |
 | `/deep-docs` | Map what's built: survey → tier → anchor → verify → index → place a standing `docs/ai-map/`. | Out of scope here. |
 
 ## Inputs & flags
@@ -53,7 +52,7 @@ Every flag is **natural-language-first** — the plain-language trigger is the p
 ## Workflow
 
 ### 1. Load & assess
-Read the plan. Identify: single- vs multi-phase, which phases are already done (Phase Summaries appendix), the Deferreds ledger, and each phase's acceptance/validation criteria. Resolve mode and flags. If resuming, start at the first unfinished phase.
+Read the plan. Identify: single- vs multi-phase, which phases are already done (Phase Summaries appendix), the Deferreds ledger, and each phase's acceptance/validation criteria. Resolve mode and flags. If resuming, start at the first unfinished phase. If the target phase is a **fix-phase** appended by `/deep-code-review --triage`, note that executing it here is the **fallback route** — `/deep-bugfix` is the primary remediation executor when installed.
 
 ### 2. Set up the worktree (if `--worktree`)
 Create the isolated worktree via `/create_worktree`. Otherwise branch-first if on `main`/`develop` (see `references/commit-and-handoff.md`). Code changes go in the worktree; **plan/summary updates go to the source branch root** (reuse the story-implementer rule).

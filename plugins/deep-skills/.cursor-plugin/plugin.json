@@ -2,7 +2,7 @@
   "name": "deep-skills",
   "displayName": "Deep Skills",
   "version": "0.1.0",
-  "description": "The Deep-* series: deep-plan → deep-plan-review → deep-implement → deep-code-review → deep-docs. A steerable, fresh-agent-resumable workflow for planning, reviewing, building, and code-reviewing features, then mapping what's built — with a self-improving directive loop that learns from each review.",
+  "description": "The Deep-* series: deep-plan → deep-plan-review → deep-implement → deep-code-review (→ deep-bugfix → re-review) → deep-docs. A steerable, fresh-agent-resumable workflow for planning, reviewing, building, code-reviewing, and bug-fixing features, then mapping what's built — with a self-improving directive loop that learns from each review.",
   "author": {
     "name": "reU",
     "email": "boothe.jeff@gmail.com"

@@ -1,8 +1,10 @@
 # DeepBugFix — Design Outline
 
-> **Status:** future dev — design note, not yet planned via `/deep-plan`.
+> **Status:** built — shipped as `/deep-bugfix`, the sixth deep-* skill (plan: `.deep-skills/deep-bugfix/01-Plan/plan.md`).
 > **Authored:** 2026-06-15 · seeded from the discussion that asked "what makes a DeepBugFix more valuable than re-running DeepImplement on the findings?"
-> **One-liner:** A 5th deep-* skill that does **diagnosis-first remediation of existing behavior under regression risk** — root-cause clustering, proof-of-fix, and blast-radius containment that `/deep-implement` structurally lacks.
+> **One-liner:** A deep-* skill that does **diagnosis-first remediation of existing behavior under regression risk** — root-cause clustering, proof-of-fix, and blast-radius containment that `/deep-implement` structurally lacks.
+
+> **Naming note:** the skill was renamed to **deep-bugfix** (one word); the historical `deep-bug-fix` / `DeepBugFix` spelling is retained in the body below.
 
 ---
 

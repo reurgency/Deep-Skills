@@ -38,9 +38,9 @@ scripts/load-active-cards.sh deep-bugfix
 | `/deep-bugfix` (you) | Remediate defects: cluster → diagnose → fix at the cause → prove → contain → commit. | **Fixes code only — never makes triage decisions, never edits the plan.** Consumes `accepted` findings (or *scopes* `open` ones — scoping ≠ triage); touches neither `deferred` nor `rejected`. |
 | `/deep-docs` | Map what's built: survey → tier → anchor → verify → index → place a standing `docs/ai-map/`. | Out of scope here. |
 
-## Artifact wiring — this section supersedes the shared template until Phase 5
+## Artifact wiring
 
-Artifacts live in `.deep-skills/<effort>/06-Bug-Fix/round-N/` (rounds are append-only; next round = max existing round + 1). The copied `references/artifact-structure.md` still shows a stale pre-round `06-Bug-Fix/report.md` row — **until the Phase 5 series-wide update lands, the wiring below supersedes that row; never follow the stale template**:
+Artifacts live in `.deep-skills/<effort>/06-Bug-Fix/round-N/` (rounds are append-only; next round = max existing round + 1), per the shared `references/artifact-structure.md` `06-Bug-Fix` row. Concretely:
 
 - `round-N/scope.json` — written at round start, before any cluster work: the selected defect ids + provisional cluster plan (the resume record).
 - `round-N/fix-summary.md` — one record per cluster (`templates/fix-summary.md`), **appended incrementally as each cluster closes**, never batched to the end.

@@ -34,7 +34,7 @@
 
 ### Blockers
 
-> A fresh review leaves Blockers at status `open` like everything else; they auto-accept (no decision) when `/deep-code-review --triage` is run. Flagged here, and in the certificate verdict, so the user knows a fix-phase is owed.
+> A fresh review leaves Blockers at status `open` like everything else; they auto-accept (no decision) when `/deep-code-review --triage` is run. Flagged here, and in the certificate verdict, so the user knows a fix is owed.
 
 - **[CR-NNN · <lens>] <title>** — severity N/10
   - Evidence: <path:line / symbol / observed behavior; last-mile findings include the hop-by-hop chain>
@@ -48,7 +48,7 @@
   - Evidence: <…>
   - Impact: <…>
   - Recommendation: <…>
-  - Status: open  <!-- review run writes `open`; --triage changes it to accepted → fix-phase | deferred → Deferreds ledger | rejected by user -->
+  - Status: open  <!-- review run writes `open`; --triage changes it to accepted → /deep-bugfix (fix-phase fallback) | deferred → Deferreds ledger | rejected by user -->
 
 ### Minor
 
@@ -80,11 +80,14 @@ Minor+ findings carry a verdict; sev ≤4 findings are unverified (below the ver
 
 <!--
 Triage-resolution rules:
-- Blockers (severity 9–10) skip triage: status "accepted (auto — Blocker) → fix-phase"; the user is informed, not asked.
+- Blockers (severity 9–10) skip triage: status "accepted (auto — Blocker)"; the user is informed, not asked.
 - Every other finding is triaged with the user, three outcomes:
-  - fix    → added to the fix-phase appended to the plan; status "accepted → fix-phase".
+  - fix    → status "accepted"; the accepted set hands off to /deep-bugfix (the primary remediation
+             executor). Fallback only, when /deep-bugfix isn't installed: a fix-phase is appended to
+             the plan for /deep-implement; status "accepted → fix-phase".
   - defer  → added to the plan's Deferreds ledger (What / Why deferred / Integration); status "deferred → Deferreds ledger".
   - reject → stays listed with status "rejected by user" so the decision is on record.
 - Statuses here mirror findings.json (numeric severity is canonical there; tiers are presentation vocabulary).
-- After /deep-implement executes the fix-phase, accepted findings may be updated to "fixed".
+- After /deep-bugfix proves a fix (or, on the fallback route, /deep-implement executes the fix-phase),
+  accepted findings are updated to "fixed".
 -->

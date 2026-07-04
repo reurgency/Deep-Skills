@@ -22,14 +22,13 @@ scripts/load-active-cards.sh deep-plan
 
 ## The deep-* series (separation of concerns)
 
-<!-- Quintet today; becomes a sextet when deep-bug-fix ships — that skill's own series-wiring adds its row here. -->
-
 | Skill | Job | This skill's boundary |
 |---|---|---|
 | `/deep-plan` (you) | Frame → explore → question → write the plan (resumable phases + deferreds). | Stop after the plan (+ optional /columbo). **No code edits** — you only frame and structure the work. |
 | `/deep-plan-review` | Independently review the finished plan with fresh agents. | Out of scope here. |
-| `/deep-implement` | Execute the plan: implement → validate → fix → commit → hand-off. The only skill that writes source. | Out of scope here. |
+| `/deep-implement` | Execute the plan: implement → validate → fix → commit → hand-off. The only skill that writes source as forward construction from a plan. | Out of scope here. |
 | `/deep-code-review` | Independently review implemented code; emit findings. | Out of scope here. |
+| `/deep-bugfix` | Remediate defects: cluster → diagnose → fix at the cause → prove → contain → commit. | Out of scope here. |
 | `/deep-docs` | Map what's built: survey → tier → anchor → verify → index → place a standing `docs/ai-map/`. | Out of scope here. |
 
 ## In-session commands — watch for these at EVERY step

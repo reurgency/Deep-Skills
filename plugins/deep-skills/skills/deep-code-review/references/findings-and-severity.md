@@ -50,16 +50,16 @@ Conventional starting points for **deterministic pre-pass** results (must match 
 
 | Tier | Action |
 |---|---|
-| **Blocker** (9–10) | **Auto-accept at triage — no decision needed.** A Blocker is by definition not optional. When `--triage` runs, it is routed straight into the fix-phase appended to the plan (or the no-plan plan stub), status set to `accepted`, and the **user is informed** that this happened. (The review run itself only flags it as a Blocker in the certificate verdict — it does not route or write the plan.) |
+| **Blocker** (9–10) | **Auto-accept at triage — no decision needed.** A Blocker is by definition not optional. When `--triage` runs, its status is set to `accepted` and it joins the set routed to `/deep-bugfix` (or, fallback only when that skill isn't installed, the fix-phase appended to the plan / the no-plan plan stub), and the **user is informed** that this happened. (The review run itself only flags it as a Blocker in the certificate verdict — it does not route or write the plan.) |
 | **Major / Minor / Nit** (1–8) | **HITL triage**, finding by finding, with exactly three outcomes (below). |
 
 Triage outcomes for non-Blockers:
 
-- **fix** → the finding joins the fix-phase appended to the plan; status `accepted`.
+- **fix** → status `accepted`; the accepted set hands off to `/deep-bugfix` (fallback only, when it isn't installed: the finding joins the fix-phase appended to the plan for `/deep-implement`).
 - **defer** → the finding is added to the plan's **Deferreds** ledger (What / Why deferred / Integration); status `deferred`.
 - **reject** → the finding stays in the report and findings.json with status **`rejected by user`** — the decision stays on record; it is not silently dropped.
 
-Statuses through the lifecycle: `open` (pre-triage) → `accepted` | `deferred` | `rejected by user`; after `/deep-implement` executes the fix-phase, accepted findings may be marked `fixed`.
+Statuses through the lifecycle: `open` (pre-triage) → `accepted` | `deferred` | `rejected by user`; after `/deep-bugfix` proves a fix (or, on the fallback route, `/deep-implement` executes the fix-phase), accepted findings are marked `fixed`.
 
 ## Presentation order (report.md)
 

@@ -2,7 +2,8 @@
      `.deep-skills/<effort>/04-Code-Review/certificate.md` by the REVIEW RUN, with the
      Triage outcomes table left pending. The separate `--triage` step fills that table.
      Verdict rule: PASS only when no Blockers exist (a fresh review with any Blocker is
-     FAIL until --triage routes it and /deep-implement fixes it). Scope line verbatim. -->
+     FAIL until --triage routes it and /deep-bugfix fixes it — or /deep-implement executes
+     the fix-phase fallback when /deep-bugfix isn't installed). Scope line verbatim. -->
 
 # Code Review Certificate — <effort-name>
 
@@ -31,8 +32,8 @@
 
 | Outcome | Count |
 |---|---|
-| Fixed / accepted → fix-phase | N |
+| Fixed / accepted → `/deep-bugfix` (fix-phase fallback) | N |
 | Deferred → Deferreds ledger | N |
 | Rejected by user | N |
 
-<one-line pointer: fix-phase appended to [plan.md](../01-Plan/plan.md) | report-only, no accepted findings>
+<one-line pointer: accepted findings handed to /deep-bugfix (statuses flip to `fixed` as it proves each fix) | fix-phase appended to [plan.md](../01-Plan/plan.md) — fallback, /deep-bugfix not installed | report-only, no accepted findings>
