@@ -12,7 +12,7 @@ Per cluster:
    - *Redirect* → relay to the cluster agent, re-present (counts against the attempt cap only if a fix was applied and failed proof).
    - *Skip* → record a skipped entry in `fix-summary.md`, statuses untouched, next cluster.
 3. On approval: apply fix → adversarial proof → containment.
-4. **Gate 2 — present**: the diff, the proof verdict (chain available via `/show-proof`), the containment result. Commit **only if the user asks**; then flip statuses, append the fix-summary record, continue.
+4. **Gate 2 — present**: the diff, the proof verdict (chain available via `/show-proof`), the containment result. Commit **only if the user asks**; flip statuses and append the fix-summary record **either way** — they follow the `fixed` verdict, not the commit decision — then continue.
 5. No notifications needed — the user is present.
 
 ## Autonomous

@@ -50,7 +50,7 @@ The skill is a resumable multi-round flow. On every start:
 1. **Detect prior rounds:** scan `06-Bug-Fix/round-*/`. **Round numbering: next round = max existing round + 1.** Rounds are **append-only** — never rewrite or renumber a prior round's artifacts.
 2. **Re-entry check:** if the latest round's `scope.json` lists clusters not yet closed in that round's `fix-summary.md`, offer three options: **resume** the round / start a **new round** / **abort**.
 3. **Resume** = `scope.json` minus defects already `fixed` in `findings.json` — this recovers scoped-in `open` findings and synthesized `BF-*` defects that statuses alone cannot reconstruct. A crashed run leaves at worst one unproven cluster's edits in the working tree; the resumed cluster is **re-diagnosed from scratch** (its agent's state is gone — evidence + the leftover diff are re-read), counting as attempt 1 of the cap.
-4. **Duplicate-run guard:** intake always excludes `fixed` findings, so re-running on the same effort selects only unresolved work — a double invocation cannot re-fix or double-commit a closed cluster (its commit exists; its summary record exists).
+4. **Duplicate-run guard:** intake always excludes `fixed` findings, so re-running on the same effort selects only unresolved work — a double invocation cannot re-fix or double-commit a closed cluster (its summary record exists; its commit exists if the user asked for one).
 
 ## Hand-off to re-review
 
