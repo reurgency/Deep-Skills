@@ -33,7 +33,7 @@ scripts/load-active-cards.sh deep-bugfix
 |---|---|---|
 | `/deep-plan` | Frame → explore → question → write the plan (resumable phases + deferreds). | Out of scope here. |
 | `/deep-plan-review` | Independently review the finished plan with fresh agents. | Out of scope here. |
-| `/deep-implement` | Execute the plan: implement → validate → fix → commit → hand-off — forward construction from a plan. | Out of scope here. |
+| `/deep-implement` | Execute the plan: implement → validate → fix → commit → hand-off. The only skill that writes source as forward construction from a plan. | Out of scope here. |
 | `/deep-code-review` | Independently review implemented code; emit findings. Triage (`--triage`) decides fix/defer/reject. | Out of scope here — **triage decisions stay there.** |
 | `/deep-bugfix` (you) | Remediate defects: cluster → diagnose → fix at the cause → prove → contain → commit. | **Fixes code only — never makes triage decisions, never edits the plan.** Consumes `accepted` findings (or *scopes* `open` ones — scoping ≠ triage); touches neither `deferred` nor `rejected`. |
 | `/deep-docs` | Map what's built: survey → tier → anchor → verify → index → place a standing `docs/ai-map/`. | Out of scope here. |
