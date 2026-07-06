@@ -1,7 +1,7 @@
 ---
 name: deep-bugfix
 description: Diagnosis-first remediation of triaged findings (or any bug report / failing test) under regression risk — cluster defects by shared root cause, re-diagnose independently of the review's hypothesis, fix minimally at the confirmed cause, prove the fix with a fresh adversarial agent, and contain the blast radius before committing. Use after /deep-code-review --triage, or standalone on a bug report / stack trace / failing test. Triggers on /deep-bugfix and on requests to fix triaged findings, remediate review findings, or fix a reported bug. Fixes code only — it never makes triage decisions and never edits the plan.
-argument-hint: findings.json / bug report / failing test, or Enter for latest triaged findings · --autonomous · --reproduce · --worktree · --learn
+argument-hint: findings.json / bug report / failing test, or Enter for latest review findings · --autonomous · --reproduce · --worktree · --learn
 ---
 
 # DeepBugFix
@@ -51,7 +51,7 @@ Artifacts live in `.deep-skills/<effort>/06-Bug-Fix/round-N/` (rounds are append
 
 Every flag is **natural-language-first** — the plain-language trigger is the primary path (users on Copilot/Codex have no CLI flags); the `--flag` is a convenience layered on top. Always accept the natural-language form.
 
-- **input** — any of: a `findings.json` path or "the triaged findings" (default: the most recent `.deep-skills/*/04-Code-Review/findings.json` with `accepted` findings), a pasted bug report / stack trace, or a failing-test reference. Normalization + scope rules: `references/intake.md`.
+- **input** — any of: a `findings.json` path or "the triaged findings" (default: the most recent `.deep-skills/*/04-Code-Review/findings.json` with actionable — `accepted` or `open` — findings; state which effort was resolved before work starts), a pasted bug report / stack trace, or a failing-test reference. Normalization + scope rules: `references/intake.md`.
 - **Just fix them all / run unattended** (`--autonomous`) or **check in with me per cluster** (`--collaborative`) — execution mode. If omitted on a multi-cluster run, **ask** (see `references/execution-modes.md`).
 - **Fix it with a reproducing test** (`--reproduce`) — upgrade proof from static chain-trace to a dynamic red→green test: written **before** the fix, observed failing pre-fix and passing post-fix (the proof agent re-runs both directions itself), committed into the host suite riding the cluster's fix commit. Genuinely unreproducible ⇒ reported + chain-trace fallback, never a silent skip. Protocol: `references/proof-of-fix.md`.
 - **Fix in a worktree** (`--worktree`) — isolate fix work in a git worktree: prefer the host's worktree command when present, else plain `git worktree add`. Code + reproduction tests stay in the worktree branch; effort artifacts (fix-summary, manifest, findings statuses) go to the source branch root; at completion the branch is offered for merge/PR. Default stays current-branch. Rules: `references/commit-and-handoff.md`.

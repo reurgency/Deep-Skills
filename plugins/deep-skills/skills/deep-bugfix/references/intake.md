@@ -6,7 +6,7 @@ Every run starts by normalizing whatever the user brought into a **uniform defec
 
 | Invocation | Source |
 |---|---|
-| `/deep-bugfix` (no args) / "fix the triaged findings" | The most recent `.deep-skills/*/04-Code-Review/findings.json` containing `accepted` findings (explicit path always honored) |
+| `/deep-bugfix` (no args) / "fix the triaged findings" | The most recent `.deep-skills/*/04-Code-Review/findings.json` containing actionable (`accepted` or `open`) findings — resolution order under **Scope rules** below (explicit path always honored) |
 | A pasted bug report / stack trace / "users report X breaks" | The report text itself |
 | A failing-test reference ("`foo.test.ts` is red", a CI failure) | The test file + its captured failure output |
 
@@ -32,6 +32,7 @@ Field names mirror `finding.json` (deep-code-review's machine shape) so findings
 
 ## Scope rules — what enters the round
 
+- **No-args resolution (which findings.json):** an explicit path always wins. Otherwise resolve to the **most recent** `.deep-skills/*/04-Code-Review/findings.json` containing actionable findings — `accepted` or `open`. Recency picks the file; its contents pick the branch below — **never skip a newer open-only review to reach an older effort's `accepted` set.** If no findings.json anywhere has actionable findings, say so and ask for an input (path / bug report / failing test). Before any round work, state which effort's findings.json was resolved and why (e.g. "Resolved: `.deep-skills/<effort>/04-Code-Review/findings.json` — N `accepted`").
 - **Series mode (accepted findings exist):** load exactly the `accepted` set. Triage already decided; **never re-ask, never widen** into `open`/`deferred`/`rejected`. Already-`fixed` findings are excluded automatically — the duplicate-run guard that makes re-entry idempotent.
 - **Only `open` findings exist** (review ran, triage didn't): present an interactive **scope pick**, findings grouped by tier (Blockers first), via the host's structured-question affordance or its numbered-list fallback (`references/host-affordances.md`). **Selection is scoping, not triage** — say so when asking. Selected findings enter the round; unselected findings keep status `open`, untouched.
 - **No effort exists** (standalone bug report / failing test, mid-series entry): ask the user for an effort name, **defaulting to the slugified current branch name**; create `.deep-skills/<effort>/` and `00-Manifest/manifest.md` (any deep-* skill owns manifest creation on first write — see `references/artifact-structure.md`).
