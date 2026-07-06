@@ -2,18 +2,22 @@
 
 A self-paced curriculum for the **Deep-\*** series: a steerable, fresh-agent-resumable
 workflow that takes a feature from idea to verified code. By the end you will be able to
-drive each skill on real work, know *why* each guardrail exists, and chain all five — from one
+drive each skill on real work, know *why* each guardrail exists, and chain all six — from one
 clean idea→merge loop to a standing map of what you built.
 
 ```
-/deep-plan  ──▶  /deep-plan-review  ──▶  /deep-implement  ──▶  /deep-code-review  ──▶  /deep-docs
-  produce         critique                execute               verify                 orient
+/deep-plan ─▶ /deep-plan-review ─▶ /deep-implement ─▶ /deep-code-review ─▶ /deep-bugfix ─▶ /deep-docs
+  produce      critique             execute            verify               remediate       orient
 ```
+
+> The tight remediation loop lives inside this chain: **review → triage → bug-fix → re-review**.
+> `/deep-bugfix` is the fifth skill — the dedicated executor for fixing defects, distinct from
+> `/deep-implement` which only builds new features.
 
 > **Prefer a browsable version?** An HTML edition of this whole program lives in
 > [`html/`](html/index.html) — open [`html/index.html`](html/index.html) in a browser. It folds
-> the curriculum *and* the [design rationale](design-rationale/index.md) into one styled,
-> per-skill "episode" set.
+> the curriculum *and* the [design rationale](design-rationale/index.md) into one styled
+> page per skill.
 
 ---
 
@@ -36,7 +40,8 @@ vocabulary from earlier ones.
 | 2 | `/deep-plan-review` | [deep-plan-review.md](deep-plan-review.md) | Independently critique a plan with fresh, codebase-aware agents. |
 | 3 | `/deep-implement` | [deep-implement.md](deep-implement.md) | Orchestrate phase-by-phase execution with bounded fix loops and checkpoints. |
 | 4 | `/deep-code-review` | [deep-code-review.md](deep-code-review.md) | Run multi-agent, evidence-gated review that catches the last mile. |
-| 5 | `/deep-docs` | [deep-docs.md](deep-docs.md) | Generate context-window-aware, anchored, verified documentation of what's been built. |
+| 5 | `/deep-bugfix` | [deep-bugfix.md](deep-bugfix.md) | Remediate defects diagnosis-first: cluster → diagnose → fix at the cause → prove → contain. |
+| 6 | `/deep-docs` | [deep-docs.md](deep-docs.md) | Generate context-window-aware, anchored, verified documentation of what's been built. |
 
 > New to the repo? Read the root [`README.md`](../../README.md) first for install and layout,
 > then come back here.
@@ -50,10 +55,11 @@ Four ideas recur across every skill. Internalize them once and the rest follows.
 ### 1. Separation of concerns — one skill, one job
 The pipeline is deliberately split so no skill does two things. `/deep-plan` **only**
 plans (no code edits). `/deep-plan-review` **only** critiques the plan. `/deep-implement`
-is the **only** skill that writes source. `/deep-code-review` **only** reviews code (and
-even splits *reviewing* from *triaging*). When a skill is tempted to cross its boundary, it
-stops and points you to the right sibling. Learning the boundaries is half of learning the
-system.
+is the **only** skill that writes *new* source from a spec. `/deep-code-review` **only** reviews
+code (and even splits *reviewing* from *triaging*). `/deep-bugfix` **only** remediates defects —
+it fixes code but never makes a triage decision and never edits the plan. When a skill is
+tempted to cross its boundary, it stops and points you to the right sibling. Learning the
+boundaries is half of learning the system.
 
 ### 2. Fresh-agent resumability — write for someone with no memory
 Every artifact is written so that **a fresh agent with only the artifact + the repo can
@@ -66,7 +72,10 @@ almost everything you produce.
 Both review skills run in **fresh agents that never see the upstream transcript**. The
 planner and the implementer are too close to their own work to see its blind spots; the
 reviewer is briefed with the artifact + codebase + your recorded preferences, but *not* the
-argument that produced it. Independence is the source of the catch.
+argument that produced it. Independence is the source of the catch. `/deep-bugfix` **tunes**
+this rule rather than dropping it: diagnosis and fix share one agent (bug-fixing needs
+continuity — the agent that finds the cause authors the fix), but a **separate, fresh
+adversarial agent** must prove the fix. The fixer never marks its own homework.
 
 ### 4. The last mile + evidence
 The signature failure the system hunts is the **last-mile problem**: code where the
@@ -90,6 +99,7 @@ directory. Knowing this layout makes the whole pipeline legible:
   03-Implementation/  summary.md    ← /deep-implement
   04-Code-Review/     report.md · findings.json · certificate.md  ← /deep-code-review
   05-Security/        (reserved for a future /deep-security)
+  06-Bug-Fix/         round-N/ scope.json · fix-summary.md · (root-causes.json)  ← /deep-bugfix
   07-Docs/            pointer + manifest line  ← /deep-docs (effort mode)
 ```
 
@@ -104,6 +114,10 @@ any effort.
 ---
 
 ## Deep-Learn — the self-improving directive loop
+
+> **The full deep-dive lives on its own page:** [deep-learn.md](deep-learn.md) (HTML edition:
+> [`html/deep-learn.html`](html/deep-learn.html)). Self-learning is how the series **adapts to
+> your codebase, conventions, and stack** — it earns a dedicated page.
 
 The skills themselves never change to encode a lesson. Instead, recurring issue classes are
 distilled into toggleable **directive cards** — structured data in
@@ -132,17 +146,20 @@ have surfaced ~100% of PR#65's review severity at *plan* time. The
 3. **[deep-plan-review](deep-plan-review.md)** — review that plan; fold findings back in.
 4. **[deep-implement](deep-implement.md)** — execute it in collaborative mode.
 5. **[deep-code-review](deep-code-review.md)** — review the result; run `--triage`.
-6. **[deep-docs](deep-docs.md)** — map what you built; confirm every anchor verifies.
-7. **Capstone** (below) — run all five end-to-end on one feature, unassisted.
+6. **[deep-bugfix](deep-bugfix.md)** — remediate the accepted findings; prove each fix; re-review.
+7. **[deep-docs](deep-docs.md)** — map what you built; confirm every anchor verifies.
+8. **Capstone** (below) — run all six end-to-end on one feature, unassisted.
 
 ### Capstone exercise
 
-Pick a small, real feature in a repo you know. Run the full loop:
+Pick a small, real feature in a repo you know. Run the full six-skill loop:
 
 - `/deep-plan` it (choose an effort name; produce a resumable plan with a Data-Flow Contract).
 - `/deep-plan-review` it in `--multi-agent` mode; apply accepted fixes to the plan.
 - `/deep-implement` it collaboratively, one phase at a time.
 - `/deep-code-review` the branch, then `/deep-code-review --triage`.
+- `/deep-bugfix` the accepted findings — cluster, diagnose, prove each fix, contain — then
+  `/deep-code-review` again to confirm the re-review is clean.
 - `/deep-docs` the result — generate the `docs/ai-map/` and confirm every anchor verifies.
 
 **You've mastered the system when:** a teammate can open only your
@@ -164,6 +181,10 @@ what was reviewed, and what remains deferred.
 | **Directive card** | A human-gated, toggleable learned improvement loaded as data at runtime. |
 | **Manifest** | `00-Manifest/manifest.md`, the per-effort stage-status index. |
 | **Triage** | The opt-in `--triage` step that decides fix/defer/reject and writes to the plan. |
+| **Cluster** | A group of defects sharing one root cause, fixed by a single change (deep-bugfix). |
+| **Proof-of-fix** | A fresh adversarial agent's verdict (`fixed`/`unproven`/`regressed`) — static chain-trace by default, red→green test under `--reproduce`. |
+| **Containment** | Blast-radius check: run the changed symbols' dependents' tests; block only on *new* failures. |
+| **Claimed fix** | deep-bugfix's signature failure: a change that silences the symptom without addressing the cause, or abandons a cluster sibling. |
 | **AI map** | `docs/ai-map/`, deep-docs' standing, machine-owned, tiered documentation of what's built. |
 | **Anchor** | A `path:line (symbol)` reference backing a doc claim; symbol-primary, verified before publish. |
 | **Tier-0** | deep-docs' always-loaded `MAP.md` + `index.json`, held under a hard token ceiling. |

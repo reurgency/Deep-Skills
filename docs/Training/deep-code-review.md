@@ -1,6 +1,6 @@
 # Training: `/deep-code-review`
 
-> Part of the [Deep Skills Training Program](README.md). Skill 4 of 5 — **verify**.
+> Part of the [Deep Skills Training Program](README.md). Skill 4 of 6 — **verify**.
 > Source: [`plugins/deep-skills/skills/deep-code-review/SKILL.md`](../../plugins/deep-skills/skills/deep-code-review/SKILL.md)
 
 `/deep-code-review` independently reviews **implemented code** the way `/deep-plan-review`
@@ -204,6 +204,6 @@ itself load cards at runtime the way the first three do.) See the
 | Lenses | Correctness · Last-Mile · Plan Conformance · Coherence |
 | Pass | No Blockers |
 | Hard rules | Review never edits source or the plan; only `--triage` writes to the plan; never Haiku in the pipeline |
-| Loops back to | [`/deep-implement`](deep-implement.md) (executes the triaged fix-phase) |
+| Loops back to | [`/deep-bugfix`](deep-bugfix.md) (remediates the accepted findings) |
 
-➡ **Next:** [Training: `/deep-docs`](deep-docs.md)
+➡ **Next:** [Training: `/deep-bugfix`](deep-bugfix.md)

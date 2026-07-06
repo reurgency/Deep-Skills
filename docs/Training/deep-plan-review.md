@@ -1,6 +1,6 @@
 # Training: `/deep-plan-review`
 
-> Part of the [Deep Skills Training Program](README.md). Skill 2 of 5 — **critique**.
+> Part of the [Deep Skills Training Program](README.md). Skill 2 of 6 — **critique**.
 > Source: [`plugins/deep-skills/skills/deep-plan-review/SKILL.md`](../../plugins/deep-skills/skills/deep-plan-review/SKILL.md)
 
 `/deep-plan-review` independently reviews a **finished plan** and surfaces where it

@@ -1,6 +1,6 @@
 # Training: `/deep-docs`
 
-> Part of the [Deep Skills Training Program](README.md). Skill 5 of 5 — **orient**.
+> Part of the [Deep Skills Training Program](README.md). Skill 6 of 6 — **orient**.
 > Source: [`plugins/deep-skills/skills/deep-docs/SKILL.md`](../../plugins/deep-skills/skills/deep-docs/SKILL.md)
 > Design rationale: [`design-rationale/deep-docs.md`](design-rationale/deep-docs.md)
 

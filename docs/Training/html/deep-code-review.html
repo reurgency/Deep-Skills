@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Episode 4 · deep-code-review — Deep Skills Training</title>
+<title>Skill 4 · deep-code-review — Deep Skills Training</title>
 <meta name="description" content="Run multi-agent, evidence-gated review that catches the last mile — and learn why review is split from triage, why findings stay open, and why the pipeline bans Haiku.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,13 +24,14 @@
       <a href="deep-plan-review.html">2 · Review</a>
       <a href="deep-implement.html">3 · Implement</a>
       <a href="deep-code-review.html" class="active">4 · Code review</a>
-      <a href="deep-docs.html">5 · Docs</a>
+      <a href="deep-bugfix.html">5 · Bug-fix</a>
+      <a href="deep-docs.html">6 · Docs</a>
     </div>
   </div>
 </nav>
 
 <section class="hero wrap narrow">
-  <div class="ep-badge"><span class="pill">EPISODE 4</span><span class="label">Verify</span></div>
+  <div class="ep-badge"><span class="pill">SKILL 4</span><span class="label">Verify</span></div>
   <h1><span class="grad">deep-code-review</span></h1>
   <p class="kicker"><code>/deep-code-review</code> independently reviews <b>implemented code</b> the way plan-review reviews a plan: fresh agents, evidence-required findings, a clean report. Its signature concern is the <b>last-mile problem</b>. <b>Review only — never edits source.</b> Triage is a separate, opt-in step.</p>
   <div class="chips center" style="justify-content:center">
@@ -63,7 +64,7 @@
 <main>
 
 <section class="sec tight" id="objectives">
-  <div class="sec-tag">In this episode</div>
+  <div class="sec-tag">In this skill</div>
   <h2>Learning objectives</h2>
   <div class="obj">
     <div class="o"><span class="i">1</span><p>Resolve and <b>state the scope</b> of a diff before launching anything, asking on ambiguity.</p></div>
@@ -386,14 +387,14 @@
       <dt>Lenses</dt><dd>Correctness · Last-Mile · Plan Conformance · Coherence</dd>
       <dt>Pass</dt><dd>No Blockers</dd>
       <dt>Hard rules</dt><dd>Review never edits source or the plan; only <code>--triage</code> writes to the plan; never Haiku in the pipeline</dd>
-      <dt>Loops back to</dt><dd><a href="deep-implement.html">/deep-implement</a> (executes the triaged fix-phase)</dd>
+      <dt>Loops back to</dt><dd><a href="deep-bugfix.html">/deep-bugfix</a> (remediates the accepted findings)</dd>
     </dl>
   </div>
 </section>
 
 <div class="epnav">
   <a href="deep-implement.html"><span class="dir">← Previous</span><span class="ttl">deep-implement</span><span class="cmd">/deep-implement</span></a>
-  <a class="next" href="deep-docs.html"><span class="dir">Next episode →</span><span class="ttl">deep-docs</span><span class="cmd">/deep-docs</span></a>
+  <a class="next" href="deep-bugfix.html"><span class="dir">Next skill →</span><span class="ttl">deep-bugfix</span><span class="cmd">/deep-bugfix</span></a>
 </div>
 
 </main>
@@ -402,8 +403,8 @@
 
 <footer>
   <div class="wrap">
-    <span>Episode 4 of 5 · deep-code-review · Verify</span>
-    <span><a href="index.html">All episodes</a></span>
+    <span>Skill 4 of 6 · deep-code-review · Verify</span>
+    <span><a href="index.html">All skills</a></span>
   </div>
 </footer>
 

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Deep Skills — Training Series</title>
-<meta name="description" content="A self-paced training series for the Deep-* skills: plan → plan-review → implement → code-review → docs. Learn to drive each skill and understand why every guardrail exists.">
+<meta name="description" content="A self-paced training series for the Deep-* skills: plan → plan-review → implement → code-review → bug-fix → docs. Learn to drive each skill and understand why every guardrail exists.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -21,7 +21,7 @@
     <div class="navlinks">
       <a href="#pipeline">Pipeline</a>
       <a href="#mental-model">Mental model</a>
-      <a href="#episodes">Episodes</a>
+      <a href="#episodes">Skills</a>
       <a href="#artifacts">Artifacts</a>
       <a href="#deep-learn">Deep-Learn</a>
     </div>
@@ -32,10 +32,10 @@
 <section class="hero wrap">
   <span class="eyebrow">● Self-paced curriculum</span>
   <h1>The Deep Skills<br><span class="grad">Training Series</span></h1>
-  <p class="kicker">Five episodes that take you from <b>idea</b> to <b>verified code</b> — and a standing map of what you built — teaching you to <b>drive</b> each skill and understand <b>why every guardrail exists</b>.</p>
+  <p class="kicker">Six skills that take you from <b>idea</b> to <b>verified code</b> — and a standing map of what you built — teaching you to <b>drive</b> each skill and understand <b>why every guardrail exists</b>.</p>
   <div class="cta-row">
-    <a class="btn primary" href="deep-plan.html">Start Episode 1 →</a>
-    <a class="btn ghost" href="#episodes">Browse all episodes</a>
+    <a class="btn primary" href="deep-plan.html">Start with Skill 1 →</a>
+    <a class="btn ghost" href="#episodes">Browse all skills</a>
   </div>
 </section>
 
@@ -44,9 +44,9 @@
   <span class="anchor" id="pipeline-a"></span>
   <div class="sec-tag">The one-loop overview</div>
   <h2>One clean idea&nbsp;→&nbsp;merge loop</h2>
-  <p class="lead">The Deep-* series is four skills, each doing exactly one job. They chain into a single workflow — and each one hands a <b>self-contained artifact</b> to the next, so a fresh agent could pick up anywhere.</p>
+  <p class="lead">The Deep-* series is six skills, each doing exactly one job. They chain into a single workflow — and each one hands a <b>self-contained artifact</b> to the next, so a fresh agent could pick up anywhere. The tight remediation loop lives inside the chain: <b>review → triage → bug-fix → re-review</b>.</p>
 
-  <div class="relay reveal">
+  <div class="relay trio reveal">
     <a class="phase p1" href="deep-plan.html">
       <span class="num">01</span><span class="verb">Produce</span>
       <h3>Plan</h3>
@@ -71,18 +71,30 @@
       <span class="cmd">/deep-code-review</span>
       <p>Multi-agent, evidence-gated review that catches the last mile. Review and triage are split.</p>
     </a>
+    <a class="phase p5" href="deep-bugfix.html">
+      <span class="num">05</span><span class="verb">Remediate</span>
+      <h3>Bug-fix</h3>
+      <span class="cmd">/deep-bugfix</span>
+      <p>Diagnosis-first remediation: cluster by cause, prove the fix with a fresh agent, contain the blast radius. Never triages.</p>
+    </a>
+    <a class="phase p6" href="deep-docs.html">
+      <span class="num">06</span><span class="verb">Orient</span>
+      <h3>Docs</h3>
+      <span class="cmd">/deep-docs</span>
+      <p>The orientation layer: a standing, tiered map of what the loop produced — every claim anchored to <code>path:line</code> and verified.</p>
+    </a>
   </div>
 
   <div class="callout note" style="margin-top:30px">
     <span class="t">Who this is for</span>
-    <p>Engineers who will <b>use</b> the deep-skills on their own features, and maintainers who will <b>extend</b> them. No prior exposure to the plugin is assumed — you should be comfortable with Claude Code, git, and reading a codebase. A fifth skill, <a href="deep-docs.html">deep-docs</a>, is the orientation layer that maps what the loop produced.</p>
+    <p>The Deep-* series is for engineers who will <b>use</b> the skills on their own features, and maintainers who will <b>extend</b> them. No prior exposure to the plugin is assumed — you should be comfortable with Claude Code, git, and reading a codebase. Each skill does exactly one job and hands a self-contained artifact to the next, so you can adopt the whole loop or reach for a single skill on its own.</p>
   </div>
 </section>
 
 <!-- ===================== MENTAL MODEL ===================== -->
 <section class="sec wrap" id="mental-model">
   <span class="anchor" id="mm"></span>
-  <div class="sec-tag">Watch this before any episode</div>
+  <div class="sec-tag">Read this before any skill</div>
   <h2>Four ideas that recur everywhere</h2>
   <p class="lead">Internalize these once and every per-skill decision reads as an instance of a few ideas. This is the spine of the whole series.</p>
 
@@ -90,7 +102,7 @@
     <div class="card reveal">
       <span class="k">PRINCIPLE 01</span>
       <h3>One skill, one job</h3>
-      <p>The pipeline is split so no skill does two things. Plan only plans. Plan-review only critiques. Implement is the <b>only</b> writer of source. Code-review only reviews — and even splits <i>reviewing</i> from <i>triaging</i>. When a skill is tempted to cross its boundary, it stops and points you to the right sibling.</p>
+      <p>The pipeline is split so no skill does two things. Plan only plans. Plan-review only critiques. Implement is the <b>only</b> writer of new source. Code-review only reviews — and even splits <i>reviewing</i> from <i>triaging</i>. Bug-fix only remediates — it fixes code but never triages and never edits the plan. When a skill is tempted to cross its boundary, it stops and points you to the right sibling.</p>
     </div>
     <div class="card reveal">
       <span class="k">PRINCIPLE 02</span>
@@ -100,7 +112,7 @@
     <div class="card reveal">
       <span class="k">PRINCIPLE 03</span>
       <h3>Independence through fresh eyes</h3>
-      <p>Both review skills run in fresh agents that <b>never see the upstream transcript</b>. The planner and the implementer are too close to their own work to see its blind spots; the reviewer gets the artifact + codebase + your recorded preferences, but not the argument that produced it. Independence is the source of the catch.</p>
+      <p>Both review skills run in fresh agents that <b>never see the upstream transcript</b>. The planner and the implementer are too close to their own work to see its blind spots; the reviewer gets the artifact + codebase + your recorded preferences, but not the argument that produced it. Bug-fix <b>tunes</b> this: diagnose and fix share one agent (continuity), but a separate fresh adversarial agent must prove the fix — the fixer never grades itself. Independence is the source of the catch.</p>
     </div>
     <div class="card reveal">
       <span class="k">PRINCIPLE 04</span>
@@ -111,21 +123,21 @@
 
   <div class="callout why" style="margin-top:26px">
     <span class="t">Why these recur</span>
-    <p>These four ideas are the recurring beats of the whole series. Each skill episode is, at heart, a demonstration of how that skill enforces one or more of them — name which principle is in play and the per-skill decisions stop looking arbitrary.</p>
+    <p>These four ideas are the recurring beats of the whole series. Each skill page is, at heart, a demonstration of how that skill enforces one or more of them — name which principle is in play and the per-skill decisions stop looking arbitrary.</p>
   </div>
 </section>
 
-<!-- ===================== EPISODES ===================== -->
+<!-- ===================== SKILLS ===================== -->
 <section class="sec wrap" id="episodes">
   <span class="anchor" id="eps"></span>
   <div class="sec-tag">The curriculum</div>
-  <h2>Five episodes</h2>
-  <p class="lead">Work them in order — the skills compose, and later episodes assume the vocabulary from earlier ones. Each page carries learning objectives, a mental model, a guided walkthrough, the <b>design decisions</b> behind the skill, common mistakes, and a mastery checklist.</p>
+  <h2>Six skills</h2>
+  <p class="lead">Work them in order — the skills compose, and later skills assume the vocabulary from earlier ones. Each page carries learning objectives, a mental model, a guided walkthrough, the <b>design decisions</b> behind the skill, common mistakes, and a mastery checklist.</p>
 
   <div class="grid c2" style="margin-top:28px">
     <a class="card ep-card t1 reveal" href="deep-plan.html">
       <span class="n">1</span>
-      <span class="k">EPISODE ONE · PRODUCE</span>
+      <span class="k">SKILL ONE · PRODUCE</span>
       <h3>deep-plan</h3>
       <span class="cmd">/deep-plan</span>
       <p>Run a steerable planning session that produces a resumable plan artifact — the durable spine the whole series writes back into.</p>
@@ -133,7 +145,7 @@
     </a>
     <a class="card ep-card t2 reveal" href="deep-plan-review.html">
       <span class="n">2</span>
-      <span class="k">EPISODE TWO · CRITIQUE</span>
+      <span class="k">SKILL TWO · CRITIQUE</span>
       <h3>deep-plan-review</h3>
       <span class="cmd">/deep-plan-review</span>
       <p>Independently critique a plan with fresh, codebase-aware agents on two lenses — user alignment and codebase alignment.</p>
@@ -141,7 +153,7 @@
     </a>
     <a class="card ep-card t3 reveal" href="deep-implement.html">
       <span class="n">3</span>
-      <span class="k">EPISODE THREE · EXECUTE</span>
+      <span class="k">SKILL THREE · EXECUTE</span>
       <h3>deep-implement</h3>
       <span class="cmd">/deep-implement</span>
       <p>Orchestrate phase-by-phase execution with bounded fix loops and checkpoints. The only skill allowed to write source.</p>
@@ -149,15 +161,23 @@
     </a>
     <a class="card ep-card t4 reveal" href="deep-code-review.html">
       <span class="n">4</span>
-      <span class="k">EPISODE FOUR · VERIFY</span>
+      <span class="k">SKILL FOUR · VERIFY</span>
       <h3>deep-code-review</h3>
       <span class="cmd">/deep-code-review</span>
       <p>Run multi-agent, evidence-gated review that catches the last mile — then triage as a separate, opt-in step.</p>
       <span class="tag">Close the loop</span>
     </a>
-    <a class="card ep-card t5 reveal" href="deep-docs.html">
+    <a class="card ep-card t-bug reveal" href="deep-bugfix.html">
       <span class="n">5</span>
-      <span class="k">EPISODE FIVE · ORIENT</span>
+      <span class="k">SKILL FIVE · REMEDIATE</span>
+      <h3>deep-bugfix</h3>
+      <span class="cmd">/deep-bugfix</span>
+      <p>Remediate defects diagnosis-first: cluster by shared cause, re-diagnose the review's hypothesis, fix at the cause, prove it with a fresh agent, contain the blast radius.</p>
+      <span class="tag">Fix it for real</span>
+    </a>
+    <a class="card ep-card t5 reveal" href="deep-docs.html">
+      <span class="n">6</span>
+      <span class="k">SKILL SIX · ORIENT</span>
       <h3>deep-docs</h3>
       <span class="cmd">/deep-docs</span>
       <p>Generate context-window-aware documentation of what's been built — three loadable tiers, every claim anchored to <code>path:line</code> and verified.</p>
@@ -182,7 +202,8 @@
   <span class="a">02-Plan-Review/</span>     review.md     <span class="c">← /deep-plan-review</span>
   <span class="a">03-Implementation/</span>  summary.md    <span class="c">← /deep-implement</span>
   <span class="a">04-Code-Review/</span>     report.md · findings.json · certificate.md  <span class="c">← /deep-code-review</span>
-  <span class="a">05-Security/</span>        <span class="c">(reserved for a future /deep-security)</span></pre>
+  <span class="a">05-Security/</span>        <span class="c">(reserved for a future /deep-security)</span>
+  <span class="a">06-Bug-Fix/</span>        round-N/ scope.json · fix-summary.md · (root-causes.json)  <span class="c">← /deep-bugfix</span></pre>
   </div>
 
   <div class="callout why">
@@ -196,7 +217,10 @@
   <span class="anchor" id="dl"></span>
   <div class="sec-tag">The self-improving loop</div>
   <h2>Deep-Learn — improvements are data, not prose</h2>
-  <p class="lead">The skills themselves <b>never change</b> to encode a lesson. Instead, recurring issue classes are distilled into toggleable <b>directive cards</b> — structured data the upstream skills load at runtime via <code>scripts/load-active-cards.sh &lt;phase&gt;</code>.</p>
+  <p class="lead">The skills themselves <b>never change</b> to encode a lesson. Instead, recurring issue classes are distilled into toggleable <b>directive cards</b> — structured data the upstream skills load at runtime via <code>scripts/load-active-cards.sh &lt;phase&gt;</code>. It's how the series <b>adapts to your codebase, conventions, and stack</b>.</p>
+  <div class="cta-row" style="margin-top:20px">
+    <a class="btn primary" href="deep-learn.html">Read the full Deep-Learn page →</a>
+  </div>
 
   <div class="grid c3" style="margin-top:26px">
     <div class="card reveal">
@@ -218,7 +242,7 @@
 
   <div class="callout decision" style="margin-top:26px">
     <span class="t">The seed card — DLC-001</span>
-    <p>The first card adds a <b>State / Data-Flow Contract</b> to plans: one row per piece of state read or written, where <i>“the reader resolves the same source the writer wrote to”</i> is a binary you can't fudge. It would have surfaced ~100% of one benchmark PR's review severity at <b>plan</b> time. You'll meet it again in Episodes 1–3.</p>
+    <p>The first card adds a <b>State / Data-Flow Contract</b> to plans: one row per piece of state read or written, where <i>“the reader resolves the same source the writer wrote to”</i> is a binary you can't fudge. It would have surfaced ~100% of one benchmark PR's review severity at <b>plan</b> time. You'll meet it again in Skills 1–3.</p>
   </div>
 
   <div class="callout warn">
@@ -231,13 +255,14 @@
 <section class="sec wrap">
   <div class="panel bar reveal">
     <div class="sec-tag">The capstone exercise</div>
-    <h2 style="font-size:clamp(24px,3.4vw,34px)">Run all five, unassisted</h2>
+    <h2 style="font-size:clamp(24px,3.4vw,34px)">Run all six, unassisted</h2>
     <p>Pick a small, real feature in a repo you know, and run the full loop end-to-end:</p>
     <ol>
       <li><code>/deep-plan</code> it — choose an effort name; produce a resumable plan with a Data-Flow Contract.</li>
       <li><code>/deep-plan-review</code> it in <code>--multi-agent</code> mode; apply accepted fixes to the plan.</li>
       <li><code>/deep-implement</code> it collaboratively, one phase at a time.</li>
       <li><code>/deep-code-review</code> the branch, then <code>/deep-code-review --triage</code>.</li>
+      <li><code>/deep-bugfix</code> the accepted findings — cluster, diagnose, prove each fix, contain — then <code>/deep-code-review</code> again for a clean re-review.</li>
       <li><code>/deep-docs</code> the result — generate the <code>docs/ai-map/</code> and confirm every anchor verifies.</li>
     </ol>
     <div class="callout why" style="margin-bottom:0">
@@ -265,6 +290,10 @@
         <tr><td><b>Directive card</b></td><td>A human-gated, toggleable learned improvement loaded as data at runtime.</td></tr>
         <tr><td><b>Manifest</b></td><td><code>00-Manifest/manifest.md</code>, the per-effort stage-status index.</td></tr>
         <tr><td><b>Triage</b></td><td>The opt-in <code>--triage</code> step that decides fix/defer/reject and writes to the plan.</td></tr>
+        <tr><td><b>Cluster</b></td><td>A group of defects sharing one root cause, fixed by a single change (deep-bugfix).</td></tr>
+        <tr><td><b>Proof-of-fix</b></td><td>A fresh adversarial agent's verdict (<code>fixed</code>/<code>unproven</code>/<code>regressed</code>) — chain-trace by default, red→green under <code>--reproduce</code>.</td></tr>
+        <tr><td><b>Containment</b></td><td>Blast-radius check: run the changed symbols' dependents' tests; block only on <i>new</i> failures.</td></tr>
+        <tr><td><b>Claimed fix</b></td><td>deep-bugfix's signature failure: silencing the symptom without addressing the cause, or abandoning a cluster sibling.</td></tr>
       </tbody>
     </table>
   </div>
@@ -273,7 +302,7 @@
 <footer>
   <div class="wrap">
     <span>Deep Skills Training Series · a self-paced course for the <code>deep-*</code> plugin</span>
-    <span><a href="deep-plan.html">Start Episode 1 →</a></span>
+    <span><a href="deep-plan.html">Start with Skill 1 →</a></span>
   </div>
 </footer>
 

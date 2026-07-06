@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep-Learn — the self-improving loop · Deep Skills Training</title>
+<meta name="description" content="How the Deep-* series learns your codebase: recurring bug classes become toggleable directive cards — data, never prose — that upstream skills load at runtime to prevent the same bug earlier next time. Human-gated, with a kill-switch and full provenance.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="theme-learn">
+<div id="progress"></div>
+<div class="glow a"></div><div class="glow b"></div><div class="glow c"></div>
+
+<nav class="top">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="dot"></span> Deep Skills <span class="muted" style="font-weight:400">/ Deep-Learn</span></a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <div class="navlinks">
+      <a href="index.html">Overview</a>
+      <a href="#why">Why</a>
+      <a href="#adapts">Adapts to you</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#lifecycle">Lifecycle</a>
+      <a href="#card">A card</a>
+      <a href="#roadmap">Roadmap</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero wrap narrow">
+  <span class="eyebrow">● The self-improving loop</span>
+  <h1><span class="grad">Deep-Learn</span><br>the series learns <em>your</em> codebase</h1>
+  <p class="kicker">Every review the series runs feeds a learning loop that turns <b>recurring bug classes</b> into toggleable <b>directive cards</b> — structured data, <b>never a prose edit to a skill</b> — which the upstream skills load at runtime to prevent the same bug <b>earlier next time</b>. Human-gated, with a kill-switch and full provenance.</p>
+  <div class="chips center" style="justify-content:center">
+    <span class="chip"><span class="d"></span> Improvements are data, not prose</span>
+    <span class="chip"><span class="d"></span> Human-gated</span>
+    <span class="chip"><span class="d"></span> Clean on/off</span>
+    <span class="chip"><span class="d"></span> Provenance + telemetry</span>
+    <span class="chip"><span class="d"></span> Adapts per repo</span>
+  </div>
+</section>
+
+<div class="wrap">
+<div class="layout">
+
+<aside class="toc">
+  <div class="tt">On this page</div>
+  <a href="#why">Why it exists</a>
+  <a href="#principle">Improvements are data</a>
+  <a href="#adapts">How it adapts to you</a>
+  <a href="#architecture">The architecture</a>
+  <a href="#lifecycle">Lifecycle &amp; the gates</a>
+  <a href="#card">Anatomy of a card</a>
+  <a href="#runtime">How skills apply cards</a>
+  <a href="#seed">The seed card — DLC-001</a>
+  <a href="#guards">Failure modes &amp; guards</a>
+  <a href="#roadmap">What's live · what's next</a>
+  <a href="#qref">Quick reference</a>
+</aside>
+
+<main>
+
+<section class="sec tight" id="why">
+  <div class="sec-tag">The problem it solves</div>
+  <h2>Why Deep-Learn exists</h2>
+  <div class="panel lead-panel bar reveal">
+    <p>The benchmark that seeded the series had a lesson in it: <span class="hl">every severity-bearing finding was the same class of bug</span> — a write path whose runtime reader resolved a <i>different</i> source ("execution is not config-aware"). None were in-function logic errors. Code-review caught them — <b>late and expensively</b>.</p>
+    <p>A one-time fix handles <i>that</i> class. But new classes keep appearing. The goal is a <span class="hl">standing mechanism</span> that learns each recurring class <b>once</b> and pushes prevention upstream automatically — with a human gate and a kill-switch, so a bad lesson can't silently degrade the skills.</p>
+  </div>
+  <div class="grid c3" style="margin-top:8px">
+    <div class="card reveal"><span class="k">THE INSIGHT</span><h4>Cheap kills are upstream</h4><p>The same bug is cheapest to prevent at plan time, next-cheapest at implement time, most expensive at review time. Deep-Learn moves each lesson as far upstream as it can go.</p></div>
+    <div class="card reveal"><span class="k">THE UNIT</span><h4>Classes, not findings</h4><p>One Blocker shouldn't rewrite a skill. A <i>recurring class</i> should. The loop accumulates root-cause-tagged classes across runs — raw findings are evidence, not lessons.</p></div>
+    <div class="card reveal"><span class="k">THE GUARANTEE</span><h4>Never silent, never stuck</h4><p>Nothing is enforced without human approval; anything can be switched off in one command; every card carries where it came from and whether it's working.</p></div>
+  </div>
+</section>
+
+<section class="sec" id="principle">
+  <div class="sec-tag">The core principle</div>
+  <h2>Improvements are data, not prose</h2>
+  <p class="lead">A learning utility must <b>never edit a <code>SKILL.md</code></b>. Prose edits cause skill bloat, drift (three skills phrasing one lesson three ways), merge conflicts, and — fatally — <b>no clean on/off</b>. So every learned improvement is a structured <b>directive card</b> in a shared registry. Each skill carries one stable stanza: <i>"load the active cards for your phase and apply them."</i> The skills stop changing; the registry changes.</p>
+  <div class="grid c2" style="margin-top:8px">
+    <div class="callout warn" style="margin:0"><span class="t">If lessons were prose in the skill…</span><p>…the skill grows without bound, three skills drift on one idea, every lesson is a merge conflict, and turning a lesson off means editing (and risking) the skill itself. There is no telemetry and no provenance.</p></div>
+    <div class="callout why" style="margin:0"><span class="t">Because lessons are cards…</span><p>On/off is a status flip. Provenance (which findings, which review) and effectiveness (did the class recur?) are built in. A skill's prose never changes, so it can't bloat or drift — all variability lives in the registry as data.</p></div>
+  </div>
+</section>
+
+<section class="sec" id="adapts">
+  <div class="sec-tag">Why this matters for you</div>
+  <h2>It adapts to <em>your</em> codebase</h2>
+  <p class="lead">The taxonomy and cards are not generic best-practices lifted from a blog. They are <b>distilled from your own reviews</b> — so the system learns the way <i>your</i> code actually breaks, the conventions <i>your</i> team keeps, and the libraries <i>your</i> project leans on.</p>
+  <div class="grid c3" style="margin-top:8px">
+    <div class="card reveal"><span class="k">YOUR FAILURE SHAPES</span><h4>The classes are yours</h4><p>Each class is a root-cause pattern that recurred in <i>your</i> reviews — e.g. a persistence surface whose reader and writer disagree. The ledger tags and counts the shapes your codebase actually produces.</p></div>
+    <div class="card reveal"><span class="k">YOUR CONVENTIONS</span><h4>The cards encode your practices</h4><p>A card like "search for an existing helper before defining a new one" enforces <i>your</i> reuse norms; a data-flow contract enforces <i>your</i> state-management discipline. The directive text reflects how your team already wants to work.</p></div>
+    <div class="card reveal"><span class="k">YOUR STACK</span><h4>Triggers fire on your surfaces</h4><p>A card's <code>trigger</code> keys off the surfaces in your repo — the stores, config, routes, and library seams you actually use — so a lesson loads only when a change touches the thing it protects.</p></div>
+  </div>
+  <div class="callout decision">
+    <span class="t">Per-repo by default — the ledger learns where the code lives</span>
+    <p>Cards and their provenance live with the plugin registry, and the loop is fed by the reviews you run on <i>this</i> project. Whether a future ledger is shared across all your repos or kept strictly per-repo is an open design question — but the animating idea is the same: <b>the system gets sharper the more you use it on your code</b>, not on someone else's.</p>
+  </div>
+</section>
+
+<section class="sec" id="architecture">
+  <div class="sec-tag">How it's wired</div>
+  <h2>The architecture — hub, spine, spokes</h2>
+  <p class="lead">A single loop connects the skill that <b>finds</b> lessons (code-review) to the skills that <b>apply</b> them (everything upstream), through a shared vocabulary so nothing drifts.</p>
+  <div class="code reveal">
+    <div class="hd"><div class="dots"><i></i><i></i><i></i></div><span class="fn">the loop: review → distill → propose → gate → apply → measure → prune</span></div>
+<pre>   every <span class="a">/deep-code-review</span> run  →  findings.json
+                     │
+                     ▼
+   ┌───────────────┐      ┌────────────────────────┐
+   │   DISTILLER    │────▶│   PATTERN LEDGER (hub)   │   accumulating, not last-run:
+   │  (post-review) │      │  classes × freq × sev    │   root-cause-tagged issue classes
+   └───────────────┘      └───────────┬────────────┘
+                                       │ promotes a class when it clears threshold
+                                       ▼
+                        ┌────────────────────────────┐
+                        │   SHARED TAXONOMY (spine)    │  the lesson categories —
+                        │   write-no-reader · deletion │  the contract between hub &amp; spokes
+                        │   -parity · claim-vs-evidence│  (a class maps to many spokes)
+                        └──┬──────────┬──────────┬─────┘
+                           ▼          ▼          ▼
+                    <span class="a">deep-plan</span>  <span class="a">deep-plan-review</span>  <span class="a">deep-implement</span>  … ← SPOKES
+                           │          │          │        (draft cards for classes they own)
+                           └──────────┴──────────┘
+                                       ▼
+                        ┌────────────────────────────┐
+                        │    DIRECTIVES REGISTRY       │  toggleable cards:
+                        │  candidate · shadow ·         │  provenance + telemetry
+                        │  active · disabled            │
+                        └───────────┬────────────────┘
+                                    │ skills load ACTIVE cards at runtime
+                                    ▼
+                 upstream skills apply them  →  next /deep-code-review run
+                                    │
+                        ┌───────────▼────────────────┐
+                        │   EFFECTIVENESS MONITOR      │  did the class recur?
+                        │   (post-review telemetry)    │  → auto-demote / flag false-positive
+                        └────────────────────────────┘</pre>
+  </div>
+  <div class="grid c2" style="margin-top:8px">
+    <div class="card reveal"><span class="k">HUB</span><h4>Pattern Ledger</h4><p>Accumulating, not "the last run's issues." Stores root-cause-tagged classes with frequency, severity, exemplar finding IDs, first/last-seen, and which phase(s) can prevent each. Fed by every <code>findings.json</code>.</p></div>
+    <div class="card reveal"><span class="k">SPINE</span><h4>Shared Taxonomy</h4><p>The category vocabulary — the contract between hub and spokes. Without it each spoke re-derives its own categories and they drift. A class maps <b>many-to-many</b> to spokes.</p></div>
+    <div class="card reveal"><span class="k">SPOKES</span><h4>The upstream skills</h4><p>For classes they own, each drafts a <b>candidate</b> card using its own leverage — plan adds artifact requirements, plan-review adds checks, implement adds exit invariants + probes. They apply nothing and touch no skill.</p></div>
+    <div class="card reveal"><span class="k">STORE</span><h4>Directives Registry</h4><p>File-per-card, directory-as-lifecycle-state (<code>active/</code> · <code>shadow/</code> · <code>candidate/</code> · <code>disabled/</code>). Where on/off, provenance, and effectiveness live.</p></div>
+  </div>
+</section>
+
+<section class="sec" id="lifecycle">
+  <div class="sec-tag">The gates</div>
+  <h2>Card lifecycle — nothing enforced without a human</h2>
+  <p class="lead">A card's <b>directory is its lifecycle state</b>; a <code>status:</code> field mirrors it. Cards move only through gates — and the gate into <code>active/</code> is a required human approval.</p>
+  <div class="code reveal">
+    <div class="hd"><div class="dots"><i></i><i></i><i></i></div><span class="fn">the state machine</span></div>
+<pre>candidate ──(distiller: class clears threshold)──▶ <span class="a">shadow</span>
+  shadow  ── evaluated, NOT enforced — logs "would this have changed the plan?"
+  shadow  ──(human gate: approve)──────────────▶ <span class="a">active</span>     ◀── HUMAN GATE (required)
+  active  ──(monitor: recurrence drops)────────▶ stays active, verdict = working
+  active  ──(monitor: class keeps recurring)───▶ <span class="a">disabled</span> (ineffective)    ◀── REMOVAL
+  active  ──(monitor: friction / false pos.)───▶ <span class="a">disabled</span> (false-positive)
+  disabled ─ kept with full provenance — never silently deleted</pre>
+  </div>
+  <div class="grid c3" style="margin-top:8px">
+    <div class="callout decision" style="margin:0"><span class="t">Human gate</span><p>No card reaches <code>active/</code> without explicit approval, recorded in <code>promotion.human_approved_by</code>. Auto-promotion waits until telemetry is trustworthy.</p></div>
+    <div class="callout decision" style="margin:0"><span class="t">Shadow mode</span><p>Candidates can be evaluated without being enforced — they log what they <i>would</i> have done. Default off. It's how a lesson earns trust before it gates anything.</p></div>
+    <div class="callout decision" style="margin:0"><span class="t">Removal is first-class</span><p>Cards can be demoted, not only added — the guard against monotonic bloat. Disabled cards stay with provenance so a decision is never lost.</p></div>
+  </div>
+  <div class="callout note">
+    <span class="t">One command, no skill edits</span>
+    <p><code>./toggle.sh DLC-001 off</code> stops applying a card (moves it to <code>disabled/</code>, flips <code>status:</code>); <code>on</code> re-applies it; bare <code>./toggle.sh</code> lists every card and its state. The move <b>and</b> the status field change together so the two never drift, and <code>git diff</code> shows exactly what flipped. That's the whole on/off mechanism — no config, no prose edit.</p>
+  </div>
+</section>
+
+<section class="sec" id="card">
+  <div class="sec-tag">What a lesson looks like</div>
+  <h2>Anatomy of a directive card</h2>
+  <p class="lead">A card is a Markdown file: <b>YAML frontmatter</b> (structured metadata the loop reasons over) + a <b>Markdown body</b> (the directive an LLM injects). One card can carry a <b>phase-scoped section per owner phase</b> — each skill applies only its own section.</p>
+  <div class="code reveal">
+    <div class="hd"><div class="dots"><i></i><i></i><i></i></div><span class="fn">DLC-001.md — frontmatter (abridged)</span></div>
+<pre><span class="c">---</span>
+id: DLC-001
+category: <span class="a">write-no-reader</span>            <span class="c"># a slug from the shared taxonomy</span>
+owner_phases: [deep-plan, deep-plan-review, deep-implement, deep-bugfix]
+title: Require a State / Data-Flow Contract
+trigger: The plan introduces/removes/changes any persisted field,
+         store, localStorage key, config surface, or runtime read.
+status: active
+provenance:
+  findings: [CR-001, CR-002, CR-003, CR-004, CR-005, CR-006, CR-008, CR-009, CR-016]
+  reviews:  ["pipeline-consolidation@6879399"]
+  added:    "2026-06-13"
+promotion:
+  human_approved_by: "…"          <span class="c"># the required human gate</span>
+  recurrence_threshold_met: true
+outcome:
+  verdict: unproven               <span class="c"># maintained by the Effectiveness Monitor</span>
+<span class="c">---</span>
+
+<span class="c"># body: one section per owner phase — each skill applies only its own</span>
+## deep-plan — add the contract artifact (required plan section)
+## deep-plan-review — dispatch check (assert every row is resolved)
+## deep-implement — validate (exit invariant + contract probe)
+## deep-bugfix — prove the contract row is closed</pre>
+  </div>
+  <div class="tbl-wrap reveal">
+    <table>
+      <thead><tr><th style="width:170px">Field</th><th>What it's for</th></tr></thead>
+      <tbody>
+        <tr><td><code>category</code></td><td>The taxonomy slug — a card must not invent a category. This is the hub↔spoke contract.</td></tr>
+        <tr><td><code>owner_phases</code></td><td>Which skills apply the card. Matched by <b>exact token</b> so <code>deep-plan</code> never matches <code>deep-plan-review</code>.</td></tr>
+        <tr><td><code>trigger</code></td><td>The change shape that makes the lesson relevant — keyed to surfaces in your repo.</td></tr>
+        <tr><td><code>provenance</code></td><td>The findings and review the lesson came from, plus the date added — the audit trail.</td></tr>
+        <tr><td><code>promotion</code></td><td>The gate record: who approved it, whether the recurrence threshold was met.</td></tr>
+        <tr><td><code>outcome</code></td><td>Effectiveness telemetry: did the class recur since the card went active? Drives auto-demotion.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="sec" id="runtime">
+  <div class="sec-tag">At runtime</div>
+  <h2>How each skill applies its cards</h2>
+  <p class="lead">Every deep-* skill carries one stable loader stanza. It runs a bundled script and treats what prints as a hard requirement for that run.</p>
+  <div class="code reveal">
+    <div class="hd"><div class="dots"><i></i><i></i><i></i></div><span class="fn">the one stanza every skill carries</span></div>
+<pre>scripts/load-active-cards.sh <span class="a">deep-plan</span>     <span class="c"># each skill passes its own phase</span></pre>
+  </div>
+  <ol class="steps">
+    <li><span class="module">Lazy &amp; scoped</span><h4>Cards reach a skill only when it runs</h4><p>Loading happens at the start of a run and only for that phase, so unrelated sessions pay nothing. A card applies to <code>deep-implement</code> only if its <code>owner_phases</code> lists that exact token.</p></li>
+    <li><span class="module">Self-locating</span><h4>Works wherever the plugin is installed</h4><p>The script finds the shared registry <b>relative to its own path</b> — sidestepping the platform limit that plugin-root variables aren't interpolated in skill prose. The script is copied byte-identically into each skill; only the registry is shared.</p></li>
+    <li><span class="module">Apply, don't edit</span><h4>A printed directive is a hard requirement</h4><p>The skill applies the section addressed to its phase. "No active cards" ⇒ it proceeds normally. On a host without a reliable shell, the skill applies cards by hand from <code>cards/active/</code>.</p></li>
+    <li><span class="module">Toggle, don't silence</span><h4>Never edit a card or skill to turn one off</h4><p>If a card is wrong or noisy, <code>toggle.sh &lt;ID&gt; off</code> — the human-gated kill-switch — not a prose edit. Editing to silence a lesson is exactly what the "data, not prose" rule exists to prevent.</p></li>
+  </ol>
+  <div class="callout note">
+    <span class="t">Code-review is the producer, not a consumer</span>
+    <p>The upstream skills (plan, plan-review, implement, bug-fix, docs) <b>load</b> cards. <code>/deep-code-review</code> is the one built skill with no loader — in the hub-and-spoke model it is the <b>producer of lessons</b> (its <code>findings.json</code> feeds the loop) and the independent measurement point. A reviewer that applied prevention cards would blur that role.</p>
+  </div>
+</section>
+
+<section class="sec" id="seed">
+  <div class="sec-tag">The worked first card</div>
+  <h2>DLC-001 — the State / Data-Flow Contract</h2>
+  <p class="lead">The seed card, shipped <b>active</b>, is the loop run by hand once. Every severity-bearing finding in the benchmark was one family — <i>a write path whose runtime reader resolves a different source</i> — so this card pushes that kill upstream. It would have surfaced <b>~100% of that review's severity at plan time</b>. One card, four phases:</p>
+  <div class="grid c2" style="margin-top:8px">
+    <div class="card reveal"><span class="k">deep-plan</span><h4>Add the contract artifact</h4><p>A required plan section: one row per piece of state the feature reads or writes, with writer <code>path:line</code>, runtime reader <code>path:line</code>, and a <b>"same source?"</b> column you can't fudge. A row with no reader, or a reader that resolves a different source, <b>blocks plan completion</b>.</p></div>
+    <div class="card reveal"><span class="k">deep-plan-review</span><h4>Dispatch check</h4><p>Assert the section is present, <b>every row is resolved</b>, and every "single source of truth" claim names exactly one source. An unresolved row that isn't explicitly Display-only + Deferred is a finding that blocks the plan.</p></div>
+    <div class="card reveal"><span class="k">deep-implement</span><h4>Exit invariant + contract probe</h4><p>For each runtime row, the reader is actually wired to the writer's source — then a <b>write → execute → assert read</b> probe. Typecheck and unit tests pass clean on these bugs; the probe is the net they miss.</p></div>
+    <div class="card reveal"><span class="k">deep-bugfix</span><h4>Prove the row is closed</h4><p>When the defect is this class, the proof-of-fix chain must terminate in <i>reader resolves writer's source</i> — the final hop cites the reader's resolution site. A proof that stops at "the write happens" or "it compiles" leaves the verdict <code>unproven</code>.</p></div>
+  </div>
+  <div class="callout why">
+    <span class="t">Why the row can't be filled without finding the bug</span>
+    <p>The writer column forces "where does the save land?"; the reader column forces a runtime trace; "same source?" is a binary. You cannot honestly complete the table without discovering a write/read mismatch — which is exactly the class the benchmark proved most expensive to catch late.</p>
+  </div>
+</section>
+
+<section class="sec" id="guards">
+  <div class="sec-tag">Kept honest</div>
+  <h2>Failure modes &amp; guards</h2>
+  <p class="lead">A self-modifying system is only safe if it can be wrong, be caught, and be rolled back. Each risk has a structural guard.</p>
+  <div class="tbl-wrap reveal">
+    <table>
+      <thead><tr><th style="width:270px">Risk</th><th>Guard</th></tr></thead>
+      <tbody>
+        <tr><td>Overfitting to one PR's quirk</td><td>Promote a class only after recurrence across <b>≥2 distinct reviews</b> — or high severity. The primary overfitting guard.</td></tr>
+        <tr><td>Monotonic bloat</td><td>Removal/demotion is <b>first-class</b>; the Monitor prunes ineffective cards. Addition <i>and</i> subtraction.</td></tr>
+        <tr><td>Conflicting cards (opposite pushes)</td><td>A conflict/dedup check at promotion time.</td></tr>
+        <tr><td>Silent degradation of the skills</td><td><b>Human gate + shadow mode + kill-switch + provenance.</b> Cards are data, never prose.</td></tr>
+        <tr><td>Auto-application runaway</td><td>Stay human-gated until telemetry is proven; only then graduate to guarded-auto.</td></tr>
+        <tr><td>Skill bloat / drift</td><td>Each skill carries one loader stanza; all variability lives in the registry.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="sec" id="roadmap">
+  <div class="sec-tag">Honest about the seams</div>
+  <h2>What's live · what's next</h2>
+  <div class="grid c2" style="margin-top:8px">
+    <div class="callout why" style="margin:0"><span class="t">Live now — Phase 1</span><p>The <b>shared taxonomy</b>, the <b>directives registry</b> with lifecycle directories, the <b>DLC-001</b> seed card shipped active, and the <b>loader stanza</b> in all six skills. On/off works by hand today via <code>toggle.sh</code>. Every skill loads its active cards at runtime.</p></div>
+    <div class="callout decision" style="margin:0"><span class="t">Planned — later phases</span><p>The <b>Distiller</b> (<code>/deep-learn</code>): <code>findings.json</code> → Pattern Ledger → candidate cards. The <b>Effectiveness Monitor</b>: recurrence telemetry that drives demote / false-positive flags. Then <b>guarded auto-promotion</b> — only once the telemetry is trustworthy.</p></div>
+  </div>
+  <div class="callout note">
+    <span class="t">Why <code>outcome.verdict</code> reads <code>unproven</code> today</span>
+    <p>That field is maintained by the Effectiveness Monitor, which is a later phase. Until it exists, humans read the same recurrence signal by hand. The seam is honest about being inert rather than pretending to measure.</p>
+  </div>
+</section>
+
+<section class="sec" id="qref">
+  <div class="sec-tag">At a glance</div>
+  <h2>Quick reference</h2>
+  <div class="qref reveal">
+    <div class="qh">Deep-Learn</div>
+    <dl>
+      <dt>Unit of learning</dt><dd>A recurring, root-cause-tagged <b>class</b> — not an individual finding</dd>
+      <dt>Form of a lesson</dt><dd>A <b>directive card</b> (data, never a skill edit): frontmatter + phase-scoped body</dd>
+      <dt>Producer</dt><dd><code>/deep-code-review</code> → <code>findings.json</code> feeds the loop</dd>
+      <dt>Consumers</dt><dd>plan · plan-review · implement · bug-fix · docs load active cards at runtime</dd>
+      <dt>Gates</dt><dd>candidate → shadow → <b>active (human-gated)</b> → disabled (kept with provenance)</dd>
+      <dt>On / off</dt><dd><code>toggle.sh &lt;ID&gt; on|off</code> — one command, no skill edits</dd>
+      <dt>Live today</dt><dd>Taxonomy · registry · DLC-001 active · loader in all six skills</dd>
+    </dl>
+  </div>
+  <div class="callout warn">
+    <span class="t">The trainee rule</span>
+    <p>When a skill prints a directive at the start of a run, treat it as a <b>hard requirement</b> for that run. Don't edit cards or skills to silence one — <b>toggle it</b>. That single discipline is what keeps the loop trustworthy.</p>
+  </div>
+</section>
+
+<div class="epnav">
+  <a href="index.html"><span class="dir">← Back to</span><span class="ttl">Series overview</span><span class="cmd">All skills</span></a>
+  <a class="next" href="deep-plan.html"><span class="dir">See a card in action →</span><span class="ttl">deep-plan</span><span class="cmd">/deep-plan</span></a>
+</div>
+
+</main>
+</div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>Deep-Learn · the self-improving directive loop · a system feature of the <code>deep-*</code> series</span>
+    <span><a href="index.html">All skills</a></span>
+  </div>
+</footer>
+
+<script src="assets/series.js"></script>
+</body>
+</html>

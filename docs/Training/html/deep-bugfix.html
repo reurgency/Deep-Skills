@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill 5 · deep-bugfix — Deep Skills Training</title>
+<meta name="description" content="Remediate defects diagnosis-first: cluster by shared root cause, re-diagnose independently of the review's hypothesis, fix minimally at the cause, prove the fix with a fresh adversarial agent, and contain the blast radius before committing.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="theme-bugfix">
+<div id="progress"></div>
+<div class="glow a"></div><div class="glow b"></div>
+
+<nav class="top">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="dot"></span> Deep Skills <span class="muted" style="font-weight:400">/ Ep.5 deep-bugfix</span></a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <div class="navlinks">
+      <a href="index.html">Overview</a>
+      <a href="deep-plan.html">1 · Plan</a>
+      <a href="deep-plan-review.html">2 · Review</a>
+      <a href="deep-implement.html">3 · Implement</a>
+      <a href="deep-code-review.html">4 · Code review</a>
+      <a href="deep-bugfix.html" class="active">5 · Bug-fix</a>
+      <a href="deep-docs.html">6 · Docs</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero wrap narrow">
+  <div class="ep-badge"><span class="pill">SKILL 5</span><span class="label">Remediate</span></div>
+  <h1><span class="grad">deep-bugfix</span></h1>
+  <p class="kicker"><code>/deep-bugfix</code> remediates defects the way <code>/deep-implement</code> builds features — <b>but inverted</b>. It clusters findings by shared cause, <b>re-diagnoses</b> independently of the review's hypothesis, fixes <b>minimally at the confirmed cause</b>, <b>proves</b> the fix with a fresh adversarial agent, and <b>contains</b> the blast radius before committing. <b>Fixes code only — never triages, never edits the plan.</b></p>
+  <div class="chips center" style="justify-content:center">
+    <span class="chip"><span class="d"></span> Diagnosis before remediation</span>
+    <span class="chip"><span class="d"></span> Prove before commit</span>
+    <span class="chip"><span class="d"></span> Root-cause clustering</span>
+    <span class="chip"><span class="d"></span> Blast-radius containment</span>
+    <span class="chip"><span class="d"></span> 9 design decisions</span>
+  </div>
+</section>
+
+<div class="wrap">
+<div class="layout">
+
+<aside class="toc">
+  <div class="tt">On this page</div>
+  <a href="#objectives">Learning objectives</a>
+  <a href="#model">Mental model</a>
+  <a href="#inversion">The inversion</a>
+  <a href="#walkthrough">How to use it</a>
+  <a href="#order">The prove-before-commit order</a>
+  <a href="#flags">Flags &amp; commands</a>
+  <a href="#why">Why it's built this way</a>
+  <a href="#mistakes">Common mistakes</a>
+  <a href="#mastery">Mastery checklist</a>
+  <a href="#qref">Quick reference</a>
+</aside>
+
+<main>
+
+<section class="sec tight" id="objectives">
+  <div class="sec-tag">In this skill</div>
+  <h2>Learning objectives</h2>
+  <div class="obj">
+    <div class="o"><span class="i">1</span><p>Explain why bug-fixing is the <b>inverse</b> of <code>/deep-implement</code> — no trusted spec, modifies <i>working</i> code, "done" means <i>provably gone</i>.</p></div>
+    <div class="o"><span class="i">2</span><p>Treat the finding's recommendation as a <b>hypothesis, not a spec</b>, and re-diagnose to a confirmed root cause before touching code.</p></div>
+    <div class="o"><span class="i">3</span><p><b>Cluster</b> defects by shared cause so one fix closes a family — and catch the abandoned sibling.</p></div>
+    <div class="o"><span class="i">4</span><p>Run the <b>apply → proof → containment → commit</b> order and know why nothing unproven ships.</p></div>
+    <div class="o"><span class="i">5</span><p>Choose <code>--reproduce</code> / <code>--worktree</code> / <code>--learn</code> and the mode, and hold the boundary: bug-fix executes, triage decides.</p></div>
+  </div>
+</section>
+
+<section class="sec" id="model">
+  <div class="sec-tag">The frame</div>
+  <h2>Mental model</h2>
+  <div class="panel lead-panel bar reveal">
+    <p>Bug-fixing is <span class="hl">forward construction run backwards</span>. deep-implement executes a trusted spec; bug-fixing has <b>no trusted spec</b> (the cause must be diagnosed first), modifies <b>working code</b> (the highest-risk edit class), and is done only when the bug is <b>provably gone</b>, not when "the step ran."</p>
+    <p>Its signature failure — the analogue of code-review's last-mile lens — is the <span class="hl">claimed fix</span>: a change that silences the symptom without addressing the cause, or fixes one member of a cluster and silently abandons its siblings.</p>
+  </div>
+  <div class="grid c2" style="margin-top:8px">
+    <div class="callout decision" style="margin:0"><span class="t">Recommendation ≠ spec</span><p>Real findings hedge their own cause ("register the route <b>or</b> correct the URL"). It enters the diagnose brief flagged <i>"hypothesis — do not trust."</i> The agent confirms the cause independently first.</p></div>
+    <div class="callout decision" style="margin:0"><span class="t">No proof ⇒ not fixed</span><p>Containment proves you <i>didn't break</i> working code; it does not prove you <i>fixed the bug</i>. A separate fresh adversarial agent must prove it — the fixer never marks its own homework.</p></div>
+  </div>
+</section>
+
+<section class="sec" id="inversion">
+  <div class="sec-tag">Why a dedicated skill</div>
+  <h2>The inversion — four assumptions flipped</h2>
+  <p>Pointing a fresh agent at <code>findings.json</code> and saying "fix these" yields N symptom patches with no proof and no regression guard. deep-implement is structurally the wrong tool because bug-fixing inverts all four of its assumptions:</p>
+  <div class="tbl-wrap reveal">
+    <table>
+      <thead><tr><th style="width:200px">deep-implement assumes…</th><th>deep-bugfix faces…</th></tr></thead>
+      <tbody>
+        <tr><td>A <b>trusted spec</b> with known steps</td><td>An <b>unknown spec</b> — the cause must be diagnosed first</td></tr>
+        <tr><td><b>Adds</b> new code</td><td><b>Modifies working code</b> — the highest-risk edit class</td></tr>
+        <tr><td>Findings are independent units</td><td>Findings often <b>share one root cause</b> — cluster, don't patch each</td></tr>
+        <tr><td>"Done" = the step ran &amp; validated</td><td>"Done" = the bug is <b>provably gone</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout why">
+    <span class="t">Clustering is a different altitude than review-time dedup</span>
+    <p>Review dedup merges <i>duplicate reports of one defect</i>. Cluster grouping is coarser — <b>cause-level</b>, across genuinely-distinct defects. The seed corpus is the proof: PR#65's CR-001…006 survived as six distinct findings that shared one cause ("a write path whose runtime reader resolves a different source"). That is the altitude where the real fix lives — and where the abandoned sibling gets caught.</p>
+  </div>
+</section>
+
+<section class="sec" id="walkthrough">
+  <div class="sec-tag">How to use it</div>
+  <h2>The remediation, module by module</h2>
+  <ol class="steps">
+    <li><span class="module">Module 1</span><h4>Intake &amp; normalize</h4><p>Accept a <code>findings.json</code>, a pasted bug report / stack trace, or a failing test → a uniform defect list. Findings pass through losslessly; raw reports get synthesized <code>BF-001…</code> ids with evidence extracted from the trace. Resolve the effort home; no effort ⇒ ask for a name (default: slugified branch), create it + the manifest.</p></li>
+    <li><span class="module">Module 2</span><h4>Scope &amp; round start</h4><p>Series mode loads the <code>accepted</code> set — <b>triage already decided; don't re-ask</b>. Only <code>open</code> findings ⇒ an interactive <b>scope pick</b> grouped by tier (<i>scoping is selection, not triage</i>; unselected stay <code>open</code>). <b>Re-entry check first</b>, then write <code>round-N/scope.json</code> — selection + provisional cluster plan — <b>before any cluster work</b>.</p></li>
+    <li><span class="module">Module 3</span><h4>Cluster by suspected shared cause</h4><p>Group defects whose evidence points at one underlying cause (same subsystem + failure shape + overlapping evidence paths). <b>Clusters are hypotheses</b> — diagnosis <i>splits</i> on divergent causes and <i>merges</i> two on a proven single cause.</p></li>
+    <li><span class="module">Module 4</span><h4>Per cluster: diagnose + fix (one fresh agent)</h4><p><b>One fresh agent per cluster</b> — remediation needs continuity: the agent that finds the cause authors the fix. Briefed with finding <b>evidence</b> + repo + the plan (context only), <b>never</b> the implementer's or reviewer's transcripts, the recommendation flagged "hypothesis — do not trust." It diagnoses to a confirmed cause, then fixes <b>minimally at the cause</b>. Attempt cap: <b>2</b>. Collaborative mode gates here — approve <i>before</i> applying.</p></li>
+    <li><span class="module">Module 5</span><h4>Adversarial proof</h4><p>A <b>separate fresh agent</b> carries the burden of <i>refuting</i> "fixed." Default tier is the <b>static chain-trace</b> — walk the corrected chain hop-by-hop, a cited <code>path:line</code> per hop; a fix without a traced chain is rejected. It must show <b>every finding in the cluster</b> resolved by the one fix, and returns <code>fixed | unproven | regressed</code>.</p></li>
+    <li><span class="module">Module 6</span><h4>Containment (blast radius)</h4><p>Extract changed symbols → discover their <b>direct dependents</b> (1 hop; LSP/host index, else grep/import-walk) → run the dependents' tests + a full typecheck. <b>Block only on <i>new</i> failures.</b> Exported/shared symbol ⇒ escalate to <b>2 hops</b>. Commands discovered from the host — <b>never</b> <code>.env</code>.</p></li>
+    <li><span class="module">Module 7</span><h4>Gate / commit — prove before commit</h4><p>Order per cluster, never reordered: <b>apply → proof verdict → containment → commit</b>. Collaborative presents fix + proof + containment; autonomous commits on <code>fixed</code> + clean containment (<code>fix(&lt;scope&gt;): &lt;cause&gt; — resolves CR-00X, CR-00Y</code>). <b>Nothing unproven ever ships.</b></p></li>
+    <li><span class="module">Module 8</span><h4>Statuses, round artifacts &amp; hand-off</h4><p>On <code>fixed</code> (and only then): flip the cluster's findings <code>accepted → fixed</code> in place, append the cluster's record to <code>fix-summary.md</code> (cause vs the review's hypothesis; under <code>--learn</code>, also <code>root-causes.json</code>). Update the manifest's <code>06 Bug Fix</code> row and point at re-review. The tight loop: <b>review → triage → bug-fix → re-review</b>.</p></li>
+  </ol>
+</section>
+
+<section class="sec" id="order">
+  <div class="sec-tag">The non-negotiable sequence</div>
+  <h2>The prove-before-commit order</h2>
+  <p>Per cluster, this order never changes. Two of the three verdicts short-circuit the commit:</p>
+  <div class="code reveal">
+    <div class="hd"><div class="dots"><i></i><i></i><i></i></div><span class="fn">one cluster, in order</span></div>
+<pre><span class="a">apply fix</span> → <span class="a">proof verdict</span> → containment → commit
+
+proof = <span class="a">fixed</span>      → containment clean → commit the cluster
+proof = unproven   → one more diagnose→fix (cap 2 total), then revert + blocker report
+proof = <span class="a">regressed</span>  → <span class="a">revert immediately</span></pre>
+  </div>
+  <div class="callout why">
+    <span class="t">Two proofs guard two different things</span>
+    <p>The <b>proof-of-fix</b> is a <i>positive</i> guarantee — the bug is gone, chain-traced (or red→green under <code>--reproduce</code>). <b>Containment</b> is a <i>negative</i> guarantee — nothing that depended on the old behavior broke. You need both, in that order, and neither is the fixer grading itself: proof runs in a fresh adversarial agent, containment runs as deterministic tools.</p>
+  </div>
+  <div class="callout note">
+    <span class="t">In-session steering</span>
+    <p><code>/skip-cluster</code> ("skip this cluster") reverts edits and moves on, statuses untouched. <code>/show-proof</code> ("show me the proof") prints the current verdict with its full hop-by-hop chain. <code>/widen</code> ("widen the containment") escalates 1 hop → 2 and re-runs. Every flag is <b>natural-language-first</b> — the plain-language trigger is primary; the <code>--flag</code> is a convenience on top.</p>
+  </div>
+</section>
+
+<section class="sec" id="flags">
+  <div class="sec-tag">Know which to reach for</div>
+  <h2>Flags &amp; the finding shape</h2>
+  <div class="tbl-wrap reveal">
+    <table>
+      <thead><tr><th style="width:170px">Flag</th><th>When</th><th>What it changes</th></tr></thead>
+      <tbody>
+        <tr><td><i>(default)</i></td><td>Triaged findings</td><td>Loads the latest <code>accepted</code> set; cluster → diagnose → static chain-trace proof → contain → commit.</td></tr>
+        <tr><td><code>--reproduce</code></td><td>Reproducible bugs</td><td>Upgrades proof from static chain-trace to a dynamic <b>red→green</b> test — written before the fix, failing pre-fix, passing post-fix, committed with the fix.</td></tr>
+        <tr><td><code>--worktree</code></td><td>Risky / parallel fixes</td><td>Isolates fix work in a git worktree; code + reproduction tests stay on the branch, effort artifacts go to the source root; branch offered for merge/PR at the end.</td></tr>
+        <tr><td><code>--learn</code></td><td>Feeding Deep-Learn</td><td>Emits <code>root-causes.json</code> — one cause-truthed record per proven cluster with a taxonomy class — for the future Pattern Ledger.</td></tr>
+        <tr><td><code>--autonomous</code> / <code>--collaborative</code></td><td>Unattended vs gated</td><td>Run all clusters unattended, or check in per cluster before applying. Omitted on a multi-cluster run ⇒ <b>ask</b>.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout decision">
+    <span class="t">Artifacts land in <code>06-Bug-Fix/round-N/</code></span>
+    <p>Rounds are <b>append-only</b> (next round = max + 1). <code>scope.json</code> is the resume record (written before any cluster work); <code>fix-summary.md</code> gets one record per cluster, appended as each closes; <code>root-causes.json</code> appears under <code>--learn</code>. Statuses flip in <code>04-Code-Review/findings.json</code> — deep-bugfix owns the <code>accepted → fixed</code> transition and no other field.</p>
+  </div>
+  <div class="callout warn">
+    <span class="t">Model routing is load-bearing</span>
+    <p>Every agent's model is resolved from the skill's <code>references/model-map.md</code> and set <b>explicitly per launch</b> — never a bare alias, never a host default. The diagnose/fix and proof stages are tiered by what each must do.</p>
+  </div>
+</section>
+
+<section class="sec" id="why">
+  <div class="sec-tag">The design rationale</div>
+  <h2>Why deep-bugfix is built this way</h2>
+  <p class="lead">Nine decisions define the fifth skill of the series. Expand each for <span class="good">what it does</span>, the <span class="bad">rejected alternative</span>, and <span class="accent">why</span>.</p>
+
+  <details class="decision-block reveal" open>
+    <summary><span class="dn">1</span><span class="dt">A dedicated skill at all — not re-running deep-implement</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Bug-fixing gets its own skill instead of routing findings back through deep-implement's triage-appended fix-phase.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Keep deep-implement as the fix-phase executor, or merely wrap it "more nicely" — explicitly rejected; the bar is doing what deep-implement is <i>structurally incapable</i> of.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>deep-implement is forward construction from a trusted spec and gates on new failures in changed files. Bug-fixing inverts all four assumptions — unknown spec, working-code edits, shared causes, provably-gone done-ness. "Fix these" yields N symptom patches with no proof and no regression guard.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">2</span><span class="dt">Diagnosis before remediation; the recommendation is a hypothesis</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Two disciplines anchor the skill: the recommendation is a <b>hypothesis, not a spec</b> (re-diagnose independently, may reject the suggested fix), and <b>no proof ⇒ not fixed</b>.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Trusting the review's proposed remedy. Real findings hedge their own cause — CR-001 literally says "register the route <b>or</b> correct the service URL."</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>The inverse of code-review's independence rule: don't anchor on the proposed remedy. A recommendation written by an agent that was <i>guessing</i> at cause is not a spec you can build against.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">3</span><span class="dt">Root-cause clustering — one fix per cause</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Group distinct findings by <i>shared underlying cause</i> and apply one fix per cause.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Fixing findings one-by-one (yields symptom patches); leaning on code-review's review-time dedup.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Review dedup merges duplicate <i>reports of one defect</i>; cluster grouping is coarser — cause-level, across distinct defects. PR#65's CR-001…006 were six distinct findings sharing one cause. That altitude is where the real fix lives — and where an abandoned sibling gets caught.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">4</span><span class="dt">Proof-of-fix in two tiers — always a real guarantee</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Never ships a claimed fix. Default is a <b>static chain-trace</b> proof (walk the root-cause chain hop-by-hop, cited evidence per hop, reusing code-review's last-mile methodology); <code>--reproduce</code> upgrades to a dynamic <b>red→green</b> test. Both are gated by an adversarial proof agent.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Accepting a claimed fix on the fixer's own say-so.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Containment proves you didn't <i>break</i> working code; it does not prove you <i>fixed</i> the bug — so a separate positive proof is required, checked by someone other than the author. "The fixer does not mark its own homework."</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">5</span><span class="dt">Reproduce-before-fix is opt-in, not default</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>A failing-then-passing reproduction test is <code>--reproduce</code>, opt-in.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Making red→green mandatory for every fix.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Some bugs can't be reproduced cheaply; the static chain-trace gives a real guarantee at the default tier. When a bug genuinely can't be reproduced, "that is itself a reported finding — never a silent skip." Proof scales with the mode chosen at invocation rather than forcing the most expensive proof on every defect.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">6</span><span class="dt">Regression containment is default</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Default-on: identify changed symbols, find their callers/dependents, re-run their tests (<code>--worktree</code> to isolate). Block only on <i>new</i> failures; escalate to 2 hops for exported/shared symbols.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>deep-implement's validation, which validates the changed file's <i>imports</i>, not its <i>dependents</i> — insufficient for the modify-working-code edit class.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>The danger in bug-fixing is regressing the things that depended on the buggy behavior; that risk lives in the <i>dependents</i>, so containment must look outward from the change, not just inward.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">7</span><span class="dt">A tuned independence model — continuity to diagnose, fresh agent to prove</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Independence is tuned per stage: <b>diagnose + fix is one agent per cluster</b> (the agent that found the cause authors the fix), while <b>proof is a fresh, adversarial agent</b> that tries to refute "fixed" and returns <code>fixed | unproven | regressed</code>.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>The series' default applied uniformly — split every stage across fresh agents. That would sever the diagnose→fix continuity bug-fixing depends on.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>The series enforces independence by withholding transcripts; deep-bugfix keeps that DNA exactly where it pays — the proof stage, so the fixer can't grade itself — but relaxes it where continuity is the whole point. The fix agent still gets evidence + codebase + plan but not the implementer's transcript, and the recommendation arrives flagged "hypothesis — do not trust."</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">8</span><span class="dt">Boundary: triage still decides; bug-fix only executes the accepted set</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Triage stays the decision step (fix / defer / reject); deep-bugfix is the specialized executor for the <code>accepted</code> set only — no triage decisions, touches neither <code>deferred</code> nor <code>rejected</code>. It replaces deep-implement as the fix-phase executor and also runs standalone on a raw bug report / trace / failing test.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Letting the fixer also decide <i>whether</i> to fix (collapsing triage into bug-fix); keeping deep-implement's fix-phase path as the primary route.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>One skill, one job. Triage is a decision; bug-fix is an execution; conflating them re-couples what the pipeline deliberately split. Running standalone mirrors how code-review runs on any PR/branch, not just deep-* efforts.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">9</span><span class="dt">Deep-Learn <code>--learn</code> emits a cause-truthed record</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Under <code>--learn</code> (opt-in), emits <code>root-causes.json</code> — cluster → confirmed cause → taxonomy class → fix → findings resolved — to feed the future Deep-Learn Pattern Ledger.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Continuing to feed the Distiller only <code>findings.json</code>, which carries the review's <i>guess</i> at root cause.</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>Fix-time is where cause becomes <i>ground truth</i> — the confirmed cause (proven by the fix) plus which findings collapsed into one cluster is strictly better signal than review's guess. Opt-in because Deep-Learn isn't built yet, making the reader a forward dependency.</p></div>
+    </div>
+  </details>
+</section>
+
+<section class="sec" id="mistakes">
+  <div class="sec-tag">Watch out</div>
+  <h2>Common mistakes</h2>
+  <div class="mistake"><p><b>Anchoring on the recommendation</b> instead of re-diagnosing — it enters the brief flagged "hypothesis — do not trust."</p></div>
+  <div class="mistake"><p><b>Committing a symptom patch</b> — a fix without a traced chain (or red→green test) is rejected at proof.</p></div>
+  <div class="mistake"><p><b>Fixing one cluster member</b> and silently abandoning its siblings — clustering exists to catch exactly this.</p></div>
+  <div class="mistake"><p><b>Reordering the gate</b> — proof and containment both come <i>before</i> commit; nothing unproven ships; <code>regressed</code> reverts immediately.</p></div>
+  <div class="mistake"><p><b>Making a triage decision</b> — fix/defer/reject belongs to <code>/deep-code-review --triage</code>. Scoping <code>open</code> findings is selection, not triage.</p></div>
+  <div class="mistake"><p><b>Editing the plan or a drive-by refactor</b> — minimal fix at the cause; a gap that needs re-planning goes back to <code>/deep-plan</code>.</p></div>
+  <div class="mistake"><p><b>Passing implementer/reviewer transcripts</b> to any agent — evidence only, fresh eyes.</p></div>
+  <div class="mistake"><p><b>Committing on <code>main</code>/<code>develop</code></b>, or reading <code>.env</code> during host-command discovery.</p></div>
+</section>
+
+<section class="sec" id="mastery">
+  <div class="sec-tag">Prove it</div>
+  <h2>Mastery checklist</h2>
+  <ul class="checklist">
+    <li>Loaded active directive cards; wrote <code>round-N/scope.json</code> before any cluster work.</li>
+    <li>Re-diagnosed each cluster to a confirmed cause; treated the recommendation as a hypothesis.</li>
+    <li>Clustered by shared cause; every finding in a cluster resolved by the one fix.</li>
+    <li>Ran apply → proof → containment → commit, in that order; nothing unproven shipped.</li>
+    <li>Flipped statuses <code>accepted → fixed</code> only on a <code>fixed</code> verdict; appended fix-summary records.</li>
+    <li>Made no triage decision, edited no plan; handed off to <code>/deep-code-review</code> for re-review.</li>
+  </ul>
+</section>
+
+<section class="sec" id="qref">
+  <div class="sec-tag">At a glance</div>
+  <h2>Quick reference</h2>
+  <div class="qref reveal">
+    <div class="qh">deep-bugfix</div>
+    <dl>
+      <dt>Input</dt><dd><code>accepted</code> findings (default), a bug report / stack trace, or a failing test</dd>
+      <dt>Output</dt><dd><code>06-Bug-Fix/round-N/</code> → scope.json · fix-summary.md · (<code>--learn</code>) root-causes.json; findings flipped <code>fixed</code></dd>
+      <dt>Order</dt><dd>apply → proof → containment → commit (never reordered)</dd>
+      <dt>Proof</dt><dd>static chain-trace (default) · red→green (<code>--reproduce</code>); fresh adversarial verdict <code>fixed | unproven | regressed</code></dd>
+      <dt>Hard rules</dt><dd>Fix code only; never triage; never edit the plan; prove before commit; never Haiku, never <code>main</code>/<code>develop</code></dd>
+      <dt>Hands off to</dt><dd><a href="deep-code-review.html">/deep-code-review</a> (re-review)</dd>
+    </dl>
+  </div>
+</section>
+
+<div class="epnav">
+  <a href="deep-code-review.html"><span class="dir">← Previous</span><span class="ttl">deep-code-review</span><span class="cmd">/deep-code-review</span></a>
+  <a class="next" href="deep-docs.html"><span class="dir">Next skill →</span><span class="ttl">deep-docs</span><span class="cmd">/deep-docs</span></a>
+</div>
+
+</main>
+</div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>Skill 5 of 6 · deep-bugfix · Remediate</span>
+    <span><a href="index.html">All skills</a></span>
+  </div>
+</footer>
+
+<script src="assets/series.js"></script>
+</body>
+</html>
