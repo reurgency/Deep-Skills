@@ -1,6 +1,8 @@
 <!-- Written when a cluster hits the fix cap (2 attempts) still unproven, or reverts on regression
-     with no cap room left. Saved alongside the round artifacts (06-Bug-Fix/round-N/) and linked
-     from the cluster's fix-summary record. Also drives the notification message. -->
+     with no cap room left. Saved as `06-Bug-Fix/round-N/blocker-<CL-K>.md` (one file per blocked
+     cluster, e.g. round-2/blocker-CL-3.md — the round dir + cluster id keep it collision-free
+     across rounds) and linked by that path from the cluster's fix-summary record ("Artifacts"
+     line). Also drives the notification message. -->
 
 ### ⛔ Blocker — Cluster <CL-K>: <one-line suspected/confirmed cause>
 
