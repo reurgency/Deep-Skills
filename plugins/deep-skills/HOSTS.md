@@ -35,15 +35,15 @@ Every host below supports **per-agent model selection** in its subagent/agent de
 ### Claude Code (reference host — shipped)
 Add the marketplace, install the plugin:
 ```
-/plugin marketplace add <owner>/<repo>
-/plugin install deep-skills@deep-skills-by-reu
+/plugin marketplace add reurgency/marketplace
+/plugin install deep-skills@reurgency
 ```
 Manifests: `.claude-plugin/marketplace.json` (repo root) + `plugins/deep-skills/.claude-plugin/plugin.json`.
 
 ### Codex (manifest authored — gate pending)
 Codex reads `SKILL.md` natively and has a plugin marketplace.
 ```
-codex plugin marketplace add <owner>/<repo>     # RE-VERIFY exact subcommand/flags
+codex plugin marketplace add reurgency/marketplace     # RE-VERIFY exact subcommand/flags
 # then in Codex: /plugins → search "deep-skills" → Install
 ```
 Manifest: `plugins/deep-skills/.codex-plugin/plugin.json` (`"skills": "./skills/"`). Codex also accepts `.claude-plugin/marketplace.json` as a legacy/compat marketplace source. For the fleets, enable fan-out (`[features] multi_agent = true` in `~/.codex/config.toml`) and ship `.codex/agents/*.toml` with per-agent `model` resolved from `model-map.md`.
@@ -63,8 +63,8 @@ Manifest: `plugins/deep-skills/.cursor-plugin/plugin.json` (`"skills": "./skills
 ### GitHub Copilot — CLI (reuses the Claude marketplace)
 Copilot CLI consumes `.claude-plugin/marketplace.json` directly:
 ```
-copilot plugin marketplace add <owner>/<repo>
-copilot plugin install deep-skills@deep-skills-by-reu
+copilot plugin marketplace add reurgency/marketplace
+copilot plugin install deep-skills@reurgency
 /skills list                     # verify
 ```
 

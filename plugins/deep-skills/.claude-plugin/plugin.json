@@ -5,8 +5,8 @@
   "version": "0.1.0",
   "description": "The Deep-* series: /deep-plan → /deep-plan-review → /deep-implement → /deep-code-review (→ /deep-bugfix → re-review) → /deep-docs. A steerable, fresh-agent-resumable workflow for planning, reviewing, building, code-reviewing, and bug-fixing features, then mapping what's built into a context-window-aware orientation map — with a self-improving directive loop that learns from each review.",
   "author": {
-    "name": "reU",
-    "email": "boothe.jeff@gmail.com"
+    "name": "reUrgency",
+    "email": "jeff.boothe@reurgency.com"
   },
   "license": "MIT",
   "keywords": ["planning", "code-review", "implementation", "multi-agent", "workflow", "deep-skills"]

@@ -97,19 +97,19 @@ The same skills install natively on each host. Full commands, the capability mat
 
 | Host | Skills | Parallel fan-out | Per-agent model | Install |
 |---|---|---|---|---|
-| **Claude Code** | ✓ | ✓ | ✓ | `/plugin marketplace add reU/Deep-Skills` → `/plugin install deep-skills@deep-skills-by-reu` |
-| **Codex** | ✓ | ✓ | ✓ | `codex plugin marketplace add reU/Deep-Skills` → `/plugins` → install ¹ |
+| **Claude Code** | ✓ | ✓ | ✓ | `/plugin marketplace add reurgency/marketplace` → `/plugin install deep-skills@reurgency` |
+| **Codex** | ✓ | ✓ | ✓ | `codex plugin marketplace add reurgency/marketplace` → `/plugins` → install ¹ |
 | **Cursor** | ✓ | ✓ | ✓ | `/add-plugin deep-skills` (or Customize → Marketplace) ¹ |
-| **Copilot CLI** | ✓ | gate ² | ✓ | `copilot plugin marketplace add reU/Deep-Skills` → `copilot plugin install deep-skills@deep-skills-by-reu` |
+| **Copilot CLI** | ✓ | gate ² | ✓ | `copilot plugin marketplace add reurgency/marketplace` → `copilot plugin install deep-skills@reurgency` |
 | **Copilot / VS Code** | ✓ | ⚠ sequential ² | ✓ | file-based: set `chat.agentSkillsLocations` → `plugins/deep-skills/skills` (no marketplace) |
 
 ```bash
 # Claude Code (reference host)
-/plugin marketplace add reU/Deep-Skills          # or: /plugin marketplace add /path/to/Deep-Skills
-/plugin install deep-skills@deep-skills-by-reu
+/plugin marketplace add reurgency/marketplace
+/plugin install deep-skills@reurgency
 ```
 
-Update later with `/plugin marketplace update deep-skills-by-reu`.
+Update later with `/plugin marketplace update reurgency`.
 
 ¹ Manifest authored; the empirical capability gate (install + run a full cycle, confirm fan-out + model binding) is **pending** — see `HOSTS.md`. Fast-moving schema/command details are marked **RE-VERIFY** there.
 ² VS Code Copilot's docs show only **sequential** handoffs. If the gate confirms no parallel fan-out, the single-agent skills (`deep-plan`, `deep-implement`, `deep-docs`) run fully and the fleet skills (`deep-code-review`, `deep-plan-review`, `deep-bugfix` — the latter fans out per-cluster diagnose+fix agents plus fresh proof agents) route to a single-agent fallback on that host only.
