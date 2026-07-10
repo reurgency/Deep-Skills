@@ -1,0 +1,13 @@
+{
+  "name": "deep-goal",
+  "displayName": "Deep Goal",
+  "version": "0.1.0",
+  "description": "Paid add-on to deep-skills: deep-goal is an autonomous, rigor-gated conductor that runs a full Deep-* effort end-to-end from one invocation — plan → review → implement → code-review → bugfix → docs — at a chosen rigor level (yolo/poc/mvp/prod). Requires the deep-skills plugin ≥ 0.2.0.",
+  "author": {
+    "name": "reU",
+    "email": "boothe.jeff@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": ["orchestration", "autonomous", "pipeline", "conductor", "workflow", "deep-skills", "deep-goal"],
+  "skills": "./skills/"
+}
