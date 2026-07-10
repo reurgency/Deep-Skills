@@ -41,6 +41,8 @@ After each round's review/re-review passes its advance test, the conductor count
 
 Exit semantics key off the level's **`re_review_cap`** — **always read from the resolved map** (`rigor-map.json`, or the merged repo override), never a hard-coded literal — so custom override levels inherit coherent behavior by cap value, not by level name. (When a round's bugfix was **skipped** under § 1.5's empty-set short-circuit, the loop exits there per § 1.5 — the machine below governs rounds whose bugfix actually ran.)
 
+**"Exit to docs"** — the shorthand used below, in § 1.5, and in the summaries (`conductor.md` § 6, SKILL.md) — means: **exit the loop and proceed to the level's remaining map stages** (at the shipped cap ≥ 1 levels the next stage is `docs`, hence the name); a level with no stages after the loop — legal for a custom override (`rigor-levels.md` § Validation imposes no docs requirement) — completes the run there, exactly like cap 0's "next map stage" exit.
+
 - **No `code-review` stage** (shipped: yolo) — no loop, nothing here applies.
 - **cap = 0** (shipped: poc) — the loop **ends after round 1's bugfix**. No re-review is ever dispatched. Residuals — every `deferred` finding and any blocked bugfix cluster — go to the run report (`references/resume-and-report.md` § 2); the run proceeds to the next map stage (poc has none — the run completes).
 - **cap = 1** (shipped: mvp) — **exactly one re-review** (round 2), then a single check, no counting test:
