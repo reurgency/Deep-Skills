@@ -7,10 +7,16 @@
        {effort_name}   — the effort slug (artifacts home: .deep-skills/{effort_name}/)
        {stage_flags}   — this stage's arguments + flags from the resolved rigor map
                          (conductor.md § Stage → invocation table)
-       {worktree_path} — renders "none — work on the current branch per the skill's own defaults"
-                         unless the run was launched with --worktree, in which case it is the ONE
-                         conductor-created worktree every post-planning stage shares (Phase 5 wires
-                         this; until then it always renders the "none" form)
+       {worktree_path} — two renderings (references/loop-and-budget.md § 5):
+                         · no --worktree: "none — work on the current branch per the skill's own
+                           defaults"
+                         · --worktree: "`<path>` (branch `deep-goal/<effort>`) — a git worktree
+                           owned by this pipeline: do ALL code work (reads, edits, builds, commits)
+                           inside it. Effort artifacts are unaffected — everything under
+                           `.deep-skills/{effort_name}/` stays in the invocation repo, exactly as
+                           stated above." — the ONE conductor-created worktree every post-planning
+                           stage shares (implement, both code-review dispatches, bugfix, every
+                           re-review round, docs)
      Keep the rendered briefing MINIMAL — the skill's own SKILL.md carries the job; this briefing
      carries only identity, effort, flags, and the pipeline rules. Never append transcripts,
      plan excerpts, or prior stages' narratives. -->
