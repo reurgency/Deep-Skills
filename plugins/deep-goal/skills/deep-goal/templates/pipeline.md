@@ -1,14 +1,15 @@
 <!-- deep-goal pipeline state — written to `.deep-skills/<effort>/00-Manifest/pipeline.md` at launch
      and updated by the CONDUCTOR ONLY, at every stage boundary (contract row #3). Core skills treat
      this file as opaque (artifact-structure.md § Add-on extensions). It is the resume source: a
-     re-invocation reads prior state from here (Phase 6), the one-stage-in-flight guard reads the
+     re-invocation reads prior state from here (references/resume-and-report.md § 1), the
+     one-stage-in-flight guard reads the
      Dispatch records, and the final run report is assembled from it.
      Header fields are resolved ONCE at launch and never re-derived mid-run. Dates in absolute form
      (YYYY-MM-DD HH:MM). Review-loop rounds append additional dispatch records ("code-review
      (round N)" etc.) plus one Review loop row per round (pre-dispatch snapshot + round accounting
      — references/loop-and-budget.md § 1); --budget runs log boundary events under Budget events
-     (§ 2); Phase 6's resume reads this file and continues updating records through the normal
-     loop (a "fresh" restart archives it first). -->
+     (§ 2); resume reads this file and continues updating records through the normal loop
+     (a "fresh" restart archives it first, as pipeline-archived-<n>.md). -->
 
 # Pipeline — <effort-name>
 
@@ -28,7 +29,7 @@ The resolved level's stages in dispatch order, with the invocation each renders 
 
 ## Dispatch records
 
-One record per dispatch, in order. **Status:** `pending` → `in-flight` → `complete` | `halted`. **Exactly one record may be `in-flight` at a time** (the double-dispatch guard: mark `in-flight` *before* launching). `halted` means the *stage* stopped without passing its advance test; whether the *run* stopped is the matching Blockers row's Policy. Resume (Phase 6) re-enters at the first record that is not `complete`.
+One record per dispatch, in order. **Status:** `pending` → `in-flight` → `complete` | `halted`. **Exactly one record may be `in-flight` at a time** (the double-dispatch guard: mark `in-flight` *before* launching). `halted` means the *stage* stopped without passing its advance test; whether the *run* stopped is the matching Blockers row's Policy. Resume (`references/resume-and-report.md` § 1.3) re-enters at the first record that is not `complete`.
 
 | # | Stage | Status | Started | Finished | Advance test | Spend (est) | Notes |
 |---|---|---|---|---|---|---|---|
@@ -67,4 +68,4 @@ Running total: <~N tokens est> — sum of completed records' estimates; uncalibr
 |---|---|---|---|
 | — | — | — | — |
 
-- **Action** values: `paused — notified, waiting` · `resumed` · `ceiling raised to ~<band>` · `ceiling removed` (resume actions are Phase 6's).
+- **Action** values: `paused — notified, waiting` · `resumed` · `ceiling raised to ~<band>` · `ceiling removed` (resume actions: `references/resume-and-report.md` § 1.3).

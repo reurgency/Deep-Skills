@@ -1,25 +1,26 @@
 # Conductor — dispatch protocol, advance test, blocker policy
 
-How the conductor actually walks the pipeline: the launch sequence, the inline planning window, the per-stage dispatch loop, the artifact-verification **advance test**, and the severity-aware **blocker policy**. SKILL.md § Workflow is the summary; this file is the protocol.
+How the conductor actually walks the pipeline: the launch sequence (re-entry first), the inline planning window, the per-stage dispatch loop, the artifact-verification **advance test**, the severity-aware **blocker policy**, and the run's bookends — resume and the final run report (§ 7 summary; spec in `references/resume-and-report.md`). SKILL.md § Workflow is the summary; this file is the protocol.
 
 Two invariants frame everything here (contract rows #3 and #4 of the plan's State/Data-Flow Contract):
 
 - **`00-Manifest/pipeline.md` is the conductor's state file** — conductor-written only, updated at every stage boundary, and the single thing a re-invocation needs to resume. Its shape is `templates/pipeline.md`.
-- **The conductor is READ-ONLY on manifest stage lines.** Each core skill flips its own line in `00-Manifest/manifest.md`; the conductor reads those flips as evidence and never writes one. (Its only manifest write, ever, is the effort summary paragraph at run end — Phase 6.)
+- **The conductor is READ-ONLY on manifest stage lines.** Each core skill flips its own line in `00-Manifest/manifest.md`; the conductor reads those flips as evidence and never writes one. (Its only manifest write, ever, is the effort summary paragraph at run completion — § 7.)
 
 ## 1. Launch sequence
 
 Run these in order, once, before anything is dispatched. Everything resolved here is persisted into `pipeline.md` and **never re-derived mid-run**.
 
-1. **Rigor resolution** — merge shipped `templates/rigor-map.json` with any `.deep-skills/rigor-map.json` override, validate, resolve the level (or ask), per SKILL.md § Rigor resolution and `references/rigor-levels.md`. On `--dry-run`: print the preview and **stop here** — no handshake, no writes.
-2. **Version handshake** — locate the installed deep-skills plugin (§ 1a below), read its `plugin.json` `version`, require ≥ 0.2.0 as semver; refuse / warn / proceed per SKILL.md § Launch. Record the resolved plugin.json path and version outcome in the `pipeline.md` header.
-3. **Effort slug** — the conductor derives the kebab-case slug from the goal:
+1. **Re-entry check — FIRST, before everything.** Does the invocation target an effort whose `00-Manifest/pipeline.md` already exists — or is it a bare "resume"? → the **re-entry protocol** (`references/resume-and-report.md` § 1): announce prior state and ask resume/fresh as one self-contained question. **Resume skips the rest of this sequence** — prior state is re-read from the pipeline.md header, never re-derived; **fresh** archives the old pipeline.md (`pipeline-archived-<n>.md`) and falls through here. No prior pipeline.md → continue. (`--dry-run` never re-enters.)
+2. **Rigor resolution** — merge shipped `templates/rigor-map.json` with any `.deep-skills/rigor-map.json` override, validate, resolve the level (or ask), per SKILL.md § Rigor resolution and `references/rigor-levels.md`. On `--dry-run`: print the preview and **stop here** — no handshake, no writes.
+3. **Version handshake** — locate the installed deep-skills plugin (§ 1a below), read its `plugin.json` `version`, require ≥ 0.2.0 as semver; refuse / warn / proceed per SKILL.md § Launch. Record the resolved plugin.json path and version outcome in the `pipeline.md` header.
+4. **Effort slug** — the conductor derives the kebab-case slug from the goal:
    - **yolo / poc** (autonomous planning): the derived slug is final — it is passed to the planner as `deep-plan --autonomous --effort=<slug>`, which uses it verbatim (deep-plan's autonomous-mode contract). State it; never ask.
    - **mvp / prod** (interactive planning): the derived slug is a *proposal* — deep-plan's own inline Setup step proposes it and the **user confirms** (or renames) as usual. Nothing is created until the name is confirmed.
-4. **Effort dir + manifest** — once the slug is final/confirmed, create `.deep-skills/<effort>/` and `00-Manifest/manifest.md` **if absent**, in the exact format of `references/artifact-structure.md` § Manifest format, all stage statuses `pending`. (Creating the manifest is allowed — the read-only rule covers *flipping* stage lines, which only core skills do.)
-5. **Initial `pipeline.md`** — write `00-Manifest/pipeline.md` from `templates/pipeline.md`: full header (goal, rigor + source, resolved deep-skills location + version outcome, gates/budget/worktree), the resolved stage list with per-stage dispatch modes and invocations, one dispatch record per planned dispatch (all `pending`), empty Blockers, zero spend. **Pipeline state exists from launch** — a crash at any later point, including mid-planning, is resumable from this file (Phase 6 owns the resume walk; this file is what it reads).
+5. **Effort dir + manifest** — once the slug is final/confirmed, create `.deep-skills/<effort>/` and `00-Manifest/manifest.md` **if absent**, in the exact format of `references/artifact-structure.md` § Manifest format, all stage statuses `pending`. (Creating the manifest is allowed — the read-only rule covers *flipping* stage lines, which only core skills do.)
+6. **Initial `pipeline.md`** — write `00-Manifest/pipeline.md` from `templates/pipeline.md`: full header (goal, rigor + source, resolved deep-skills location + version outcome, gates/budget/worktree), the resolved stage list with per-stage dispatch modes and invocations, one dispatch record per planned dispatch (all `pending`), empty Blockers, zero spend. **Pipeline state exists from launch** — a crash at any later point, including mid-planning, is resumable from this file (`references/resume-and-report.md` § 1 owns the resume walk; this file is what it reads).
 
-At mvp/prod, steps 4–5 execute the moment the effort name is confirmed at the top of the inline planning window — *before* any question round — so the long interactive session is crash-covered too.
+At mvp/prod, steps 5–6 execute the moment the effort name is confirmed at the top of the inline planning window — *before* any question round — so the long interactive session is crash-covered too.
 
 ### 1a. Locating the installed deep-skills plugin (per host)
 
@@ -48,7 +49,7 @@ Branch on the plan stage's `mode` in the resolved map:
 
 For each remaining stage in the resolved list, in order:
 
-1. **Guard:** exactly **one stage in flight at a time.** Before launching, confirm no other record is `in-flight`, then mark this record `in-flight` with its start time. (If deep-goal is re-invoked while a record is `in-flight`, announce the running stage instead of double-dispatching — see the plan's Interaction & re-entry rules; Phase 6 owns full resume.)
+1. **Guard:** exactly **one stage in flight at a time.** Before launching, confirm no other record is `in-flight`, then mark this record `in-flight` with its start time. (If deep-goal is re-invoked while a record is `in-flight`, announce the running stage instead of double-dispatching; full resume — including the re-entry edition of this guard — is `references/resume-and-report.md` § 1.)
 2. **Render the briefing:** fill `templates/stage-briefing.md` — substitute `{skill_name}` (from the merged map's `known_stages.<stage>.skill`), `{skill_path}` (from the launch-resolved deep-skills location), `{effort_name}`, `{stage_flags}` (per the invocation table below), and `{worktree_path}` (the conductor-created worktree on `--worktree` runs, else the none-form — both renderings: `references/loop-and-budget.md` § 5 and the template's comment block). The rendered text is the subagent's **entire prompt** — nothing else rides along, no transcripts, no plan excerpts; the briefed agent reads the skill's own SKILL.md and the effort's artifacts.
 3. **Dispatch:** launch **one fresh subagent** at the session model (no model tiering here — fleet skills self-tier via their own `model-map.md`). Await completion. Never dispatch two stages concurrently, never reuse a stage's agent for the next stage.
 4. **Advance test** (§ 4): verify artifacts and manifest evidence — never the subagent's closing narrative. Pass → complete the record (finished time, advance-test result, spend estimate from `references/rigor-levels.md` § Cost bands — refined by observed usage where the host surfaces it, always labeled an estimate) and continue. Fail → inspect for a blocker artifact and apply the blocker policy (§ 5).
@@ -106,9 +107,9 @@ A blocker is a stage saying "a human is needed." The conductor classifies by **w
 | Bugfix **unproven cluster at the fix cap** (reverted) | `06-Bug-Fix/round-N/blocker-<CL-K>.md` (one per blocked cluster) | **tail** | **CONTINUE + record** — clusters are independent; other clusters' fixes stand |
 | Docs **anchor drift blocks publish** (`drifted` / `over-budget` anchors) | the drift record: `docs/ai-map/coverage.md` + the drifted-anchor list in `docs/ai-map/learn-signal.json` | **tail** | **CONTINUE + record** — a docs-only failure never invalidates the built code |
 
-**Either way, `pipeline.md` carries the blocker-report path** (Blockers table row: stage · policy · report path · one-line note), and the final run report (Phase 6) lists every blocker with its path.
+**Either way, `pipeline.md` carries the blocker-report path** (Blockers table row: stage · policy · report path · one-line note), and the final run report (§ 7; `references/resume-and-report.md` § 2) lists every blocker with its path.
 
-**HALT procedure:** mark the stage's dispatch record `halted` (with the advance-test result), append the Blockers row with policy `HALT`, **notify**, and stop — dispatch nothing further. Do not archive or unwind anything: the halted `pipeline.md` *is* the resume point (Phase 6 re-enters at the halted stage once the human unblocks it).
+**HALT procedure:** mark the stage's dispatch record `halted` (with the advance-test result), append the Blockers row with policy `HALT`, **notify**, and stop — dispatch nothing further. Do not archive or unwind anything: the halted `pipeline.md` *is* the resume point (a re-invocation re-enters at the halted stage once the human unblocks it — `references/resume-and-report.md` § 1.3).
 
 **CONTINUE procedure:** record the blocker (Blockers row, policy `CONTINUE`) and proceed to the next stage. The stage's own record reflects its actual outcome: `complete` when its advance test still passed (bugfix with one blocked cluster among fixed ones — `fix-summary.md` exists and the manifest flipped), `halted` when it didn't (docs publish blocked by drift) — `halted` on a record means *the stage* stopped, the Blockers row's policy column says whether *the run* did. No mid-run notification for CONTINUE blockers — they ride the completion notification and the run report (the notify-sparingly rule: halts, gates, budget pauses, completion only).
 
@@ -128,6 +129,12 @@ Exit semantics key off the level's **`re_review_cap`, read from the resolved map
 - **cap 1** — exactly one re-review; **HALT** only on unresolved Blockers (certificate FAIL), else **exit to docs** with round-2 residuals (fresh `open` + all `deferred`) reported.
 - **cap ≥ 2** — from round 2: exit on certificate **PASS** AND **strictly fewer** non-`fixed` findings than the prior round; fail with re-reviews remaining → triage → bugfix → next round; cap reached without convergence → **HALT + notify as a convergence failure**.
 
-## 7. Hosts
+## 7. Re-entry & run completion (summary)
+
+Spec: `references/resume-and-report.md`. **Re-entry** is the launch sequence's **first check** (§ 1 item 1): an invocation that finds an existing `00-Manifest/pipeline.md` announces prior state and asks **resume / fresh** as one self-contained question — resume re-enters at the **first dispatch record that is not `complete`** (a `pending` record re-runs its boundary checks — budget with the current ceiling, then any unapproved gate re-fires; an `in-flight` record whose artifacts pass the advance test is marked complete and skipped — the idempotency rule; one that fails is re-dispatched once, on the core skills' own internal resume; review rounds ≥ 2 judged by the round-aware test, never bare existence); fresh archives the old pipeline.md as `pipeline-archived-<n>.md` and relaunches. All persisted header state — rigor, stage list, deep-skills location, gates, budget, worktree — is **re-read, never re-derived**.
+
+**Completion** — when the walk's last record is `complete`, in order: **write `00-Manifest/run-report.md`** (`templates/run-report.md`; contents spec `resume-and-report.md` § 2.2 — stages + commits, the plan's Assumptions **verbatim**, every `deferred` finding with severity from findings.json, every blocker with its report path, per-stage + total spend with the uncalibrated caveat, worktree + merge instructions when set) → **update the manifest effort summary paragraph** (the conductor's ONLY manifest write, ever) → **completion notification** (`loop-and-budget.md` § 4) → **deliver the full report as the closing message**. HALTed runs write no report; the halted pipeline.md is the resume point.
+
+## 8. Hosts
 
 Everything above assumes **Claude Code subagent affordances** (fresh background subagents with a supplied prompt) — the v1 designed-and-verified floor. On hosts without them (Codex / Cursor / Copilot), dispatch degrades to **inline sequential execution** per `HOSTS.md` — same stage order, same briefing content, same advance tests and pipeline.md records; honestly caveated (prod-rigor runs may hit context limits). Only this section's *mechanism* changes per host; the protocol does not.

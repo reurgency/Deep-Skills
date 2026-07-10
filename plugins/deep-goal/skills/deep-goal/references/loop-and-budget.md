@@ -39,10 +39,10 @@ After each round's review/re-review passes its advance test, the conductor count
 Exit semantics key off the level's **`re_review_cap`** — **always read from the resolved map** (`rigor-map.json`, or the merged repo override), never a hard-coded literal — so custom override levels inherit coherent behavior by cap value, not by level name:
 
 - **No `code-review` stage** (shipped: yolo) — no loop, nothing here applies.
-- **cap = 0** (shipped: poc) — the loop **ends after round 1's bugfix**. No re-review is ever dispatched. Residuals — every `deferred` finding and any blocked bugfix cluster — go to the run report (Phase 6); the run proceeds to the next map stage (poc has none — the run completes).
+- **cap = 0** (shipped: poc) — the loop **ends after round 1's bugfix**. No re-review is ever dispatched. Residuals — every `deferred` finding and any blocked bugfix cluster — go to the run report (`references/resume-and-report.md` § 2); the run proceeds to the next map stage (poc has none — the run completes).
 - **cap = 1** (shipped: mvp) — **exactly one re-review** (round 2), then a single check, no counting test:
   - `certificate.md` verdict **FAIL** (unresolved Blockers — a fresh 9–10 finding, or a prior Blocker not `fixed`) → **HALT + notify**. Blockers row: stage `code-review (round 2)`, policy HALT, report = the certificate path.
-  - otherwise → **exit to docs**. Round 2's fresh findings are *not* triaged or bugfixed — they stay `open` and join every `deferred` finding as **residuals, listed prominently in the run report** (Phase 6 requirement, specced here).
+  - otherwise → **exit to docs**. Round 2's fresh findings are *not* triaged or bugfixed — they stay `open` and join every `deferred` finding as **residuals, listed prominently in the run report** (`references/resume-and-report.md` § 2.2 — the "still open, never triaged" section).
 - **cap ≥ 2** (shipped: prod, cap 3) — from round 2 on, after each re-review's round accounting, the **exit test**:
 
   > certificate verdict **PASS** (no unresolved Blockers) **AND** this round's non-`fixed` count **< the prior round's count** (strictly — both read from the Review loop table / findings.json).
@@ -56,19 +56,19 @@ Exit semantics key off the level's **`re_review_cap`** — **always read from th
 *Natural-language trigger: "cap spend at ~500k tokens," "budget this run to a million tokens."*
 
 - **Band:** an approximate total-token ceiling for the run (`--budget=500k`, `~500k tokens`, `1.5m`), normalized and recorded in the pipeline.md header's Budget slot at launch. It is a **soft, estimate-based ceiling** — spend figures are the uncalibrated heuristic bands of `rigor-levels.md` § Cost bands (refined by observed usage where the host surfaces it), so treat the ceiling as "roughly here," never an exact meter.
-- **Recording:** as each dispatch record completes, its Spend (est) cell is filled (Phase 4 behavior — unchanged); the Spend section's running total sums the completed records' estimates (band midpoints, or observed figures where available).
+- **Recording:** as each dispatch record completes, its Spend (est) cell is filled (`conductor.md` § 3 behavior — unchanged); the Spend section's running total sums the completed records' estimates (band midpoints, or observed figures where available).
 - **Check — at stage boundaries ONLY.** A dispatched stage always finishes; the conductor never interrupts one mid-flight and never leaves a half-written artifact. At each boundary (after completing a record, before marking the next `in-flight` — see § 6 for the boundary order), compare the running total against the ceiling. **Crossed** → pause:
   1. append a **Budget events** row to pipeline.md (boundary = the next, undispatched stage; running total; ceiling; action `paused — notified, waiting`);
   2. **notify** (§ 4) — one line, e.g. `deep-goal paused: budget ~150k tokens crossed (est ~185k) before code-review — re-invoke deep-goal to resume, raise, or stop.`;
   3. **stop the turn and wait.** Nothing further is dispatched. The next stage's record stays `pending`.
-- **Resume** (contract row #8's other half — Phase 6 owns it): a re-invocation reads the Budget events row and continues from the paused boundary; the user may raise or remove the ceiling there (logged as another Budget events row). Without `--budget`, no check runs and the Budget events log stays empty.
+- **Resume** (contract row #8's other half — spec: `references/resume-and-report.md` § 1.3): a re-invocation reads the Budget events row and re-enters **at the paused boundary** — the budget check re-runs with the current ceiling, then any unapproved gate at the same boundary re-fires; the user may raise or remove the ceiling there (logged as another Budget events row). Without `--budget`, no check runs and the Budget events log stays empty.
 
 ## 3. Gate injection — `--gate=<stage>` (repeatable)
 
 *Natural-language trigger: "pause before implement," "check in with me before docs" ("…before implement and before docs" = two gates).*
 
 - **Validated at launch, never mid-run:** each gate must name a stage in the **resolved** stage list; an unknown or not-in-this-level name refuses at launch with the valid menu (the launch-refusal guardrail). Gating `plan` is legal but redundant at interactive levels (the user is already present).
-- **Persisted:** gates are written into the pipeline.md header's Gates slot at launch, so a resumed run honors them (Phase 6 reads the header — the gate survives crashes and budget pauses).
+- **Persisted:** gates are written into the pipeline.md header's Gates slot at launch, so a resumed run honors them (resume re-reads the header, `references/resume-and-report.md` § 1.3 — the gate survives crashes and budget pauses).
 - **Fires once,** at the stage boundary immediately before the named stage's **first** dispatch. Loop rounds do not re-fire it (a gate on `code-review` fires before round 1 only — gating every re-review would turn the loop into an interview).
 - **At the gate:** notify (§ 4 — gates are on the trigger list; the user may be away from the terminal), then ask **one self-contained structured question** (host-affordances: native structured-question tool, numbered-list chat fallback) and wait:
   - **Content** — everything needed to decide lives in the question itself, never in between-tool-call prose: *what ran* (per completed record: stage + one-line advance-test result + spend est), *what's next* (the gated stage, its exact invocation from the Stage list table, its cost band), and the two options.
@@ -84,7 +84,7 @@ The conductor notifies on **exactly four triggers** — the series' notify-spari
 | **HALT** (blocker policy, `conductor.md` § 5 — or a convergence failure, § 1.4) | `deep-goal halted: implement blocked at Phase 2 (fix cap) — see .deep-skills/<effort>/01-Plan/plan.md § Phase Summaries. Re-invoke deep-goal to resume once unblocked.` |
 | **Gate** (§ 3) | `deep-goal at your --gate before implement: 3 stages done, plan reviewed clean — answer the question in the session to proceed or stop.` |
 | **Budget pause** (§ 2) | `deep-goal paused: budget ~500k tokens crossed (est ~530k) before code-review — re-invoke deep-goal to resume, raise, or stop.` |
-| **Completion** (run report written — Phase 6) | `deep-goal done: mvp run complete, 6/6 stages, 3 findings fixed, 2 deferred — run report at .deep-skills/<effort>/00-Manifest/run-report.md.` |
+| **Completion** (run report written — `references/resume-and-report.md` § 2.1) | `deep-goal done: mvp run complete, 6/6 stages, 3 findings fixed, 2 deferred — run report at .deep-skills/<effort>/00-Manifest/run-report.md.` |
 
 **Mechanics** (same as `conductor.md` § 5): **one line, < 200 chars, lead with the actionable fact** (what needs the user, where the artifact is), delivered via the host-affordances fallback chain — native notifier (Claude Code `PushNotification`) → shell `osascript` → a bold **`ATTENTION:`** line as the last line of the turn.
 
@@ -104,7 +104,7 @@ The conductor notifies on **exactly four triggers** — the series' notify-spari
   Record the absolute path and branch in the header Worktree slot. Resolved once — a resumed run **reuses the recorded path and never creates a second worktree**.
 - **Substitute into every subsequent stage briefing:** from here on, every rendered `stage-briefing.md` gets the worktree form of `{worktree_path}` (both renderings are defined in the template's comment block): *do ALL code work — reads, edits, builds, commits — inside `<path>`; effort artifacts under `.deep-skills/<effort>/` stay in the invocation repo.* That covers **implement, code-review (both dispatches), bugfix, every re-review round, and docs** — all in the same tree, on the same `deep-goal/<effort>` branch.
 - **Where the conductor reads:** effort artifacts (plan, manifest, pipeline.md, review artifacts) live in the **invocation repo** — advance tests read them there, and resume works from the repo deep-goal is invoked in. Artifacts that live in the **code tree** (commits; deep-docs' published `docs/ai-map/`) are read **in the worktree** on a `--worktree` run.
-- **At completion** (requirement specced here; Phase 6 writes it): the run report **must** carry the worktree path, its branch, and merge instructions (review the branch, `git merge deep-goal/<effort>` or PR it, then `git worktree remove <path>`). The conductor never deletes the worktree itself.
+- **At completion** (requirement specced here; the run report writes it — `references/resume-and-report.md` § 2.2): the run report **must** carry the worktree path, its branch, and merge instructions (review the branch, `git merge deep-goal/<effort>` or PR it, then `git worktree remove <path>`). The conductor never deletes the worktree itself.
 - **Omitted:** `{worktree_path}` renders the none-form; every stage runs on the current branch per its own skill's defaults — no worktree anywhere.
 
 ## 6. Stage-boundary order
