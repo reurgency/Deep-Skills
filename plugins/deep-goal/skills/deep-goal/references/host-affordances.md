@@ -24,7 +24,7 @@ Two properties of the map that call sites must respect (concrete model IDs stay 
 - **Universal fallback (no notifier):** emit a **bold `ATTENTION:` line** as the last line of the turn, leading with the actionable fact.
 - **User-extensible (Claude Code):** the user may register a `Notification` hook in `.claude/settings.json` to route the signal (Slack, custom push, sound); the skill only *emits* — the hook handles routing. Offer to scaffold one via the `update-config` skill — never add it silently.
 
-Notify sparingly regardless of mechanism: blockers and autonomous full-run completion only.
+Notify sparingly regardless of mechanism: blockers, user-requested checkpoints (a gate or pause the user explicitly configured at launch — reaching one answers a standing request, never an unsolicited ping; skills with no such checkpoints have only the other two triggers), and autonomous full-run completion only — never routine progress.
 
 ## Reasoning effort
 

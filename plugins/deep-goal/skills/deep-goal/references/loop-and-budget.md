@@ -96,7 +96,7 @@ A skip is a **normal boundary decision**, not a blocker: it runs as part of § 6
 
 ## 4. Notifications
 
-The conductor notifies on **exactly four triggers** — the series' notify-sparingly rule; `pipeline.md`'s dispatch-record table is the per-stage "spinner," and a user can ask for status in natural language at any time. Never ping on routine stage completion, and CONTINUE-class blockers ride the completion notification + run report, never their own ping.
+The conductor notifies on **exactly four triggers** — the series' notify-sparingly rule (`references/host-affordances.md`: gates and budget pauses are its *user-requested checkpoints*; HALTs are its blockers); `pipeline.md`'s dispatch-record table is the per-stage "spinner," and a user can ask for status in natural language at any time. Never ping on routine stage completion, and CONTINUE-class blockers ride the completion notification + run report, never their own ping.
 
 | Trigger | Example line |
 |---|---|
