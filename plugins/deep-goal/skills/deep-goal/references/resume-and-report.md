@@ -8,7 +8,7 @@ The conductor's two bookends: **re-entry** (§ 1 — crash-safe resume from `00-
 
 Before anything else in the launch sequence (`references/conductor.md` § 1 — before rigor resolution, before the handshake), check for prior state:
 
-- **Invocation targets an effort** (an `--effort`/named effort, or a goal whose derived slug matches an existing effort dir) **whose `00-Manifest/pipeline.md` exists** → re-entry (§ 1.2).
+- **Invocation targets an effort** (an effort named in the invocation — "resume the `<slug>` effort" — or a goal whose derived slug matches an existing effort dir; deep-goal has no `--effort` flag of its own — that flag belongs to the *dispatched* `deep-plan`) **whose `00-Manifest/pipeline.md` exists** → re-entry (§ 1.2).
 - **Bare resume invocation** ("resume deep-goal", "continue the run", re-invoking after a pause notification) → scan `.deep-skills/*/00-Manifest/pipeline.md` for **open runs**: any dispatch record not `complete`, or all records `complete` with a HALT Blockers row or no `run-report.md` yet. Exactly one open run → target it. Several → the re-entry question carries one resume option per open run (previews per § 1.2). None → say so; nothing to resume.
 - **No prior pipeline.md** for the targeted effort → not a re-entry; the normal launch sequence continues.
 - **`--dry-run` never re-enters** — it prints the preview and stops, touching nothing, prior state or not.
