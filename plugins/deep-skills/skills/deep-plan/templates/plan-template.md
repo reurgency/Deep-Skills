@@ -10,6 +10,14 @@ Why this change is being made — the problem or need, what prompted it, and the
 
 Performance, compatibility, security, scope, deadline, platform constraints that the design must honor. (Populated by `/constraints`; omit the section if none.)
 
+## Assumptions  <!-- autonomous runs (`--autonomous`) only; omit in interactive sessions -->
+
+One row per planning question the session answered **itself** instead of asking the user (see `references/autonomous-mode.md`). Every self-answered question lands here — none are silently absorbed into prose.
+
+| # | Question | Chosen answer | Why |
+|---|---|---|---|
+| 1 | <the question that would have been asked> | <the answer chosen> | <one-line rationale — evidence from exploration, convention, or stated best judgment> |
+
 ## Approach
 
 The recommended approach in a few sentences. Note any rejected alternative and why, briefly. Name existing functions/utilities/patterns to reuse, with their paths.

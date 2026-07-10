@@ -19,6 +19,8 @@ By the end you can:
 4. Structure a **multi-phase** plan and maintain a **Deferreds ledger** so nothing is lost.
 5. Fill the **State / Data-Flow Contract** (directive `DLC-001`) so cross-layer bugs surface
    at plan time.
+6. Run the skill **unattended** with `--autonomous` and read its **Assumptions** section as
+   the audit trail of every decision it made alone.
 
 ## Prerequisites
 
@@ -128,6 +130,20 @@ behavior it provided); reader = none or reader-source ≠ writer-source ⇒ bloc
 Present the plan, fold in feedback, update the doc. Offer `/columbo` **last** as the final
 completeness check; fix what it surfaces. That's the hand-off point to `/deep-plan-review` /
 `/deep-implement`.
+
+---
+
+## Flags (know which to reach for)
+
+Every flag is **natural-language-first** — say the plain-language form on any host; the
+`--flag` is a convenience. With no flags, the session is fully interactive as taught above.
+
+| Flag | Say | What it changes |
+|---|---|---|
+| `--autonomous` | *"plan this autonomously"* | Runs the same workflow with **zero questions**: skips the cadence question, self-answers every planning question with best judgment, and records each as a row in the plan's **Assumptions** section (question · chosen answer · why). The Assumptions table is the run's audit trail — read it before trusting the plan. (`references/autonomous-mode.md`) |
+| `--columbo` | *"include a columbo pass"* | Self-runs the `/columbo` completeness check at the end and fixes what it surfaces — the unattended counterpart of Module 9's offer. Meaningful primarily with `--autonomous`. |
+| `--effort=<slug>` | *"call the effort auth-refresh"* | Names the effort dir up front, skipping propose-and-confirm — handy for scripted or unattended invocations. Absent, an autonomous run derives the slug itself and **states** it, never asks. |
+| `--rounds=<n>` | *"three rounds of questions"* | Interactive sessions only: skip the cadence question and run exactly *n* front-loaded question rounds, then proceed (gap rounds still available on request). Ignored under `--autonomous`. |
 
 ---
 

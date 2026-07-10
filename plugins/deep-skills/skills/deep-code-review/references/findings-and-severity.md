@@ -61,6 +61,34 @@ Triage outcomes for non-Blockers:
 
 Statuses through the lifecycle: `open` (pre-triage) → `accepted` | `deferred` | `rejected by user`; after `/deep-bugfix` proves a fix (or, on the fallback route, `/deep-implement` executes the fix-phase), accepted findings are marked `fixed`.
 
+## Auto-policy triage — `--triage --auto-accept-min=<severity>`
+
+*Natural-language trigger: say "accept majors and up," "auto-triage, accept severity 7 and above."*
+
+With the numeric threshold argument, the HITL loop is replaced by a deterministic, **zero-prompt** policy over the `open` findings in the latest `findings.json`:
+
+| Finding | Outcome |
+|---|---|
+| **Blocker (9–10)** | `accepted` — **always, regardless of the threshold** (a Blocker is by definition not optional; identical to HITL triage). |
+| severity ≥ threshold | `accepted` — joins the `/deep-bugfix` hand-off (or the fix-phase fallback) exactly like a HITL "fix." |
+| severity < threshold | **auto-DEFER** — status `deferred` **and a new row in the plan's Deferreds ledger** (What = the finding, one line with its id and severity · Why deferred = below the auto-accept threshold `<severity>` this run · Integration = re-triage or fix in a later round; the finding stays on record in findings.json). |
+| already `deferred` / `rejected by user` / `fixed` (prior rounds) | **Untouched** — status and any existing ledger row are preserved. Auto-policy acts only on `open` findings, so no dedupe pass is needed: re-review rounds emit fresh CR ids for fresh findings only (see § Re-review rounds). |
+
+Two invariants: **nothing is ever auto-rejected** — `rejected by user` means exactly that, a human said no — and **nothing is dropped**: every below-threshold finding is loudly deferred (ledger row + `deferred` status), never silently discarded. Everything else in the triage step is unchanged: rewrite `findings.json` statuses, fill the certificate's Triage-outcomes table, update the effort manifest, route the accepted set.
+
+Threshold values are the same canonical 1–10 numeric severities findings carry (tier names are presentation vocabulary): `--auto-accept-min=9` accepts Blockers only; `=7` Blocker + Major; `=5` Blocker + Major + Minor.
+
+## Re-review rounds — append semantics (canonical)
+
+A **re-review** — a fresh `/deep-code-review` run on the same effort after a fix round — does not start a new findings file; it **appends to the existing one**. Canonical rules (deep-bugfix's hand-off pointer, "a re-review re-diffs and appends new findings under fresh IDs," summarizes this section):
+
+- **Fresh CR ids, appended.** The re-review re-diffs and writes every new finding under a fresh sequential id (next = max existing `CR-NNN` + 1), appended to the same `findings.json` `findings` array. Ids are never reused or renumbered.
+- **Prior statuses preserved.** Existing findings keep their statuses exactly — `fixed` stays `fixed`, `deferred` stays `deferred`, `rejected by user` stays `rejected by user`. A re-review never resets anything to `open`; only its own fresh findings are born `open`.
+- **`reviewed` date updated.** The file's top-level `reviewed` field is set to the re-review date (this, plus the fresh ids, is how a consumer distinguishes "a new round ran" from "nothing happened").
+- `report.md` and `certificate.md` are rewritten for the current round as usual; the round's rollup and verdict consider unresolved findings (a `fixed` or `rejected by user` Blocker no longer fails the certificate; see Presentation order below).
+
+This is what makes round accounting possible for any consumer of `findings.json`: the non-`fixed` count per round is meaningful only because prior verdicts survive the append.
+
 ## Presentation order (report.md)
 
 Group by tier, Blockers first; within a tier, by lens. Lead with the severity rollup. End each lens with a one-line verdict ("Coherence: clean") — say clean explicitly rather than padding. The certificate's verdict is **pass only when no Blockers remain unresolved** (every 9–10 finding is `fixed`, or none existed).

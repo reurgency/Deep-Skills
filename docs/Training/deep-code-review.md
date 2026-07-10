@@ -124,6 +124,18 @@ Decoupled so the review never blocks on a human. On the latest `open` findings:
   Steps / Acceptance) so `/deep-implement` can execute it cold. No-plan mode generates a
   minimal plan stub.
 
+**Auto-policy** (`--triage --auto-accept-min=<severity>` — say *"accept majors and up"*):
+replaces the HITL loop with a zero-prompt threshold — at/above the numeric severity →
+`accepted`; below → **auto-deferred** (status `deferred` + a new Deferreds-ledger row —
+**never auto-rejected**); Blockers (9–10) always accepted regardless. Prior-round `deferred`
+findings keep their status and row. Without the argument, HITL triage is unchanged.
+(`references/findings-and-severity.md` § Auto-policy triage.)
+
+**Re-review append semantics** (canonical in `references/findings-and-severity.md`): a
+re-review after a fix round **appends** fresh `CR-NNN` ids to the same `findings.json`,
+**preserves every prior status** (never resets to `open`), and updates the `reviewed` date —
+which is what makes per-round finding counts meaningful.
+
 ---
 
 ## Flags (know which to reach for)
@@ -136,6 +148,7 @@ Decoupled so the review never blocks on a human. On the latest `open` findings:
 | `--browser` | Live last-mile proof | Exercises promised behaviors against an **already-running** dev server; cites observed request/response. Never starts a server; never reads `.env`. |
 | `--security` | (future) | Inert until `/deep-security` exists — a documented seam. |
 | `--triage` | After a review | Runs only the triage step; the one mode that writes to the plan. |
+| `--triage --auto-accept-min=<sev>` | Unattended triage — say *"accept majors and up"* | Zero-prompt policy: ≥ threshold → `accepted`; below → auto-**deferred** (ledger row; never auto-rejected); Blockers always accepted. HITL unchanged without it. |
 
 ### The model-tier discipline (multi-agent / mega)
 Finders are **model-tiered by what each lens catches**, and the model is **set explicitly on

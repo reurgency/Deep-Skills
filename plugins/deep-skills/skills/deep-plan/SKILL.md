@@ -1,7 +1,7 @@
 ---
 name: deep-plan
-description: Run an interactive, steerable feature-planning session that produces a self-contained, fresh-agent-resumable plan artifact. Use when the user wants to plan a feature, run a planning session, "deep plan" something, or before handing work to /deep-implement. Triggers on /deep-plan and on requests to plan a feature, design an approach, or scope work before building. Planning only — it does not implement.
-argument-hint: describe feature/task to plan
+description: Run an interactive, steerable feature-planning session that produces a self-contained, fresh-agent-resumable plan artifact. Use when the user wants to plan a feature, run a planning session, "deep plan" something, or before handing work to /deep-implement. Also runs unattended — "plan this autonomously" (--autonomous) self-answers every planning question and records each as an Assumption. Triggers on /deep-plan and on requests to plan a feature, design an approach, or scope work before building. Planning only — it does not implement.
+argument-hint: describe feature/task to plan · --autonomous · --effort=<slug> · --columbo · --rounds=<n>
 ---
 
 # DeepPlan
@@ -46,12 +46,23 @@ The user may type any of these at any point. Service the command, then return to
 
 These in-session commands are natural-language-first — say e.g. *'run a columbo pass,' 'drill into X,' 'break out Y,' 'check for gaps/risks/constraints'*; the `/slash` forms are conveniences on hosts that have them. If a user types one of these without the leading slash but clearly means it, treat it the same way.
 
+## Flags
+
+Per the cross-assistant **Portability** rule, every flag is **natural-language-first** — the plain-language trigger is the primary path (users on Copilot/Codex have no CLI flags); the `--flag` is a convenience layered on top. Always accept the natural-language form. **With none of these flags, the session runs exactly as the workflow below describes — interactive behavior is unchanged.**
+
+- **Plan autonomously** (`--autonomous`) — say *"plan this autonomously," "plan it unattended, no questions."* Run the same workflow with **zero questions to the user**: skip the cadence question, self-answer every planning question with best judgment, and record each as a row in the plan's **Assumptions** section (question · chosen answer · why). Full mode spec: `references/autonomous-mode.md`.
+- **Include a columbo pass** (`--columbo`) — say *"include a columbo pass."* Self-run the existing `/columbo` completeness check at the end of the session and fix what it surfaces — meaningful primarily with `--autonomous` (interactively it pre-answers the step-8 offer as "yes"). See `references/autonomous-mode.md`.
+- **Name the effort up front** (`--effort=<slug>`) — say *"call the effort <name>."* Use the supplied kebab-case slug as the effort name, skipping the propose-and-confirm step. In autonomous mode with no `--effort`, the slug is self-derived and **stated, never asked**.
+- **Set the question depth** (`--rounds=<n>`) — say *"three rounds of questions."* Interactive sessions only: skip the cadence question and run exactly *n* front-loaded question rounds (each a batched round via the host's structured-question tool), then proceed; the user can still request extra gap rounds. Ignored under `--autonomous` (no rounds by definition).
+
 ## Session workflow (interruptible state machine)
+
+Everything below describes the default **interactive** session. Under `--autonomous` the same state machine runs unattended with the per-step deltas in `references/autonomous-mode.md`.
 
 ### 1. Setup
 - Restate the feature in one sentence; confirm with the user.
-- Ask **question cadence** — 1-at-a-time · 3-at-a-time · all-at-once. Recommend **all-at-once** for small features. See `references/question-cadence.md`.
-- Propose an **effort name** — a kebab-case slug derived from the feature — and get the user's confirmation. The plan is written to `.deep-skills/<effort-name>/01-Plan/plan.md` (see `references/artifact-structure.md`). An explicit path argument overrides this default.
+- Ask **question cadence** — 1-at-a-time · 3-at-a-time · all-at-once. Recommend **all-at-once** for small features. See `references/question-cadence.md`. (Skipped when `--rounds=<n>` was given — run exactly *n* front-loaded rounds instead, per § Flags.)
+- Propose an **effort name** — a kebab-case slug derived from the feature — and get the user's confirmation. (When `--effort=<slug>` was supplied, use it as-is and state it instead of asking.) The plan is written to `.deep-skills/<effort-name>/01-Plan/plan.md` (see `references/artifact-structure.md`). An explicit path argument overrides this default.
 - Form an initial **multi-phase?** judgment (you'll revisit before writing).
 
 ### 2. Frame
@@ -76,6 +87,7 @@ Write to `.deep-skills/<effort-name>/01-Plan/plan.md` (or the explicit path over
 - Self-contained **Context / Approach / Steps / Files / Verification**.
 - Reference reused functions/utilities with their paths.
 - A **Deferreds** ledger (see `templates/plan-template.md` and below).
+- In autonomous runs only: the populated **Assumptions** section — one row per self-answered question (see `references/autonomous-mode.md`); interactive sessions omit it.
 - If **multi-phase**: structure each phase per `references/phase-structuring.md` so a fresh agent can execute it cold, and leave an empty **Phase Summaries** appendix for `/deep-implement` to append to.
 - If the feature adds a **user-triggered action/submit/navigation or a stateful/resumable flow**, fill the template's **Interaction & re-entry** section — specify the double-submit guard, processing feedback, navigation fallback, and re-entry story rather than leaving them implicit. Omit the section for pure refactors/migrations with no such surface.
 - **Do not implement.** No source edits — only the plan document.
