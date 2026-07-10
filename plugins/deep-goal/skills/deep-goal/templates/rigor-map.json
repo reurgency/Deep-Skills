@@ -1,0 +1,59 @@
+{
+  "_template": "Shipped rigor defaults for deep-goal — the SINGLE CANONICAL SOURCE of the stage list, per-stage modes/flags, planning rounds, triage threshold, and re-review cap for every rigor level. The conductor's launch resolution and --dry-run both read this file; SKILL.md prose never hard-codes a stage list. A repo override at `.deep-skills/rigor-map.json` merges over this file at the LEVEL granularity (a level named there replaces the shipped level whole; unnamed shipped levels remain) — see `references/rigor-levels.md` for override authoring and validation rules. Every key starting with `_` is documentation and is ignored at resolution; overrides may omit them.",
+  "map_version": 1,
+  "_doc_known_stages": "The known-stage roster: every `stage` name used in any level's stage list must appear here, and its entry must have `available: true`. Overrides are validated against the merged roster (shipped + any `known_stages` the override declares). `security` is a reserved slot for the future /deep-security skill — present so that adding it to a stage list is a data change only; until it ships, using it refuses at launch as 'reserved, not yet shipped' rather than 'unknown stage'.",
+  "known_stages": {
+    "plan": { "skill": "deep-plan", "available": true },
+    "plan-review": { "skill": "deep-plan-review", "available": true },
+    "implement": { "skill": "deep-implement", "available": true },
+    "code-review": { "skill": "deep-code-review", "available": true },
+    "bugfix": { "skill": "deep-bugfix", "available": true },
+    "docs": { "skill": "deep-docs", "available": true },
+    "security": { "skill": "deep-security", "available": false }
+  },
+  "_doc_stage_entry": "Each stage-list entry: `stage` (roster name; required) plus per-stage options. On `plan`: `mode` (`autonomous` | `interactive`), `rounds` (integer >= 0 — front-loaded interactive question rounds, passed as deep-plan --rounds; 0 under autonomous), `columbo` (boolean — self-run columbo pass, deep-plan --columbo). On `plan-review` and `code-review`: `mode` (`single-agent` | `multi-agent`; multi-agent dispatches with --multi-agent). On `code-review` only: `triage` (`{\"auto_accept_min\": N}` — deep-code-review --triage --auto-accept-min=N; findings at/above N auto-accept, everything below auto-defers, never auto-rejects). `columbo` and `triage` are PER-STAGE OPTIONS of their owning skill, not standalone dispatch stages — matching how core exposes them. Severities are numeric 1-10 (canonical per deep-code-review references/findings-and-severity.md); Blocker/Major/Minor/Nit are presentation vocabulary only.",
+  "_doc_re_review_cap": "Per-level integer >= 0: maximum re-review rounds in the code-review → triage → bugfix → re-review loop. Absent when the level has no code-review stage (yolo). The cap is data — the conductor never hard-codes a loop literal.",
+  "levels": {
+    "yolo": {
+      "_doc": "Trust the model end-to-end: autonomous plan, build, done. No review of any kind, no triage, no loop, no docs.",
+      "stages": [
+        { "stage": "plan", "mode": "autonomous", "rounds": 0, "columbo": false },
+        { "stage": "implement" }
+      ]
+    },
+    "poc": {
+      "_doc": "Fast but sanity-checked: autonomous plan with a columbo pass, one light single-agent code review, auto-triage accepting Blockers only (severity >= 9), one bugfix pass, no re-review.",
+      "stages": [
+        { "stage": "plan", "mode": "autonomous", "rounds": 0, "columbo": true },
+        { "stage": "implement" },
+        { "stage": "code-review", "mode": "single-agent", "triage": { "auto_accept_min": 9 } },
+        { "stage": "bugfix" }
+      ],
+      "re_review_cap": 0
+    },
+    "mvp": {
+      "_doc": "The recommended default: interactive planning (1 front-loaded round + optional gap rounds) with columbo, a single-agent plan review, single-agent code review auto-accepting Blocker+Major (severity >= 7), bugfix, exactly one re-review, then docs.",
+      "stages": [
+        { "stage": "plan", "mode": "interactive", "rounds": 1, "columbo": true },
+        { "stage": "plan-review", "mode": "single-agent" },
+        { "stage": "implement" },
+        { "stage": "code-review", "mode": "single-agent", "triage": { "auto_accept_min": 7 } },
+        { "stage": "bugfix" },
+        { "stage": "docs" }
+      ],
+      "re_review_cap": 1
+    },
+    "prod": {
+      "_doc": "Full rigor: interactive planning (3 front-loaded rounds + gap rounds as needed) with columbo, multi-agent plan review, multi-agent code review auto-accepting Blocker+Major+Minor (severity >= 5), bugfix, re-review loop until the certificate passes with no Blockers AND strictly fewer findings each round (hard cap below), then docs.",
+      "stages": [
+        { "stage": "plan", "mode": "interactive", "rounds": 3, "columbo": true },
+        { "stage": "plan-review", "mode": "multi-agent" },
+        { "stage": "implement" },
+        { "stage": "code-review", "mode": "multi-agent", "triage": { "auto_accept_min": 5 } },
+        { "stage": "bugfix" },
+        { "stage": "docs" }
+      ],
+      "re_review_cap": 3
+    }
+  }
+}

@@ -60,15 +60,37 @@ The resolved plugin.json location is persisted into `00-Manifest/pipeline.md` at
 Every flag is **natural-language-first** — the plain-language trigger is the primary path (users on Copilot/Codex have no CLI flags); the `--flag` is a convenience layered on top. Always accept the natural-language form.
 
 - **goal/feature** — what to build, as the argument (NL: "run deep-goal on <feature>").
-- **Rigor** (`--rigor=<yolo|poc|mvp|prod>`, NL: "at mvp rigor") — selects the stage list, planning interactivity, triage threshold, and loop cap. Omitted → ask one structured question (recommend mvp). *(Placeholder — Phase 2 fills rigor resolution, the repo override, and `templates/rigor-map.json`.)*
-- **Preview** (`--dry-run`, NL: "preview the run") — print the resolved stage list and stop; dispatches nothing; exempt from the version handshake. *(Placeholder — Phase 2 fills.)*
+- **Rigor** (`--rigor=<level>`, NL: "at mvp rigor") — one dial that selects, from data, the stage list, planning interactivity, review thoroughness, triage threshold, and re-review cap. Shipped levels are `yolo` / `poc` / `mvp` / `prod`; a repo override can add or reshape levels. Resolution below (§ Rigor resolution); level semantics and override authoring in `references/rigor-levels.md`. Omitted → ask one structured question (recommend **mvp**).
+- **Preview** (`--dry-run`, NL: "preview the run", "what would an mvp run do") — print the resolved pipeline for the chosen rigor and stop. Dispatches nothing, creates nothing, and is **exempt from the version handshake** (it works without deep-skills installed at all).
 - **Budget / gates / worktree** (`--budget`, `--gate=<stage>`, `--worktree`). *(Placeholder — Phase 5 fills.)*
+
+## Rigor resolution (config-as-data)
+
+**Never hard-code a stage list — this skill's prose describes levels; the data defines them.** The stage list, per-stage options, planning rounds, triage threshold, and re-review cap for every level live in one place: **`templates/rigor-map.json`** (in this skill's directory — the single canonical source). Resolve rigor at launch, once, in this order:
+
+1. **Read the map.** Load the shipped `templates/rigor-map.json`. If **`.deep-skills/rigor-map.json`** exists at the repo root, it wins: merge it over the shipped map at **level granularity** — a level it names replaces the shipped level whole, a new name adds a level, its `known_stages` entries extend the stage roster, and unnamed shipped levels remain. Keys starting with `_` are documentation; ignore them. Full merge semantics and authoring guide: `references/rigor-levels.md`.
+2. **Validate — at launch, never mid-run.** Check the merged map per the rules in `references/rigor-levels.md` § Validation: every stage name must exist in the merged roster and be `available` (reserved roster slots refuse as "not yet shipped"), stage lists must be non-empty and start with `plan`, per-stage options must sit on their owning stage with in-range values (`auto_accept_min` 1–10 numeric, `rounds` ≥ 0, `re_review_cap` ≥ 0 and present exactly when the level runs a code review). On any violation, **refuse before dispatching anything**, naming the file, the offending key/value, and the valid alternatives (e.g. `.deep-skills/rigor-map.json → levels.poc-reviewed.stages[3].stage: "sec-review" is not a known stage; known stages: plan, plan-review, implement, code-review, bugfix, docs`).
+3. **Resolve the level.** Accept `--rigor=<level>` or its natural-language equivalents ("at mvp rigor", "yolo it", "prod-level run"); match against the merged map's level names. An unknown level refuses at launch with the valid menu (shipped + override levels). If the phrasing is fuzzy rather than naming a level ("quick and dirty"?), confirm the mapping instead of guessing.
+4. **Ask when omitted.** No rigor stated → ask exactly **one structured question**, recommending **mvp**. The question is **self-contained**: each level is an option whose description/preview (≤15 lines — hosts truncate beyond that) is built *from the resolved map*, carrying that level's stage list with per-stage modes, its planning interactivity, and a rough cost band (from `references/rigor-levels.md` § Cost bands, labeled as estimates) — never rely on between-tool-call prose to explain the levels. Include any override-defined levels as options. On hosts without a structured-question tool, fall back to a numbered list in chat ("reply 1–4"), same content per option.
+
+The resolved level (and the merged map it came from) feeds everything downstream — the dry-run preview, the rigor-selection previews, and the conductor's stage walk all read the same resolution, performed once at launch and persisted in `pipeline.md` *(Phase 4)*.
+
+### `--dry-run` — preview, then stop
+
+On `--dry-run` (NL: "preview the run", "what would a prod run do here"), perform rigor resolution exactly as above (including override merge, validation, and ask-when-omitted), then **print and stop**:
+
+- the resolved level and where it came from (shipped map, or repo override);
+- the stage list **in order**, one line per stage, with each stage's mode and the flags the conductor would dispatch it with (planning mode + rounds + columbo; review modes; `--triage --auto-accept-min=<N>`);
+- the triage threshold (numeric, with its tier meaning as presentation), the re-review cap, and any `--gate` injections;
+- a rough cost band per stage and a summed total band, labeled as uncalibrated estimates (`references/rigor-levels.md` § Cost bands).
+
+Dry-run **dispatches nothing and writes nothing** — no effort directory, no `pipeline.md`, no manifest — and is **exempt from the version handshake**. It must answer identically whether invoked as `--dry-run --rigor=prod` or as "preview a prod run".
 
 ## Workflow
 
 *(Placeholder — Phase 4 fills the conductor workflow: launch → inline planning window → per-stage dispatch loop with the artifact-verification advance test → blocker policy → pipeline.md state. See `references/conductor.md` when it lands.)*
 
-1. **Launch:** run the version handshake (above); resolve rigor *(Phase 2)*; create/verify the effort dir and write initial `00-Manifest/pipeline.md` *(Phase 4)*.
+1. **Launch:** resolve rigor from the merged rigor map and validate it (§ Rigor resolution) — on `--dry-run`, print the preview and stop here; otherwise run the version handshake (above), then create/verify the effort dir and write initial `00-Manifest/pipeline.md` *(Phase 4)*.
 2. **Planning window (inline):** *(Phase 4)*.
 3. **Dispatch loop:** *(Phase 4)*.
 4. **Review→fix loop, budget guard, gates, notifications, worktree:** *(Phase 5 — see `references/loop-and-budget.md` when it lands)*.
