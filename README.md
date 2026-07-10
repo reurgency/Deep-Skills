@@ -86,6 +86,35 @@ Say these any time *while a skill is running*; it services the command and retur
 | | `/show-proof` | Print the current cluster's proof verdict with its full hop-by-hop chain (or test evidence). |
 | | `/widen` | Escalate the current cluster's containment from 1 hop to 2 hops and re-run it. |
 
+## The deep-goal add-on (optional, paid)
+
+**`/deep-goal`** is a separate, optional **paid add-on plugin** that runs the whole relay above from **one invocation** — an autonomous, rigor-gated **conductor**. It is *not* part of the deep-skills plugin (which stays exactly six skills): deep-goal knows the six core skills; the core skills never require deep-goal.
+
+```
+            ┌──────────────────────────  /deep-goal (conductor — optional add-on)  ─────────────────────────┐
+            │      resolve rigor → walk the stage list → dispatch fresh agents → verify artifacts → report  │
+            ▼               ▼                  ▼                  ▼                ▼               ▼
+/deep-plan  ──▶  /deep-plan-review  ──▶  /deep-implement  ──▶  /deep-code-review  ──▶  /deep-bugfix  ──▶  /deep-docs
+                                                                  └────────── (re-review loop) ──┘
+```
+
+A single `--rigor=<yolo|poc|mvp|prod>` dial selects — from data, repo-overridable — which stages run, how interactive planning is, what auto-triage accepts, and how many review→fix rounds the loop may take. Interactive stages (planning at mvp/prod) run inline; autonomous stages each get a fresh subagent; the conductor advances only when the stage's **artifact exists and its manifest line flipped** — never on a subagent's word. State lives in `00-Manifest/pipeline.md` (kill + re-invoke = resume); every run ends with a `run-report.md` surfacing everything decided autonomously.
+
+> **Hosts:** deep-goal is designed and verified on **Claude Code** (the host floor). On Codex, Cursor, and Copilot it degrades to inline sequential execution — functional, but prod-rigor runs may hit context limits; see [`plugins/deep-goal/HOSTS.md`](plugins/deep-goal/HOSTS.md) for the honest per-host matrix before running it anywhere else.
+
+**Flags** (natural-language-first, like everything in the series):
+
+| Flag | Say | What it does |
+|---|---|---|
+| *(goal argument)* | *"run deep-goal on \<feature\>"* | The feature/goal to take through the pipeline. |
+| `--rigor=<level>` | *"at mvp rigor"*, *"yolo it"* | Pick the rigor level; omitted → one structured question (recommends mvp). |
+| `--dry-run` | *"preview the run"* | Print the resolved pipeline + cost bands and stop — dispatches nothing, needs no deep-skills install. |
+| `--budget=<band>` | *"cap spend at ~500k tokens"* | Soft token ceiling checked between stages; crossing pauses + notifies; re-invoke to resume. |
+| `--gate=<stage>` | *"pause before implement"* | Human checkpoint before a named stage, even in an autonomous run (repeatable; survives resume). |
+| `--worktree` | *"build in a worktree"* | One conductor-owned worktree for all post-planning stages; the run report ends with merge instructions. |
+
+Requires **deep-skills ≥ 0.2.0** installed alongside (verified at launch). Install: `/plugin install deep-goal@reurgency` (after the deep-skills install below). Training page: [`docs/Training/deep-goal.md`](docs/Training/deep-goal.md).
+
 ## Learn the skills
 
 New to the Deep-\* series? Work through the **[Training Program](docs/Training/README.md)** —
@@ -126,7 +155,7 @@ Deep-Skills/
 ├── .claude-plugin/
 │   └── marketplace.json            # marketplace catalog (offers the deep-skills plugin)
 ├── plugins/
-│   └── deep-skills/
+│   ├── deep-skills/
 │       ├── .claude-plugin/plugin.json   # Claude Code manifest
 │       ├── .codex-plugin/plugin.json    # Codex manifest        ┐ thin per-host manifests,
 │       ├── .cursor-plugin/plugin.json   # Cursor manifest       ┘ one shared skills/ tree
@@ -140,6 +169,9 @@ Deep-Skills/
 │       │   └── deep-docs/
 │       └── directives/             # Deep-Learn registry — sibling of skills/ so the
 │                                   #   self-locating loader resolves it on every host
+│   └── deep-goal/                  # OPTIONAL PAID ADD-ON — the pipeline conductor
+│       ├── HOSTS.md                #   (own plugin, own manifests, own HOSTS.md;
+│       └── skills/deep-goal/       #    requires deep-skills ≥ 0.2.0, never vice versa)
 ├── docs/
 │   └── roadmap/                    # self-learning directive-loop design notes
 └── README.md

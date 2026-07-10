@@ -183,6 +183,14 @@
       <p>Generate context-window-aware documentation of what's been built — three loadable tiers, every claim anchored to <code>path:line</code> and verified.</p>
       <span class="tag">Map what you built</span>
     </a>
+    <a class="card ep-card reveal" href="deep-goal.html" style="grid-column:1/-1">
+      <span class="n">＋</span>
+      <span class="k">OPTIONAL ADD-ON · PAID · SEPARATE PLUGIN</span>
+      <h3>deep-goal</h3>
+      <span class="cmd">/deep-goal</span>
+      <p>Run the whole six-skill relay from <b>one invocation</b> — an autonomous, rigor-gated conductor (<code>yolo</code>/<code>poc</code>/<code>mvp</code>/<code>prod</code>) that dispatches the skills above and verifies their artifacts. <b>Not a seventh bundled skill:</b> it requires deep-skills ≥ 0.2.0, and the six never require it back. Learn the six first — its page assumes all of them.</p>
+      <span class="tag">Conduct the pipeline</span>
+    </a>
   </div>
 </section>
 
@@ -265,9 +273,13 @@
       <li><code>/deep-bugfix</code> the accepted findings — cluster, diagnose, prove each fix, contain — then <code>/deep-code-review</code> again for a clean re-review.</li>
       <li><code>/deep-docs</code> the result — generate the <code>docs/ai-map/</code> and confirm every anchor verifies.</li>
     </ol>
-    <div class="callout why" style="margin-bottom:0">
+    <div class="callout why">
       <span class="t">You've mastered the system when…</span>
       <p>A teammate can open <b>only</b> your <code>.deep-skills/&lt;effort&gt;/</code> directory — no chat history — and reconstruct what was built, why, what was reviewed, and what remains deferred.</p>
+    </div>
+    <div class="callout note" style="margin-bottom:0">
+      <span class="t">Add-on shortcut</span>
+      <p>Or run the capstone with one command via <a href="deep-goal.html"><b>deep-goal</b></a> — <i>“run deep-goal at mvp rigor”</i> conducts the same six-skill loop end-to-end (optional paid add-on; do it by hand at least once first).</p>
     </div>
   </div>
 </section>
@@ -294,6 +306,14 @@
         <tr><td><b>Proof-of-fix</b></td><td>A fresh adversarial agent's verdict (<code>fixed</code>/<code>unproven</code>/<code>regressed</code>) — chain-trace by default, red→green under <code>--reproduce</code>.</td></tr>
         <tr><td><b>Containment</b></td><td>Blast-radius check: run the changed symbols' dependents' tests; block only on <i>new</i> failures.</td></tr>
         <tr><td><b>Claimed fix</b></td><td>deep-bugfix's signature failure: silencing the symptom without addressing the cause, or abandoning a cluster sibling.</td></tr>
+        <tr><td><b>Rigor</b></td><td>deep-goal's single quality dial (<code>yolo</code>/<code>poc</code>/<code>mvp</code>/<code>prod</code>): selects, as data, the stage list, planning interactivity, triage threshold, and re-review cap.</td></tr>
+        <tr><td><b>Conductor</b></td><td>deep-goal's role: a thin pipeline walker that sequences and verifies the six skills, never doing their jobs.</td></tr>
+        <tr><td><b>pipeline.md</b></td><td><code>00-Manifest/pipeline.md</code> — the conductor's state file, updated at every stage boundary; re-invoking deep-goal resumes from it.</td></tr>
+        <tr><td><b>Advance test</b></td><td>The conductor's verification before advancing: expected artifact exists at its canonical path AND the skill flipped its own manifest line.</td></tr>
+        <tr><td><b>Gate</b></td><td>A user-injected human checkpoint (<code>--gate=&lt;stage&gt;</code>, “pause before implement”) before a named stage in an otherwise autonomous run.</td></tr>
+        <tr><td><b>Budget band</b></td><td>An approximate token ceiling (<code>--budget</code>) checked between stages only; crossing it pauses the run at the boundary.</td></tr>
+        <tr><td><b>Run report</b></td><td><code>00-Manifest/run-report.md</code> — the completion artifact surfacing everything an autonomous run decided alone (Assumptions verbatim, auto-deferrals, blockers, spend).</td></tr>
+        <tr><td><b>Assumptions ledger</b></td><td>Plan section written by <code>deep-plan --autonomous</code>: one row per self-answered planning question (question · chosen answer · why).</td></tr>
       </tbody>
     </table>
   </div>

@@ -2,6 +2,8 @@
 
 The deep-* skills are **one set of skills** (the `skills/<name>/SKILL.md` + `references/` + `scripts/` + `templates/` layout every modern agent host reads). This repo adds **thin per-host manifests** so each assistant installs the *same* skills natively. **Skill bodies are never forked per host** — the only per-host files are the manifest directories below.
 
+> **Add-on note:** an optional, separately-installed **deep-goal** plugin (a paid pipeline conductor that runs the six skills end-to-end) **works with** this plugin — it is never required by it, and nothing here depends on it. deep-goal has its own host matrix and install steps: [`plugins/deep-goal/HOSTS.md`](../deep-goal/HOSTS.md).
+
 > **Status — schema/capability gates are DEFERRED.** The manifests here were authored against each host's official marketplace docs (mid-2026) but the **empirical capability-verification gate (M3)** — install on the host, run a full `deep-plan → deep-code-review` cycle, and confirm (a) load + NL/slash invocation, (b) parallel fan-out actually runs, (c) per-agent model selection binds to `model-map.md` — has **not** been run. Run it per host before treating that host as committed. Items marked **RE-VERIFY** are schema/command details that move fast and must be re-checked against current docs at install time.
 
 ## The vendoring invariant (why directives live next to skills)

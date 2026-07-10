@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add-on · deep-goal — Deep Skills Training</title>
+<meta name="description" content="Run the whole deep-* relay from one invocation — an autonomous, rigor-gated conductor. Optional paid add-on to the six-skill deep-skills plugin; the core skills never require it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="theme-roadmap">
+<div id="progress"></div>
+<div class="glow a"></div><div class="glow b"></div>
+
+<nav class="top">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="dot"></span> Deep Skills <span class="muted" style="font-weight:400">/ Add-on · deep-goal</span></a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <div class="navlinks">
+      <a href="index.html">Overview</a>
+      <a href="deep-plan.html">1 · Plan</a>
+      <a href="deep-plan-review.html">2 · Review</a>
+      <a href="deep-implement.html">3 · Implement</a>
+      <a href="deep-code-review.html">4 · Code review</a>
+      <a href="deep-bugfix.html">5 · Bug-fix</a>
+      <a href="deep-docs.html">6 · Docs</a>
+      <a href="deep-goal.html" class="active">＋ deep-goal</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero wrap narrow">
+  <div class="ep-badge"><span class="pill">ADD-ON · PAID</span><span class="label">Conduct</span></div>
+  <h1><span class="grad">deep-goal</span></h1>
+  <p class="kicker"><code>/deep-goal</code> runs one effort through the <b>whole deep-* relay from a single invocation</b> — plan → review → implement → code-review → bugfix → docs — with a <b>rigor level</b> selecting which stages run and how hard they try. A <b>thin conductor</b>: it sequences and verifies; it never writes plans, source, reviews, or docs itself. <b>Optional add-on — not a seventh bundled skill;</b> the six core skills never require it.</p>
+  <div class="chips center" style="justify-content:center">
+    <span class="chip"><span class="d"></span> One invocation, whole pipeline</span>
+    <span class="chip"><span class="d"></span> Rigor: yolo · poc · mvp · prod</span>
+    <span class="chip"><span class="d"></span> Artifacts, never transcripts</span>
+    <span class="chip"><span class="d"></span> Advance test, not narratives</span>
+    <span class="chip"><span class="d"></span> Requires deep-skills ≥ 0.2.0</span>
+  </div>
+</section>
+
+<div class="wrap">
+<div class="layout">
+
+<aside class="toc">
+  <div class="tt">On this page</div>
+  <a href="#objectives">Learning objectives</a>
+  <a href="#model">Mental model</a>
+  <a href="#rigor">The rigor dial</a>
+  <a href="#walkthrough">How a run works</a>
+  <a href="#loop">The review→fix loop</a>
+  <a href="#blockers">Blocker policy</a>
+  <a href="#flags">Flags</a>
+  <a href="#resume">Resume &amp; run report</a>
+  <a href="#hosts">Hosts</a>
+  <a href="#mistakes">Common mistakes</a>
+  <a href="#mastery">Mastery checklist</a>
+  <a href="#qref">Quick reference</a>
+</aside>
+
+<main>
+
+<section class="sec tight" id="objectives">
+  <div class="sec-tag">In this add-on</div>
+  <h2>Learning objectives</h2>
+  <div class="obj">
+    <div class="o"><span class="i">1</span><p>Choose a <b>rigor level</b> deliberately — and preview the resolved pipeline with <code>--dry-run</code> before spending anything.</p></div>
+    <div class="o"><span class="i">2</span><p>Explain the <b>conductor mental model</b>: thin walker, artifacts-only hand-offs, and the <b>advance test</b>.</p></div>
+    <div class="o"><span class="i">3</span><p>Locate the <b>interactivity boundary</b> — questions live in the planning window; autonomy starts when <code>plan.md</code> exists.</p></div>
+    <div class="o"><span class="i">4</span><p>Predict the <b>review→fix loop</b> at each rigor: triage thresholds, the re-review cap, convergence vs halt.</p></div>
+    <div class="o"><span class="i">5</span><p>Classify blockers as <b>spine (HALT)</b> vs <b>tail (CONTINUE)</b> and know the conductor's action for each.</p></div>
+    <div class="o"><span class="i">6</span><p><b>Resume</b> a killed or paused run from <code>pipeline.md</code>, and audit the <b>run report</b> for every decision made alone.</p></div>
+  </div>
+</section>
+
+<section class="sec" id="model">
+  <div class="sec-tag">The frame</div>
+  <h2>Mental model</h2>
+  <div class="panel lead-panel bar reveal">
+    <p>The conductor is <span class="hl">thin on purpose</span>. It resolves rigor to a stage list <b>from data</b> (<code>rigor-map.json</code>, repo-overridable), then walks the list: <b>interactive stages run inline</b> (planning at mvp/prod — you are present by definition), <b>autonomous stages each get one fresh subagent</b> briefed with a minimal stage briefing. Nothing travels between stages except <span class="hl">artifacts under <code>.deep-skills/&lt;effort&gt;/</code></span> — never transcripts.</p>
+    <p>State lives in <code>00-Manifest/pipeline.md</code>, updated at every stage boundary. Kill the run anywhere; re-invoking deep-goal resumes from it.</p>
+  </div>
+  <div class="grid c2" style="margin-top:8px">
+    <div class="callout decision" style="margin:0"><span class="t">The advance test</span><p>After every stage the conductor verifies <b>with its own reads</b>: the expected artifact exists at its canonical path AND the skill flipped its own manifest line. A subagent's closing narrative is not evidence.</p></div>
+    <div class="callout decision" style="margin:0"><span class="t">The interactivity boundary</span><p>All human interaction happens in the inline planning window. From the moment <code>plan.md</code> exists, the run is autonomous: it only <i>notifies</i> (halts, gates, budget pauses, completion) and only <i>waits</i> where you asked (<code>--gate</code>, <code>--budget</code>).</p></div>
+  </div>
+</section>
+
+<section class="sec" id="rigor">
+  <div class="sec-tag">One dial, all data</div>
+  <h2>The rigor dial</h2>
+  <p>One level selects — as data, never prose — which stages run, planning interactivity, review thoroughness, what auto-triage accepts, and the re-review cap. Exact stage lists live in <code>templates/rigor-map.json</code>; a repo override at <code>.deep-skills/rigor-map.json</code> can add or reshape levels (validated at launch, never mid-run).</p>
+  <div class="grid c2" style="margin-top:8px">
+    <div class="card reveal"><span class="k">YOLO</span><h4>Trust the model</h4><p>Autonomous plan, build, stop. No review, no docs. Spikes, throwaways, "just show me something."</p></div>
+    <div class="card reveal"><span class="k">POC</span><h4>Fast but sanity-checked</h4><p>Autonomous plan + columbo, one light review, auto-triage accepts <b>Blockers only (≥ 9)</b> — everything else deferred, on the record. No re-review.</p></div>
+    <div class="card reveal"><span class="k">MVP · recommended</span><h4>You plan, it builds</h4><p>Interactive planning (1 round), plan review, single-agent code review, triage accepts <b>Blocker + Major (≥ 7)</b>, exactly one re-review, docs.</p></div>
+    <div class="card reveal"><span class="k">PROD</span><h4>Full rigor</h4><p>Deep interactive planning (3 rounds), <b>multi-agent</b> reviews, triage down to <b>Minor (≥ 5)</b>, loop must <i>converge</i> (cert PASS + strictly fewer findings each round), cap 3, then docs.</p></div>
+  </div>
+  <div class="callout note">
+    <span class="t">Auto-deferred, never auto-rejected</span>
+    <p>Below-threshold findings get status <code>deferred</code> + a Deferreds-ledger row and are listed <b>loudly</b> in the run report. Nothing is ever auto-rejected; Blockers (9–10) are always accepted regardless of threshold.</p>
+  </div>
+</section>
+
+<section class="sec" id="walkthrough">
+  <div class="sec-tag">How a run works</div>
+  <h2>Launch to report, module by module</h2>
+  <ol class="steps">
+    <li><span class="module">Module 1</span><h4>Launch: handshake &amp; resolution</h4><p>Re-entry check first (a prior <code>pipeline.md</code> → resume/fresh question) → resolve rigor from the merged map (omitted → one structured question, recommends mvp) → <b>version handshake</b>: deep-skills ≥ 0.2.0 or a polite refusal → settle the effort slug → write the initial <code>pipeline.md</code>. State exists from launch; even a crash during planning is resumable.</p></li>
+    <li><span class="module">Module 2</span><h4>Preview with <code>--dry-run</code></h4><p>Say <i>"preview the run"</i>: prints the resolved stage list with per-stage modes/flags, triage threshold, re-review cap, gates, and uncalibrated cost bands — then stops. Dispatches nothing, writes nothing, needs no handshake. The cheapest question you can ask the add-on.</p></li>
+    <li><span class="module">Module 3</span><h4>The planning window</h4><p>Autonomous (yolo/poc): one dispatched <code>deep-plan --autonomous --effort=&lt;slug&gt;</code> (+ columbo per the map) — zero questions; every self-answered decision lands as an <b>Assumptions</b> row, reproduced verbatim in the run report. Interactive (mvp/prod): <code>/deep-plan</code> inline with the map's <code>--rounds</code>. Planning completes when <code>plan.md</code> exists — the autonomy boundary.</p></li>
+    <li><span class="module">Module 4</span><h4>Dispatch + advance test</h4><p>Per stage: mark <code>in-flight</code> → render the stage briefing (the subagent's <b>entire prompt</b>) → one fresh subagent → advance test → complete the record. One stage in flight at a time. Triage is a <b>second dispatch</b> of deep-code-review, tested on findings.json statuses + the certificate's Triage outcomes table. The conductor is <b>read-only on manifest stage lines</b>.</p></li>
+    <li><span class="module">Module 5</span><h4>Boundary machinery</h4><p>At every stage boundary, in order: round accounting → <b>budget check</b> → <b>gate check</b> → next dispatch. Pauses land <i>between</i> stages — a dispatched stage always finishes. Notifications fire on exactly four triggers: halts, gates, budget pauses, completion.</p></li>
+    <li><span class="module">Module 6</span><h4>Completion</h4><p>Write <code>00-Manifest/run-report.md</code> → update the manifest effort summary (the conductor's <b>only</b> manifest write, ever) → notify → deliver the full report as the closing message.</p></li>
+  </ol>
+</section>
+
+<section class="sec" id="loop">
+  <div class="sec-tag">Where rigor bites</div>
+  <h2>The review→fix loop</h2>
+  <p>Round 1 = code-review → auto-triage at the map's threshold → bugfix. Re-review rounds reuse the level's own code-review entry (same mode, same threshold) and are judged by the <b>round-aware advance test</b> — a pre-dispatch snapshot of findings.json's CR ids / count / <code>reviewed</code> date, so a crash mid-round never marks an un-run round complete.</p>
+  <div class="tbl-wrap reveal">
+    <table>
+      <thead><tr><th style="width:160px">Cap (from the map)</th><th>Exit semantics</th></tr></thead>
+      <tbody>
+        <tr><td><code>0</code> — poc</td><td>Loop ends after round 1's bugfix; residual deferred findings go to the run report.</td></tr>
+        <tr><td><code>1</code> — mvp</td><td>Exactly one re-review. <b>HALT</b> only on unresolved Blockers (certificate FAIL); otherwise exit to docs with residuals reported.</td></tr>
+        <tr><td><code>≥ 2</code> — prod (3)</td><td>Converge on certificate <b>PASS</b> + <b>strictly fewer</b> non-<code>fixed</code> findings each round. Cap breached → <b>HALT as a convergence failure</b>.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="sec" id="blockers">
+  <div class="sec-tag">When a stage says "human needed"</div>
+  <h2>Blocker policy — severity-aware</h2>
+  <p>Classified by <b>where in the spine it happened</b>: upstream blockers poison every later stage; tail blockers are self-contained.</p>
+  <div class="grid c2" style="margin-top:8px">
+    <div class="callout warn" style="margin:0"><span class="t">HALT + notify — spine</span><p>Plan-review Blocker verdict · implement phase blocked at the fix cap. Downstream would review rubble. The halted <code>pipeline.md</code> is the resume point — re-invoke once unblocked.</p></div>
+    <div class="callout note" style="margin:0"><span class="t">CONTINUE + record — tail</span><p>An unproven bugfix cluster (clusters are independent) · docs anchor drift (docs-only failure). The run finishes; the report lists them loudly, each with its blocker-report path.</p></div>
+  </div>
+</section>
+
+<section class="sec" id="flags">
+  <div class="sec-tag">Natural-language-first</div>
+  <h2>Flags</h2>
+  <p>The plain-language trigger is the <b>primary</b> path (Copilot/Codex users have no CLI flags); <code>--flag</code> syntax is a convenience on top.</p>
+  <div class="tbl-wrap reveal">
+    <table>
+      <thead><tr><th style="width:190px">Flag</th><th>Say</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><i>(goal argument)</i></td><td><i>"run deep-goal on &lt;feature&gt;"</i></td><td>The feature/goal to take through the pipeline.</td></tr>
+        <tr><td><code>--rigor=&lt;level&gt;</code></td><td><i>"at mvp rigor," "yolo it"</i></td><td>Select the rigor level. Omitted → one structured question (recommends mvp).</td></tr>
+        <tr><td><code>--dry-run</code></td><td><i>"preview the run"</i></td><td>Print the resolved pipeline + cost bands, then stop. Dispatches nothing; exempt from the handshake.</td></tr>
+        <tr><td><code>--budget=&lt;band&gt;</code></td><td><i>"cap spend at ~500k tokens"</i></td><td>Soft token ceiling, checked between stages; crossing pauses + notifies; resume continues.</td></tr>
+        <tr><td><code>--gate=&lt;stage&gt;</code></td><td><i>"pause before implement"</i></td><td>Human checkpoint before a named stage, even in an autonomous run; persisted; fires once.</td></tr>
+        <tr><td><code>--worktree</code></td><td><i>"build in a worktree"</i></td><td>One conductor-owned worktree for every post-planning stage; report carries path + merge instructions.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout decision">
+    <span class="t">The two core hooks it leans on (free-tier features)</span>
+    <p><code>deep-plan --autonomous --effort=&lt;slug&gt; [--columbo] [--rounds=&lt;n&gt;]</code> and <code>deep-code-review --triage --auto-accept-min=&lt;sev&gt;</code> shipped in deep-skills 0.2.0 as free-standing features — useful without deep-goal, documented on their own skill pages. That's why the handshake requires ≥ 0.2.0.</p>
+  </div>
+</section>
+
+<section class="sec" id="resume">
+  <div class="sec-tag">Crash-safe by design</div>
+  <h2>Resume &amp; the run report</h2>
+  <p>Re-invoking on an effort with a <code>pipeline.md</code> announces prior state and asks <b>resume / fresh</b> (fresh archives only the pipeline state; artifacts remain). Resume re-enters at the first non-<code>complete</code> record: a stage that finished but wasn't recorded is recognized and skipped (idempotency); one that died mid-flight is re-dispatched once, on the core skill's own internal resume (phase summaries, round scope, <code>--refresh</code>).</p>
+  <div class="callout why">
+    <span class="t">The run report — read it end-to-end</span>
+    <p>At yolo/poc <b>nobody was watching</b> — so everything the pipeline decided alone surfaces in <code>00-Manifest/run-report.md</code> or nowhere: the plan's Assumptions <b>verbatim</b>, every auto-deferred finding with severity, every blocker with its report path, spend by stage (uncalibrated estimates), and the worktree path + merge instructions when set.</p>
+  </div>
+</section>
+
+<section class="sec" id="hosts">
+  <div class="sec-tag">Where it runs</div>
+  <h2>Hosts — Claude Code is the floor</h2>
+  <div class="callout warn">
+    <span class="t">Designed and verified on Claude Code</span>
+    <p>The per-stage fresh-subagent dispatch assumes Claude Code affordances. On <b>Codex, Cursor, and Copilot</b> deep-goal degrades to <b>inline sequential execution</b> — same stage order, briefings, advance tests, and pipeline.md records, but one shared context window: functional, and <b>prod-rigor runs may hit context limits</b>. The honest per-host matrix, install steps, and the manual per-stage-restart mitigation live in <code>plugins/deep-goal/HOSTS.md</code>.</p>
+  </div>
+</section>
+
+<section class="sec" id="mistakes">
+  <div class="sec-tag">Watch out</div>
+  <h2>Common mistakes</h2>
+  <div class="mistake"><p><b>Treating deep-goal as a seventh bundled skill</b> — it's an optional add-on conductor; the six core skills work identically without it.</p></div>
+  <div class="mistake"><p><b>yolo/poc on work that matters</b> — autonomous planning means the Assumptions were the model's calls alone. Read them; better, use mvp and be present.</p></div>
+  <div class="mistake"><p><b>Skipping <code>--dry-run</code></b> — prod's multi-agent reviews × loop rounds is the expensive corner; preview first.</p></div>
+  <div class="mistake"><p><b>Expecting mid-run questions</b> — after <code>plan.md</code> exists it won't ask. Want a checkpoint? That's <code>--gate</code>, set at launch.</p></div>
+  <div class="mistake"><p><b>Trusting a subagent's "done"</b> — the conductor never does; the advance test is the only evidence.</p></div>
+  <div class="mistake"><p><b>Hand-editing <code>pipeline.md</code></b> or another skill's manifest line — pipeline state is conductor-owned; stage lines are each skill's own.</p></div>
+  <div class="mistake"><p><b>Ignoring auto-deferred findings</b> because the run "passed" — deferral is loud by design; triage the report's list like any Deferreds row.</p></div>
+  <div class="mistake"><p><b>Prod rigor on a non-Claude-Code host</b> — the inline fallback is functional but may hit context limits; see HOSTS.md.</p></div>
+</section>
+
+<section class="sec" id="mastery">
+  <div class="sec-tag">Prove it</div>
+  <h2>Mastery checklist</h2>
+  <ul class="checklist">
+    <li>Previewed with <code>--dry-run</code> and chose a rigor deliberately, against the cost bands.</li>
+    <li>Ran an mvp effort end-to-end from one invocation; answered questions only in the planning window.</li>
+    <li>Read a run report and accounted for every Assumption and auto-deferred finding.</li>
+    <li>Correctly predicted HALT vs CONTINUE for a spine and a tail blocker.</li>
+    <li>Killed and resumed a run with no duplicated stage side effects.</li>
+    <li>Authored a repo rigor override that survives launch validation.</li>
+  </ul>
+</section>
+
+<section class="sec" id="qref">
+  <div class="sec-tag">At a glance</div>
+  <h2>Quick reference</h2>
+  <div class="qref reveal">
+    <div class="qh">deep-goal · optional add-on</div>
+    <dl>
+      <dt>Input</dt><dd>A goal/feature + a rigor level (yolo / poc / mvp / prod, or a repo-defined level)</dd>
+      <dt>Output</dt><dd>The six skills' own artifacts + <code>pipeline.md</code> (state) + <code>run-report.md</code> (accountability)</dd>
+      <dt>Interactivity</dt><dd>Planning window only; then gates and budget pauses, nothing else waits</dd>
+      <dt>Advance test</dt><dd>Artifact at canonical path AND manifest line flipped (round-aware in the loop)</dd>
+      <dt>Hard rules</dt><dd>Never writes code/plans/reviews/docs; read-only on stage lines; artifacts are the only inter-stage channel; refuses at launch, never mid-run</dd>
+      <dt>Requires</dt><dd>deep-skills ≥ 0.2.0 (verified at launch); core never requires deep-goal back</dd>
+    </dl>
+  </div>
+</section>
+
+<div class="epnav">
+  <a href="deep-docs.html"><span class="dir">← Skill 6</span><span class="ttl">deep-docs</span><span class="cmd">/deep-docs</span></a>
+  <a class="next" href="index.html"><span class="dir">Back to →</span><span class="ttl">Training overview</span><span class="cmd">all six skills</span></a>
+</div>
+
+</main>
+</div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>Optional add-on · deep-goal · Conduct — not one of the six bundled skills</span>
+    <span><a href="index.html">All skills</a></span>
+  </div>
+</footer>
+
+<script src="assets/series.js"></script>
+</body>
+</html>

@@ -43,6 +43,12 @@ vocabulary from earlier ones.
 | 5 | `/deep-bugfix` | [deep-bugfix.md](deep-bugfix.md) | Remediate defects diagnosis-first: cluster → diagnose → fix at the cause → prove → contain. |
 | 6 | `/deep-docs` | [deep-docs.md](deep-docs.md) | Generate context-window-aware, anchored, verified documentation of what's been built. |
 
+> **Optional add-on (paid, separate plugin):** [`/deep-goal`](deep-goal.md) — an autonomous,
+> rigor-gated **conductor** that runs the whole six-skill relay from one invocation. It is
+> **not a seventh bundled skill**: it ships as its own plugin, requires deep-skills ≥ 0.2.0,
+> and the six core skills never require it. Learn the six by hand first — its page assumes
+> all of them. (HTML edition: [`html/deep-goal.html`](html/deep-goal.html).)
+
 > New to the repo? Read the root [`README.md`](../../README.md) first for install and layout,
 > then come back here.
 
@@ -166,6 +172,11 @@ Pick a small, real feature in a repo you know. Run the full six-skill loop:
 `.deep-skills/<effort>/` directory — no chat history — and reconstruct what was built, why,
 what was reviewed, and what remains deferred.
 
+> **Add-on shortcut:** or run the capstone with one command via
+> [`deep-goal`](deep-goal.md) — *"run deep-goal at mvp rigor"* conducts the same six-skill
+> loop end-to-end (optional paid add-on; do it by hand at least once first — the run report
+> only means something if you know what each stage should have produced).
+
 ---
 
 ## Glossary
@@ -188,3 +199,11 @@ what was reviewed, and what remains deferred.
 | **AI map** | `docs/ai-map/`, deep-docs' standing, machine-owned, tiered documentation of what's built. |
 | **Anchor** | A `path:line (symbol)` reference backing a doc claim; symbol-primary, verified before publish. |
 | **Tier-0** | deep-docs' always-loaded `MAP.md` + `index.json`, held under a hard token ceiling. |
+| **Rigor** | deep-goal's single quality dial (`yolo`/`poc`/`mvp`/`prod`): selects, as data, the stage list, planning interactivity, triage threshold, and re-review cap. |
+| **Conductor** | deep-goal's role: a thin pipeline walker that sequences and verifies the six skills, never doing their jobs. |
+| **pipeline.md** | `00-Manifest/pipeline.md` — the conductor's state file, updated at every stage boundary; re-invoking deep-goal resumes from it. |
+| **Advance test** | The conductor's verification before advancing: expected artifact exists at its canonical path AND the skill flipped its own manifest line. |
+| **Gate** | A user-injected human checkpoint (`--gate=<stage>`, "pause before implement") before a named stage in an otherwise autonomous run. |
+| **Budget band** | An approximate token ceiling (`--budget`) checked between stages only; crossing it pauses the run at the boundary. |
+| **Run report** | `00-Manifest/run-report.md` — the completion artifact surfacing everything an autonomous run decided alone (Assumptions verbatim, auto-deferrals, blockers, spend). |
+| **Assumptions ledger** | Plan section written by `deep-plan --autonomous`: one row per self-answered planning question (question · chosen answer · why). |
