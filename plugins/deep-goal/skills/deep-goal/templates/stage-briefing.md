@@ -16,7 +16,8 @@
                            `.deep-skills/{effort_name}/` stays in the invocation repo, exactly as
                            stated above." — the ONE conductor-created worktree every post-planning
                            stage shares (implement, both code-review dispatches, bugfix, every
-                           re-review round, docs)
+                           re-review round, docs — and plan-review when the level runs one,
+                           inert for a read-only stage)
      Keep the rendered briefing MINIMAL — the skill's own SKILL.md carries the job; this briefing
      carries only identity, effort, flags, and the pipeline rules. Never append transcripts,
      plan excerpts, or prior stages' narratives. -->

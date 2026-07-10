@@ -159,7 +159,7 @@
         <tr><td><code>--dry-run</code></td><td><i>"preview the run"</i></td><td>Print the resolved pipeline + cost bands, then stop. Dispatches nothing; exempt from the handshake.</td></tr>
         <tr><td><code>--budget=&lt;band&gt;</code></td><td><i>"cap spend at ~500k tokens"</i></td><td>Soft token ceiling, checked between stages; crossing pauses + notifies; resume continues.</td></tr>
         <tr><td><code>--gate=&lt;stage&gt;</code></td><td><i>"pause before implement"</i></td><td>Human checkpoint before a named stage, even in an autonomous run; persisted; fires once.</td></tr>
-        <tr><td><code>--worktree</code></td><td><i>"build in a worktree"</i></td><td>One conductor-owned worktree for every post-planning stage; report carries path + merge instructions.</td></tr>
+        <tr><td><code>--worktree</code></td><td><i>"build in a worktree"</i></td><td>One conductor-owned worktree for every post-planning stage (plan-review's briefing carries it too — inert for a read-only stage); report carries path + merge instructions.</td></tr>
       </tbody>
     </table>
   </div>

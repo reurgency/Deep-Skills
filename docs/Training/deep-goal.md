@@ -145,8 +145,9 @@ The boundary machinery (all NL-first — see Flags):
 - **`--gate=<stage>`** — a human checkpoint before a named stage, even in an autonomous run.
   Fires once, persisted so resume honors it.
 - **`--worktree`** — the conductor creates **one** worktree after planning; implement, both
-  review dispatches, bugfix, and docs all work in that same tree, so reviews see implement's
-  commits naturally. The report ends with the path + merge instructions.
+  review dispatches, bugfix, and docs all work in that same tree (plan-review's briefing
+  carries it too — inert for a read-only stage), so reviews see implement's commits naturally.
+  The report ends with the path + merge instructions.
 - **Notifications** fire on exactly four triggers — halts, gates, budget pauses, completion —
   never routine stage completions. `pipeline.md`'s status table is the spinner; ask for status
   in natural language any time.
