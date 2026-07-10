@@ -153,7 +153,7 @@ Update later with `/plugin marketplace update reurgency`.
 ```
 Deep-Skills/
 ├── .claude-plugin/
-│   └── marketplace.json            # marketplace catalog (offers the deep-skills plugin)
+│   └── marketplace.json            # marketplace catalog (deep-skills + the deep-goal add-on)
 ├── plugins/
 │   ├── deep-skills/
 │   │   ├── .claude-plugin/plugin.json   # Claude Code manifest
