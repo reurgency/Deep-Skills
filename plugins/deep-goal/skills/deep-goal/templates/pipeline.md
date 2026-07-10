@@ -4,8 +4,9 @@
      re-invocation reads prior state from here (references/resume-and-report.md § 1), the
      one-stage-in-flight guard reads the
      Dispatch records, and the final run report is assembled from it.
-     Header fields are resolved ONCE at launch and never re-derived mid-run. Dates in absolute form
-     (YYYY-MM-DD HH:MM). Review-loop rounds append additional dispatch records ("code-review
+     Header fields are resolved ONCE at launch and never re-derived mid-run; the Artifact baseline
+     is likewise recorded once at launch and re-read on resume, never re-snapshot. Dates in absolute
+     form (YYYY-MM-DD HH:MM). Review-loop rounds append additional dispatch records ("code-review
      (round N)" etc.) plus one Review loop row per round (pre-dispatch snapshot + round accounting
      — references/loop-and-budget.md § 1); --budget runs log boundary events under Budget events
      (§ 2); resume reads this file and continues updating records through the normal loop
@@ -26,6 +27,20 @@ The resolved level's stages in dispatch order, with the invocation each renders 
 |---|---|---|---|
 | 1 | plan | <inline (interactive) *or* subagent (autonomous)> | `deep-plan <…flags per the map>` |
 | 2 | <stage> | subagent | `<skill> <…flags>` |
+
+## Artifact baseline (recorded at launch)
+
+What already existed at each canonical path when THIS run launched — advance tests judge each stage's work against this, never against absolute existence (`references/conductor.md` § 4), so a prior run's surviving artifacts (a fresh restart archives only pipeline state) or a pre-run manual skill can neither pass a stage that did not run nor fail one that did. Recorded once at launch; a resume **re-reads it, never re-snapshots** (re-recording would misread this run's own pre-crash work as pre-existing). All rows `absent` on a virgin effort.
+
+| Canonical artifact | At launch | Baseline detail |
+|---|---|---|
+| 01-Plan/plan.md | <absent \| present> | <— \| mtime> |
+| 02-Plan-Review/review.md | <absent \| present> | <— \| mtime> |
+| 03-Implementation/summary.md | <absent \| present> | <— \| mtime> |
+| 04-Code-Review/findings.json | <absent \| present> | <— \| max CR id · count · `reviewed` · findings/cert mtimes> |
+| 06-Bug-Fix/round-*/ | <none \| present> | <— \| highest round-K> |
+| docs/ai-map/ (code tree) | <absent \| present> | <— \| index.json mtime> |
+| Manifest stage statuses | — | <e.g. all pending \| 01–06 complete (prior run)> |
 
 ## Dispatch records
 
@@ -50,7 +65,7 @@ Every blocker any stage reported, HALT and CONTINUE alike, each with its report 
 
 ## Review loop
 
-*Only when the level runs a code review (`references/loop-and-budget.md` § 1). One row per review round.* The **Snapshot** is written when the round's re-review record goes `in-flight` — **before** the subagent launches — so a crash mid-round is detectable (round-aware advance test, § 1.2); round 1 uses the plain advance test (no snapshot). **Non-`fixed`** = findings in `findings.json` with status ≠ `fixed`, counted right after the round's review/re-review passes its advance test.
+*Only when the level runs a code review (`references/loop-and-budget.md` § 1). One row per review round.* The **Snapshot** is written when the round's re-review record goes `in-flight` — **before** the subagent launches — so a crash mid-round is detectable (round-aware advance test, § 1.2); round 1 uses the plain advance test (no snapshot) when the Artifact baseline shows no pre-existing `findings.json` — over a pre-existing one, round 1 is judged round-aware with the launch baseline as its snapshot (§ 1.2; `references/conductor.md` § 4). **Non-`fixed`** = findings in `findings.json` with status ≠ `fixed`, counted right after the round's review/re-review passes its advance test.
 
 | Round | Snapshot (max CR id · count · `reviewed` · findings/cert mtimes) | Fresh CR ids | Non-`fixed` | Certificate | Decision |
 |---|---|---|---|---|---|

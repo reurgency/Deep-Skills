@@ -19,6 +19,8 @@ Re-reviews **append** to the same `04-Code-Review/findings.json` — fresh seque
 
 `04-Code-Review/` artifacts are **not round-versioned** — from round 2, "the artifact exists" is vacuously true, so the plain advance test (`conductor.md` § 4) proves nothing. The loop replaces it:
 
+**Round 1 over a pre-existing `findings.json`** (a fresh restart over a prior run, or a manual review predating deep-goal — the append contract makes it indistinguishable from a round ≥ 2) uses this same test, with the **launch baseline** (`conductor.md` § 4; `templates/pipeline.md` § Artifact baseline) standing in as the snapshot.
+
 **Snapshot — before dispatch.** When the round's re-review record is marked `in-flight` (i.e. *before* the subagent launches — this is what makes a crash detectable), the conductor writes into that round's Review loop row: the highest existing CR id, the findings count, findings.json's top-level `reviewed` date, and the file mtimes of `findings.json` and `certificate.md`.
 
 **Pass — compare after the dispatch returns.** Per dispatch type:
@@ -33,7 +35,7 @@ Re-reviews **append** to the same `04-Code-Review/findings.json` — fresh seque
 
 ### 1.3 Round accounting
 
-After each round's review/re-review passes its advance test, the conductor counts the findings in `findings.json` whose **status ≠ `fixed`** (that is: `open` + `accepted`-but-unfixed + `deferred` + `rejected by user` — in an autonomous run nothing is ever auto-rejected, so the last is normally zero) and appends the count to the round's Review loop row, together with the certificate verdict. Round 1's count is taken right after the review (all findings `open`, so it equals the total found). This table — same file the convergence test reads — is the loop's ledger; the run report reproduces it.
+After each round's review/re-review passes its advance test, the conductor counts the findings in `findings.json` whose **status ≠ `fixed`** (that is: `open` + `accepted`-but-unfixed + `deferred` + `rejected by user` — in an autonomous run nothing is ever auto-rejected, so the last is normally zero) and appends the count to the round's Review loop row, together with the certificate verdict. Round 1's count is taken right after the review (on a virgin `findings.json` all findings are `open`, so it equals the total found; over a pre-existing file it also carries the prior non-`fixed` statuses — a constant across this run's rounds, so the strict-decrease comparison still measures this run's progress). This table — same file the convergence test reads — is the loop's ledger; the run report reproduces it.
 
 ### 1.4 Convergence state machine
 
