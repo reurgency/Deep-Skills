@@ -113,7 +113,9 @@ manifest stage lines**; its only manifest write, ever, is the effort summary par
 completion.
 
 ### Module 5 — The review→fix loop
-Round 1 = code-review → auto-triage → bugfix. Re-review rounds reuse the level's own
+Round 1 = code-review → auto-triage → bugfix — with the **empty-set short-circuit** every
+round: nothing `open` → triage is skipped, nothing `accepted`-and-unfixed → bugfix is skipped
+and the loop exits by cap (a clean review is a healthy run, never a halt). Re-review rounds reuse the level's own
 code-review entry (same mode, same threshold) and are judged by the **round-aware advance
 test** — a pre-dispatch snapshot of findings.json's CR ids / count / `reviewed` date, so a
 crash mid-round never marks an un-run round complete. Exit keys off the map's

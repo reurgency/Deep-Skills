@@ -123,7 +123,7 @@
 <section class="sec" id="loop">
   <div class="sec-tag">Where rigor bites</div>
   <h2>The review→fix loop</h2>
-  <p>Round 1 = code-review → auto-triage at the map's threshold → bugfix. Re-review rounds reuse the level's own code-review entry (same mode, same threshold) and are judged by the <b>round-aware advance test</b> — a pre-dispatch snapshot of findings.json's CR ids / count / <code>reviewed</code> date, so a crash mid-round never marks an un-run round complete.</p>
+  <p>Round 1 = code-review → auto-triage at the map's threshold → bugfix — with the <b>empty-set short-circuit</b> every round: nothing <code>open</code> → triage is skipped, nothing <code>accepted</code>-and-unfixed → bugfix is skipped and the loop exits by cap (a clean review is a healthy run, never a halt). Re-review rounds reuse the level's own code-review entry (same mode, same threshold) and are judged by the <b>round-aware advance test</b> — a pre-dispatch snapshot of findings.json's CR ids / count / <code>reviewed</code> date, so a crash mid-round never marks an un-run round complete.</p>
   <div class="tbl-wrap reveal">
     <table>
       <thead><tr><th style="width:160px">Cap (from the map)</th><th>Exit semantics</th></tr></thead>

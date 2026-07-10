@@ -10,6 +10,7 @@ The loop exists whenever the resolved level's stage list contains `code-review` 
 
 - **Round 1** is the map's own stages, dispatched by the normal loop (`conductor.md` § 3) with the normal advance tests (§ 4): `code-review` (the review; mode per the stage entry) → `code-review (triage)` (`--triage --auto-accept-min=<triage.auto_accept_min>` — the threshold always flows from the resolved map into the dispatch args, every round) → `bugfix`.
 - **Re-review rounds (N ≥ 2)** append dispatch records past the resolved stage list: `code-review (round N)`, and — only when the convergence test says *continue* — `code-review (triage, round N)` and `bugfix (round N)`. A re-review dispatch reuses the level's `code-review` stage entry verbatim (same `mode`, same `triage.auto_accept_min`): per-rigor thoroughness applies to every round, not just the first.
+- **Both post-review dispatches are conditional on work existing** in `findings.json` — every round, including round 1: triage is skipped when nothing is `open`, bugfix is skipped when nothing is `accepted`-and-not-`fixed`, and a skipped bugfix exits the loop by cap. The **empty-set short-circuits** (§ 1.5) define both skips; a skipped dispatch still completes its record.
 - Every loop dispatch gets a normal dispatch record **and** each round gets one row in pipeline.md's **Review loop** table (snapshot, fresh ids, non-`fixed` count, certificate verdict, decision).
 
 Re-reviews **append** to the same `04-Code-Review/findings.json` — fresh sequential CR ids, prior statuses preserved, top-level `reviewed` date updated, `report.md`/`certificate.md` rewritten for the round (canonical: findings-and-severity.md § Re-review rounds). That append contract is what makes everything below possible.
@@ -36,7 +37,7 @@ After each round's review/re-review passes its advance test, the conductor count
 
 ### 1.4 Convergence state machine
 
-Exit semantics key off the level's **`re_review_cap`** — **always read from the resolved map** (`rigor-map.json`, or the merged repo override), never a hard-coded literal — so custom override levels inherit coherent behavior by cap value, not by level name:
+Exit semantics key off the level's **`re_review_cap`** — **always read from the resolved map** (`rigor-map.json`, or the merged repo override), never a hard-coded literal — so custom override levels inherit coherent behavior by cap value, not by level name. (When a round's bugfix was **skipped** under § 1.5's empty-set short-circuit, the loop exits there per § 1.5 — the machine below governs rounds whose bugfix actually ran.)
 
 - **No `code-review` stage** (shipped: yolo) — no loop, nothing here applies.
 - **cap = 0** (shipped: poc) — the loop **ends after round 1's bugfix**. No re-review is ever dispatched. Residuals — every `deferred` finding and any blocked bugfix cluster — go to the run report (`references/resume-and-report.md` § 2); the run proceeds to the next map stage (poc has none — the run completes).
@@ -50,6 +51,20 @@ Exit semantics key off the level's **`re_review_cap`** — **always read from th
   - Test **passes** → exit to docs (residuals = `deferred` findings, reported as above).
   - Test **fails** and re-reviews dispatched so far **< cap** → continue the round: `code-review (triage, round N)` at the same threshold → `bugfix (round N)` → re-review `code-review (round N+1)`.
   - Test **fails** and re-reviews dispatched **= cap** → **HALT + notify as a convergence failure**. The last re-review's record is `complete` (it ran and passed its advance test); the *run* halts: Blockers row with stage `code-review (round N)`, policy HALT, report = the certificate path, note = the count series (e.g. `convergence failure: counts 7 → 7 → 7, cap 3 reached`). The halted pipeline.md is the resume point, as with any HALT.
+
+### 1.5 Empty-set short-circuits (any round)
+
+Both post-review loop dispatches presuppose a non-empty work set, and dispatching an autonomous agent with an empty one strands it: deep-bugfix's own intake, finding nothing actionable, says so and asks for an input — and the stage briefing forbids asking (`templates/stage-briefing.md`, rule 3) — so the agent stops with no `fix-summary.md` and no manifest flip, and the advance test would spuriously HALT a healthy run. The conductor therefore checks the set itself, reading `findings.json`, at the boundary before each dispatch:
+
+- **Skip triage** when `findings.json` has **zero `open` findings** (round 1: the review found nothing; round N: a clean re-review with every prior finding already triaged). There is nothing to accept or defer — do not dispatch; mark the `code-review (triage)` / `code-review (triage, round N)` record `complete` straight from `pending` (never `in-flight`), advance test `skipped — zero open findings, nothing to triage`. A skip is a conductor decision recorded in pipeline.md — it needs no artifact evidence, and the certificate's Triage-outcomes table stays exactly as the review left it.
+- **Skip bugfix** when `findings.json` has **zero findings with status `accepted` that are not `fixed`** (e.g. poc's threshold-9 auto-triage deferring everything below a Blocker). Do not dispatch; mark the `bugfix` / `bugfix (round N)` record `complete` straight from `pending`, advance test `skipped — zero accepted-and-unfixed findings, nothing to fix`. No `06-Bug-Fix/round-K/` dir is created, and the `06 Bug Fix` manifest line stays untouched — a skill that never ran flips nothing, and the conductor never flips a stage line.
+- **Exit after a skipped bugfix — by cap, immediately.** A skipped bugfix leaves the tree unchanged, so a re-review of it could neither verify a fix nor strictly reduce the non-`fixed` count — never dispatch one after a skip. Read the current `certificate.md` verdict and exit:
+  - **cap = 0** — unchanged: the loop was ending after round 1's bugfix anyway; the run proceeds to the next map stage (poc has none — the run completes).
+  - **cap = 1 / cap ≥ 2** — verdict **PASS** → **exit to docs** (at cap ≥ 2 this *is* convergence: nothing the loop is allowed to fix remains). Verdict **FAIL** → **HALT + notify** per § 1.4's Blocker rule — structurally FAIL should not co-occur with an empty accepted set (Blockers always auto-accept, and an unfixed prior Blocker stays `accepted`), but a FAIL certificate never rides silently into docs.
+
+  The round's Review loop row records the skip in its Decision cell (e.g. `bugfix skipped (empty set) → exit → docs`), and residuals — every `deferred` finding and any never-triaged `open` — go to the run report as usual (`references/resume-and-report.md` § 2.2).
+
+A skip is a **normal boundary decision**, not a blocker: it runs as part of § 6 step 2 (so a resumed run re-derives it at the same boundary), spends nothing, appends no Blockers row, and triggers no notification — a clean(ish) review is a healthy run.
 
 ## 2. Budget guard — `--budget=<band>`
 
@@ -112,7 +127,7 @@ The conductor notifies on **exactly four triggers** — the series' notify-spari
 At every stage boundary the conductor runs, in order — each step reading/writing pipeline.md before the next:
 
 1. **Complete the finishing record** (advance test result, finished time, spend estimate — `conductor.md` §§ 3–4).
-2. **Round accounting + convergence** when inside the review→fix loop (§§ 1.3–1.4) — this may turn "next stage" into a loop dispatch, an exit to docs, or a HALT.
+2. **Round accounting + convergence + empty-set check** when inside the review→fix loop (§§ 1.3–1.5) — this may turn "next stage" into a loop dispatch, a skipped record (§ 1.5), an exit to docs, or a HALT.
 3. **Budget check** (§ 2) — may pause the run here.
 4. **Gate check** (§ 3) — may pause the run here. (Budget is checked first: if both fire, the budget pause wins and the gate re-fires at this same boundary on resume.)
 5. **Mark the next record `in-flight`** and dispatch (with the § 1.2 snapshot first when it is a loop round ≥ 2).

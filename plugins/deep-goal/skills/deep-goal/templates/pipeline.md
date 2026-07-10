@@ -29,14 +29,14 @@ The resolved level's stages in dispatch order, with the invocation each renders 
 
 ## Dispatch records
 
-One record per dispatch, in order. **Status:** `pending` → `in-flight` → `complete` | `halted`. **Exactly one record may be `in-flight` at a time** (the double-dispatch guard: mark `in-flight` *before* launching). `halted` means the *stage* stopped without passing its advance test; whether the *run* stopped is the matching Blockers row's Policy. Resume (`references/resume-and-report.md` § 1.3) re-enters at the first record that is not `complete`.
+One record per dispatch, in order. **Status:** `pending` → `in-flight` → `complete` | `halted` (a loop dispatch skipped by the empty-set short-circuit, `references/loop-and-budget.md` § 1.5, goes straight `pending` → `complete`). **Exactly one record may be `in-flight` at a time** (the double-dispatch guard: mark `in-flight` *before* launching). `halted` means the *stage* stopped without passing its advance test; whether the *run* stopped is the matching Blockers row's Policy. Resume (`references/resume-and-report.md` § 1.3) re-enters at the first record that is not `complete`.
 
 | # | Stage | Status | Started | Finished | Advance test | Spend (est) | Notes |
 |---|---|---|---|---|---|---|---|
 | 1 | plan | pending | — | — | — | — | — |
 | 2 | <stage> | pending | — | — | — | — | — |
 
-- **Advance test** — the conductor's own verification result, e.g. `pass — 01-Plan/plan.md exists`, `pass — summary.md + manifest "03 Implementation: complete"`, `fail — findings.json has open statuses`. Per-stage checks: `references/conductor.md` § 4.
+- **Advance test** — the conductor's own verification result, e.g. `pass — 01-Plan/plan.md exists`, `pass — summary.md + manifest "03 Implementation: complete"`, `fail — findings.json has open statuses`, `skipped — zero accepted-and-unfixed findings, nothing to fix` (empty-set short-circuit, `references/loop-and-budget.md` § 1.5). Per-stage checks: `references/conductor.md` § 4.
 - **Spend (est)** — heuristic band per `references/rigor-levels.md` § Cost bands (refined by observed usage where the host surfaces it); always an estimate, never presented as measured.
 - **Notes** — short facts a resume or report needs: assumption-row count, phases committed, blocked clusters, blocker-report path, re-dispatch note.
 
@@ -56,7 +56,7 @@ Every blocker any stage reported, HALT and CONTINUE alike, each with its report 
 |---|---|---|---|---|---|
 | 1 | — | CR-001..CR-NNN | N | <PASS \| FAIL> | <triage → bugfix> |
 
-- **Decision** values: `triage → bugfix` (round 1, per the map) · `re-review (round N+1)` · `exit → docs` · `loop done (cap 0)` · `HALT — unresolved Blockers` · `HALT — convergence failure (cap <re_review_cap> reached)`.
+- **Decision** values: `triage → bugfix` (round 1, per the map) · `re-review (round N+1)` · `exit → docs` · `loop done (cap 0)` · `HALT — unresolved Blockers` · `HALT — convergence failure (cap <re_review_cap> reached)`. When the empty-set short-circuit fires (`references/loop-and-budget.md` § 1.5), the skip prefixes the exit in the same cell, e.g. `bugfix skipped (empty set) → exit → docs` or `triage + bugfix skipped (empty set) → loop done (cap 0)`.
 
 ## Spend
 
