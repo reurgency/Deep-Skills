@@ -65,4 +65,4 @@ Point `chat.agentSkillsLocations` at **both** `plugins/deep-skills/skills` and `
 
 The core maintainer rules apply verbatim (`plugins/deep-skills/HOSTS.md` § Maintainer rules): one source of truth per skill body, byte-identical shared files, no Claude-only affordance at a call site, frontmatter discipline, M3 gate before committing a host. deep-goal adds one:
 
-6. **`references/artifact-structure.md` is the seventh copy.** Any canonical edit to the series artifact contract is swept across **all six core copies + deep-goal's copy**, `cmp`-verified pairwise. Same for `scripts/load-active-cards.sh` (deep-goal's is the seventh byte-identical copy).
+6. **`references/artifact-structure.md` is the seventh copy.** Any canonical edit to the series artifact contract is swept across **all six core copies + deep-goal's copy**, `cmp`-verified pairwise. Same for `references/host-affordances.md` and `scripts/load-active-cards.sh` (deep-goal's is the seventh byte-identical copy of each).
