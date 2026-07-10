@@ -54,6 +54,7 @@
   <a href="#model">Mental model</a>
   <a href="#walkthrough">How to use it</a>
   <a href="#commands">The steering wheel</a>
+  <a href="#flags">Flags &amp; autonomous mode</a>
   <a href="#contract">The Data-Flow Contract</a>
   <a href="#why">Why it's built this way</a>
   <a href="#mistakes">Common mistakes</a>
@@ -167,6 +168,28 @@
   <div class="callout why">
     <span class="t">/drill vs /breakout — a core skill</span>
     <p><b>Drill</b> stays in the shared conversation (cheap, contextual). <b>Breakout</b> spins an isolated agent (protects your main context from a deep tangent). Reach for breakout when the side-quest would otherwise flood the session — the away-team returns only the “pearl,” not the whole transcript.</p>
+  </div>
+</section>
+
+<!-- FLAGS -->
+<section class="sec" id="flags">
+  <div class="sec-tag">Know which to reach for</div>
+  <h2>Flags &amp; autonomous mode</h2>
+  <p>Every flag is <b>natural-language-first</b> — say the plain-language form on any host; the <code>--flag</code> is a convenience. With no flags, the session is fully interactive as taught above.</p>
+  <div class="tbl-wrap reveal">
+    <table>
+      <thead><tr><th style="width:170px">Flag</th><th>Say</th><th>What it changes</th></tr></thead>
+      <tbody>
+        <tr><td><code>--autonomous</code></td><td><i>“plan this autonomously”</i></td><td>Same workflow, <b>zero questions</b>: skips the cadence question, self-answers every planning question with best judgment, and records each as a row in the plan's <b>Assumptions</b> section (question · chosen answer · why).</td></tr>
+        <tr><td><code>--columbo</code></td><td><i>“include a columbo pass”</i></td><td>Self-runs the <code>/columbo</code> completeness check at the end and fixes what it surfaces — the unattended counterpart of the Module 9 offer. Meaningful primarily with <code>--autonomous</code>.</td></tr>
+        <tr><td><code>--effort=&lt;slug&gt;</code></td><td><i>“call the effort auth-refresh”</i></td><td>Names the effort dir up front, skipping propose-and-confirm. Absent, an autonomous run derives the slug itself and <b>states</b> it, never asks.</td></tr>
+        <tr><td><code>--rounds=&lt;n&gt;</code></td><td><i>“three rounds of questions”</i></td><td>Interactive sessions only: skip the cadence question and run exactly <i>n</i> front-loaded question rounds, then proceed. Ignored under <code>--autonomous</code>.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout why">
+    <span class="t">The Assumptions table is the audit trail</span>
+    <p>An autonomous plan surfaces every decision it made alone as an Assumption row — read that table before trusting the plan. An empty Assumptions section on a non-trivial feature is a red flag: it means questions were silently absorbed instead of recorded.</p>
   </div>
 </section>
 

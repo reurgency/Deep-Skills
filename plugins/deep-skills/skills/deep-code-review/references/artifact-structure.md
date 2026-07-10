@@ -57,7 +57,18 @@ Each skill updates its own stage's status line (and the summary, if it changes t
 
 - `<effort-name>` is a **kebab-case slug**.
 - **deep-plan** proposes the slug derived from the feature name; the **user confirms** (or supplies their own) before anything is written.
+- **Autonomous-mode carve-out (deep-plan `--autonomous`):** an autonomous planning run never asks — the slug is either supplied up front via `--effort=<slug>` (e.g. by a caller naming the effort dir before dispatch) or auto-derived by the skill and **stated** in its output, not asked.
 - **Mid-series entry without a plan** (any other deep-* skill starting fresh): ask the user for the effort name, **defaulting to the current branch name** (slugified).
+
+## Add-on extensions
+
+Orchestrator add-ons that drive the deep-* series (dispatching the core skills over this same artifact tree) may extend the layout **without changing any core skill's behavior**:
+
+- `00-Manifest/pipeline.md` — orchestrator-owned pipeline state (rigor level, resolved stage list, dispatch records, gates, blockers, spend). Written only by the orchestrator.
+- `00-Manifest/run-report.md` — orchestrator-owned final run report.
+- `.deep-skills/rigor-map.json` (**repo level**, sibling of the effort dirs, not per-effort) — an optional user-edited override of an orchestrator's shipped rigor defaults.
+
+Ownership rule: core skills never read or write these files, and treat unknown files in `00-Manifest/` as opaque — each skill updates its own stage line in `manifest.md` and leaves everything else untouched. Likewise, an orchestrator never writes a core skill's stage line (it reads statuses; the summary paragraph is its only manifest write).
 
 ## Legacy note
 

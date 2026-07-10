@@ -37,7 +37,11 @@ What each skill does with no argument, plus the flags it accepts at invocation.
 
 | Skill | Argument / flag | What it does |
 |---|---|---|
-| `/deep-plan` | <feature/task> | The argument is the feature to plan. Fully interactive; no inline flags. |
+| `/deep-plan` | <feature/task> | The argument is the feature to plan. Fully interactive by default. |
+| | `--autonomous` | *"Plan this autonomously"* — zero questions: skips the cadence question, self-answers every planning question with best judgment, and records each as an **Assumptions** row (question · chosen answer · why) in the plan. |
+| | `--columbo` | *"Include a columbo pass"* — self-run the `/columbo` completeness check at the end and fix what it surfaces (meaningful primarily with `--autonomous`). |
+| | `--effort=<slug>` | *"Call the effort X"* — name the effort dir up front, skipping propose-and-confirm. Absent, an autonomous run derives the slug itself and states it, never asks. |
+| | `--rounds=<n>` | *"Three rounds of questions"* — interactive sessions only: skip the cadence question and run exactly n front-loaded question rounds (ignored under `--autonomous`). |
 | `/deep-plan-review` |  | Reviews the most recent plan (`.deep-skills/*/01-Plan/plan.md`); or pass an explicit plan path. |
 | | `--multi-agent` | Parallel review — one fresh agent per dimension, then a synthesis pass. |
 | `/deep-implement` |  | Implements the most recent plan; or pass an explicit plan path. |
@@ -49,6 +53,7 @@ What each skill does with no argument, plus the flags it accepts at invocation.
 | | `--multi-agent` | Full fleet review — eight model-tiered single-lens finders, adversarial verification of survivors, scripted synthesis into one report. |
 | | `--mega` | Maximum review — every finder/verifier on the top model, quality caps lifted (~2× cost; for release gates). |
 | | `--triage` | Opt-in pass over an existing review's findings (fix / defer / reject); routes accepted findings to `/deep-bugfix` (plan fix-phase as the fallback). The only mode that edits the plan. |
+| | `--auto-accept-min=<sev>` | With `--triage`: *"accept majors and up"* — zero-prompt triage: findings at/above the numeric severity are accepted, everything below is auto-deferred (Deferreds-ledger row; never auto-rejected); Blockers (9–10) always accepted. HITL triage unchanged without it. |
 | | `--fix` | With `--triage`: chain straight into an autonomous `/deep-bugfix` run on the accepted findings (no-op with a pointer when `/deep-bugfix` isn't installed). |
 | | `--browser` | Live last-mile checks against an already-running dev server (never starts one; never reads `.env`). |
 | | `--security` | Reserved seam for a future `/deep-security` pass; inert until that skill ships. |

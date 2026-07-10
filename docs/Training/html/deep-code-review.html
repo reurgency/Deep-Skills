@@ -158,6 +158,7 @@
         <tr><td><code>--mega</code></td><td>Release gates</td><td>Same pipeline, dials at max — all finders/verifiers on the main tier; ~2× wall clock. <b>Confirm cost first.</b></td></tr>
         <tr><td><code>--browser</code></td><td>Live last-mile proof</td><td>Exercises promised behaviors against an already-running dev server; cites observed traffic.</td></tr>
         <tr><td><code>--triage</code></td><td>After a review</td><td>Runs only triage; the one mode that writes to the plan.</td></tr>
+        <tr><td><code>--triage --auto-accept-min=&lt;sev&gt;</code></td><td>Unattended triage — say <i>“accept majors and up”</i></td><td>Zero-prompt policy: ≥ threshold → <code>accepted</code>; below → auto-<b>deferred</b> (ledger row; never auto-rejected); Blockers always accepted. HITL unchanged without it.</td></tr>
       </tbody>
     </table>
   </div>
@@ -180,6 +181,14 @@
     <li><span class="sev m">Major</span> <span class="sev n">Minor</span> <span class="sev t">Nit</span> → <b>HITL</b>, finding by finding: <b>fix</b> / <b>defer</b> (→ Deferreds ledger) / <b>reject</b>.</li>
     <li>Accepted findings become a <b>fix-phase appended to the plan</b> (Goal / Prerequisites / Files / Steps / Acceptance) so <code>/deep-implement</code> can execute it cold. No-plan mode generates a minimal plan stub.</li>
   </ul>
+  <div class="callout decision">
+    <span class="t">Auto-policy — <code>--triage --auto-accept-min=&lt;severity&gt;</code></span>
+    <p>Say <i>“accept majors and up.”</i> Replaces the HITL loop with a zero-prompt threshold over the same <code>open</code> set: at/above the numeric severity → <code>accepted</code>; below → <b>auto-deferred</b> (status <code>deferred</code> + a new Deferreds-ledger row — <b>never auto-rejected</b>); Blockers (9–10) always accepted regardless. Prior-round <code>deferred</code> findings keep their status and row. Without the argument, HITL triage is unchanged.</p>
+  </div>
+  <div class="callout note">
+    <span class="t">Re-review append semantics</span>
+    <p>A re-review after a fix round <b>appends</b> fresh <code>CR-NNN</code> ids to the same <code>findings.json</code>, <b>preserves every prior status</b> (never resets to <code>open</code>), and updates the <code>reviewed</code> date — which is what makes per-round finding counts meaningful. Canonical spec: <code>references/findings-and-severity.md</code>.</p>
+  </div>
 </section>
 
 <section class="sec" id="why">

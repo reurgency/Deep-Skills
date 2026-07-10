@@ -1,7 +1,7 @@
 ---
 name: deep-code-review
 description: Independently review implemented code with fresh, evidence-driven agents — correctness bugs, last-mile functional gaps (UI that looks wired but isn't), plan conformance, and coherence — and produce a review report with every finding left open. Triage (fix/defer/reject) and routing accepted findings to /deep-bugfix (fix-phase + /deep-implement as the fallback) are a separate, opt-in step (--triage; add --fix to chain into an autonomous bugfix run), so the review itself runs autonomously and never edits the plan. Use after /deep-implement, before merge, or on any branch/PR/diff. Triggers on /deep-code-review and on requests to deep-review code, a PR, a branch, or a diff. Reviews code only — it never edits application source.
-argument-hint: branch/PR/diff/folder, or Enter for current branch · --multi-agent · --triage · --fix
+argument-hint: branch/PR/diff/folder, or Enter for current branch · --multi-agent · --triage [--auto-accept-min=<severity>] · --fix
 ---
 
 # DeepCodeReview
@@ -100,6 +100,16 @@ Triage is **decoupled from the review** so the review never blocks on a human an
 
 This is the **only** step that writes to the plan or the Deferreds ledger (deferrals always; the fix-phase append and its no-plan stub only on the fallback route). The review run that produced the findings did none of that.
 
+**Auto-policy (`--triage --auto-accept-min=<severity>`)** — say *"accept majors and up," "triage automatically, accept severity 7 and above."* When the numeric threshold argument is present, the HITL loop above is replaced by a zero-prompt threshold policy over the same `open` set:
+
+- severity **at/above** the threshold → status `accepted` (joins the `/deep-bugfix` hand-off as usual);
+- severity **below** the threshold → **auto-DEFER**: status `deferred` + a **new** row in the plan's Deferreds ledger — **never auto-reject** (`rejected by user` requires a human);
+- **Blockers (9–10) are always auto-accepted regardless of the threshold** — same as HITL triage;
+- findings already `deferred` from a prior round **keep their status and their existing ledger row** (auto-triage acts only on `open` findings, so no dedupe pass is needed);
+- everything else in this step is unchanged: rewrite `findings.json`, fill the certificate's Triage-outcomes table, update the manifest, close by routing the accepted set (or chaining under `--fix`).
+
+Semantics and full policy table: `references/findings-and-severity.md` § Auto-policy triage. Without the argument, `--triage` runs the HITL loop exactly as above.
+
 ## Flags
 
 Per the cross-assistant **Portability** rule, every flag is **natural-language-first** — the plain-language trigger is the primary path (users on Copilot/Codex have no slash-commands or CLI flags); the `--flag` is a convenience layered on top. Always accept the natural-language form.
@@ -108,6 +118,7 @@ Per the cross-assistant **Portability** rule, every flag is **natural-language-f
 - **Run the mega / maximum review** (`--mega`) — say *"run the mega / maximum review."* The thorough tier: the same five-stage pipeline with the cost/accuracy dials at maximum — **all eight finders and all verifiers on the main tier** (the orchestrator's model, set explicitly per launch), quality's sev cap lifted — at roughly double the default's wall clock and rate-limit footprint. The scripted stages (chunking, parallel pre-pass, fact harvest, report assembly) stay: determinism trades no accuracy. For release gates and large risky merges; confirm the cost with the user before launching. See `references/multi-agent.md` § `--mega`.
 - **Include the security pass** (`--security`) — say *"include the security pass."* A documented seam, **inert until `/deep-security` exists** (a separate effort; nothing executes under this flag today — if invoked, say so and proceed without it). The contract for when it lands: deep-security's dimension agents join this review's fan-out under the same read-only finder rules, same finding shape (`dimension` set) and same 1–10 severity scale; their findings merge into THIS report's **Security** section for a **single triage pass** (never a separate report); artifacts still land in this effort's `04-Code-Review/` (only standalone `/deep-security` runs write to `05-Security/`, per `references/artifact-structure.md`). Full seam contract: `references/multi-agent.md` § The `--security` seam.
 - **Triage the findings** (`--triage`) — say *"triage the findings," "route the findings for fixing."* Run **only** the triage step (Workflow § 7) over the latest review's `open` findings: Blockers auto-accept; Major/Minor/Nit get fix/defer/reject; accepted findings route to `/deep-bugfix` (fix-phase append + `/deep-implement`, fallback only, when it isn't installed) and deferreds into the plan's ledger. This is the **one mode that writes to the plan** — the review modes never do. Invoke it after a review, when you're ready to decide; it never re-runs the review.
+- **Auto-triage at a threshold** (`--triage --auto-accept-min=<severity>`) — say *"accept majors and up," "auto-triage, accept severity 7 and above."* Replace `--triage`'s HITL loop with a zero-prompt policy: findings at/above the numeric threshold are `accepted`, everything below is auto-**deferred** (status `deferred` + a new Deferreds-ledger row — never auto-rejected), Blockers (9–10) always accepted regardless. Full semantics: Workflow § 7 and `references/findings-and-severity.md` § Auto-policy triage. Without this argument, `--triage`'s HITL behavior is unchanged.
 - **Triage, then fix** (`--fix`) — say *"triage and fix," "fix whatever we accept."* Only meaningful with `--triage`: after triage completes, chain straight into an **autonomous `/deep-bugfix` run** on the accepted set (the § 7 primary route, invoked rather than pointed at). When `/deep-bugfix` isn't installed, this flag is a **no-op with a pointer** — triage completes normally on the fallback route and tells the user to run the fix-phase via `/deep-implement`.
 - **Review with browser verification** (`--browser`) — say *"review with browser verification."* Live last-mile verification: exercise the plan's promised behaviors against an **already-running** dev server via browser tools, watching real network traffic; findings feed the last-mile lens with observed evidence (`evidence.observed` cites request URL/method/status/payload as seen, never inferred). **Never starts a server; never reads `.env` for port discovery** (package.json / angular.json / CLAUDE.md, else ask). See `references/browser-verification.md`.
 
