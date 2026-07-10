@@ -156,19 +156,19 @@ Deep-Skills/
 │   └── marketplace.json            # marketplace catalog (offers the deep-skills plugin)
 ├── plugins/
 │   ├── deep-skills/
-│       ├── .claude-plugin/plugin.json   # Claude Code manifest
-│       ├── .codex-plugin/plugin.json    # Codex manifest        ┐ thin per-host manifests,
-│       ├── .cursor-plugin/plugin.json   # Cursor manifest       ┘ one shared skills/ tree
-│       ├── HOSTS.md                # per-host install + capability matrix + maintainer rules
-│       ├── skills/                 # auto-discovered (the single source of truth)
-│       │   ├── deep-plan/          # SKILL.md + references/ + scripts/ + templates/
-│       │   ├── deep-plan-review/
-│       │   ├── deep-implement/
-│       │   ├── deep-code-review/
-│       │   ├── deep-bugfix/
-│       │   └── deep-docs/
-│       └── directives/             # Deep-Learn registry — sibling of skills/ so the
-│                                   #   self-locating loader resolves it on every host
+│   │   ├── .claude-plugin/plugin.json   # Claude Code manifest
+│   │   ├── .codex-plugin/plugin.json    # Codex manifest        ┐ thin per-host manifests,
+│   │   ├── .cursor-plugin/plugin.json   # Cursor manifest       ┘ one shared skills/ tree
+│   │   ├── HOSTS.md                # per-host install + capability matrix + maintainer rules
+│   │   ├── skills/                 # auto-discovered (the single source of truth)
+│   │   │   ├── deep-plan/          # SKILL.md + references/ + scripts/ + templates/
+│   │   │   ├── deep-plan-review/
+│   │   │   ├── deep-implement/
+│   │   │   ├── deep-code-review/
+│   │   │   ├── deep-bugfix/
+│   │   │   └── deep-docs/
+│   │   └── directives/             # Deep-Learn registry — sibling of skills/ so the
+│   │                               #   self-locating loader resolves it on every host
 │   └── deep-goal/                  # OPTIONAL PAID ADD-ON — the pipeline conductor
 │       ├── HOSTS.md                #   (own plugin, own manifests, own HOSTS.md;
 │       └── skills/deep-goal/       #    requires deep-skills ≥ 0.2.0, never vice versa)
