@@ -5,7 +5,9 @@
      one-stage-in-flight guard reads the
      Dispatch records, and the final run report is assembled from it.
      Header fields are resolved ONCE at launch and never re-derived mid-run; the Artifact baseline
-     is likewise recorded once at launch and re-read on resume, never re-snapshot. Dates in absolute
+     is likewise recorded once at launch and re-read on resume, never re-snapshot (sole exception:
+     on --worktree runs the docs/ai-map row is re-recorded from the fresh worktree when the
+     worktree is created — references/loop-and-budget.md § 5). Dates in absolute
      form (YYYY-MM-DD HH:MM). Review-loop rounds append additional dispatch records ("code-review
      (round N)" etc.) plus one Review loop row per round (pre-dispatch snapshot + round accounting
      — references/loop-and-budget.md § 1); --budget runs log boundary events under Budget events
@@ -30,7 +32,7 @@ The resolved level's stages in dispatch order, with the invocation each renders 
 
 ## Artifact baseline (recorded at launch)
 
-What already existed at each canonical path when THIS run launched — advance tests judge each stage's work against this, never against absolute existence (`references/conductor.md` § 4), so a prior run's surviving artifacts (a fresh restart archives only pipeline state) or a pre-run manual skill can neither pass a stage that did not run nor fail one that did. Recorded once at launch; a resume **re-reads it, never re-snapshots** (re-recording would misread this run's own pre-crash work as pre-existing). All rows `absent` on a virgin effort.
+What already existed at each canonical path when THIS run launched — advance tests judge each stage's work against this, never against absolute existence (`references/conductor.md` § 4), so a prior run's surviving artifacts (a fresh restart archives only pipeline state) or a pre-run manual skill can neither pass a stage that did not run nor fail one that did. Recorded once at launch; a resume **re-reads it, never re-snapshots** (re-recording would misread this run's own pre-crash work as pre-existing). All rows `absent` on a virgin effort. **Sole exception — the `docs/ai-map/ (code tree)` row on `--worktree` runs:** the docs advance test reads `docs/ai-map/` in the worktree, where checkout gives every file an mtime after launch, so this one row is **re-recorded from the fresh worktree at worktree creation** (and again if a vanished worktree is recreated on resume) — `references/loop-and-budget.md` § 5.
 
 | Canonical artifact | At launch | Baseline detail |
 |---|---|---|
@@ -39,7 +41,7 @@ What already existed at each canonical path when THIS run launched — advance t
 | 03-Implementation/summary.md | <absent \| present> | <— \| mtime> |
 | 04-Code-Review/findings.json | <absent \| present> | <— \| max CR id · count · `reviewed` · findings/cert mtimes> |
 | 06-Bug-Fix/round-*/ | <none \| present> | <— \| highest round-K> |
-| docs/ai-map/ (code tree) | <absent \| present> | <— \| index.json mtime> |
+| docs/ai-map/ (code tree) | <absent \| present> | <— \| index.json mtime — on --worktree runs, re-recorded from the worktree at worktree creation (loop-and-budget.md § 5)> |
 | Manifest stage statuses | — | <e.g. all pending \| 01–06 complete (prior run)> |
 
 ## Dispatch records
