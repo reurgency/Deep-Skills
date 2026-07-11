@@ -8,5 +8,13 @@
   },
   "license": "MIT",
   "keywords": ["orchestration", "autonomous", "pipeline", "conductor", "workflow", "deep-skills", "deep-goal"],
-  "skills": "./skills/"
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Deep Goal",
+    "shortDescription": "Autonomous rigor-gated conductor that runs a full Deep-* effort end-to-end.",
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/icon.png",
+    "brandColor": "#2277B4",
+    "category": "Productivity"
+  }
 }

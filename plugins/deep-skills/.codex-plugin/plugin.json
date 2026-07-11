@@ -8,5 +8,13 @@
   },
   "license": "MIT",
   "keywords": ["planning", "code-review", "implementation", "multi-agent", "workflow", "deep-skills"],
-  "skills": "./skills/"
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Deep Skills",
+    "shortDescription": "Plan → review → build → code-review → bugfix → docs, as one resumable workflow.",
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/icon.png",
+    "brandColor": "#6CB33F",
+    "category": "Productivity"
+  }
 }
