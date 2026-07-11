@@ -113,7 +113,7 @@ A single `--rigor=<yolo|poc|mvp|prod>` dial selects — from data, repo-overrida
 | `--gate=<stage>` | *"pause before implement"* | Human checkpoint before a named stage, even in an autonomous run (repeatable; survives resume). |
 | `--worktree` | *"build in a worktree"* | One conductor-owned worktree for all post-planning stages; the run report ends with merge instructions. |
 
-Requires **deep-skills ≥ 0.2.0** installed alongside (verified at launch). Install: `/plugin install deep-goal@reurgency` (after the deep-skills install below). Training page: [`docs/Training/deep-goal.md`](docs/Training/deep-goal.md).
+Requires **deep-skills ≥ 0.2.0** installed alongside (verified at launch). deep-goal is a paid add-on and is **not yet in the storefront** — `/plugin install deep-goal@reurgency` will be the install command at launch. Training page: [`docs/Training/deep-goal.md`](docs/Training/deep-goal.md).
 
 ## Learn the skills
 
