@@ -48,6 +48,9 @@ Codex reads `SKILL.md` natively and has a plugin marketplace.
 codex plugin marketplace add reurgency/marketplace     # RE-VERIFY exact subcommand/flags
 # then in Codex: /plugins → search "deep-skills" → Install
 ```
+
+![Codex Plugin Install](./assets/Codex-plugin-install.png)
+
 Manifest: `plugins/deep-skills/.codex-plugin/plugin.json` (`"skills": "./skills/"`). Codex also accepts `.claude-plugin/marketplace.json` as a legacy/compat marketplace source. For the fleets, enable fan-out (`[features] multi_agent = true` in `~/.codex/config.toml`) and ship `.codex/agents/*.toml` with per-agent `model` resolved from `model-map.md`.
 **RE-VERIFY:** the official Codex marketplace path is `.agents/plugins/marketplace.json` (add one if the legacy `.claude-plugin` source isn't honored on the target version); exact `codex plugin marketplace add` flags; per-skill `agents/openai.yaml` metadata.
 
