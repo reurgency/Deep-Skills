@@ -1,8 +1,10 @@
 /* ============================================================
    Deep Skills - Marketing Site
    Fresh design system. One stylesheet, all nine pages.
-   Dark brand family, ONE primary accent (amber). No per-skill
-   rainbow. Zero dependencies beyond Google Fonts via <link>.
+   Dark brand family. Amber is the site-wide accent; each skill
+   page re-themes the accent tokens via a body.theme-* class
+   (palette mirrors docs/Training). Zero dependencies beyond
+   Google Fonts via <link>.
    ============================================================ */
 
 /* ---------- design tokens ---------- */
@@ -43,6 +45,14 @@
   --body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
   --mono:'JetBrains Mono','SF Mono',ui-monospace,Menlo,monospace;
 }
+
+/* ---------- per-skill accent themes (mirrors docs/Training palette) ---------- */
+.theme-plan       {--accent:#6ea8ff;--accent-deep:#4f86e0;--accent-bright:#b3d2ff;--accent-soft:rgba(110,168,255,.12);--accent-line:rgba(110,168,255,.34);--accent-glow:rgba(110,168,255,.28)}
+.theme-plan-review{--accent:#a98bff;--accent-deep:#8a68f0;--accent-bright:#cfbdff;--accent-soft:rgba(169,139,255,.13);--accent-line:rgba(169,139,255,.34);--accent-glow:rgba(169,139,255,.28)}
+.theme-implement  {--accent:#5fd0a0;--accent-deep:#3eb583;--accent-bright:#9fe9c8;--accent-soft:rgba(95,208,160,.13);--accent-line:rgba(95,208,160,.34);--accent-glow:rgba(95,208,160,.26)}
+.theme-code-review{--accent:#ffb24d;--accent-deep:#f5972a;--accent-bright:#ffd49b;--accent-soft:rgba(255,178,77,.12);--accent-line:rgba(255,178,77,.34);--accent-glow:rgba(255,178,77,.30)}
+.theme-bugfix     {--accent:#ff6b6b;--accent-deep:#ec4f4f;--accent-bright:#ffa8a8;--accent-soft:rgba(255,107,107,.12);--accent-line:rgba(255,107,107,.34);--accent-glow:rgba(255,107,107,.28)}
+.theme-docs       {--accent:#46d5d0;--accent-deep:#27b3ae;--accent-bright:#8ceae6;--accent-soft:rgba(70,213,208,.12);--accent-line:rgba(70,213,208,.34);--accent-glow:rgba(70,213,208,.26)}
 
 /* ---------- base ---------- */
 *{box-sizing:border-box;margin:0;padding:0}
