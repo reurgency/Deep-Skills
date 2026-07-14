@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>deep-code-review: findings that survive being attacked — Deep Skills</title>
+<meta name="description" content="deep-code-review hunts the last mile — code that looks wired but doesn't behave — with fresh agents, evidence-required findings, and adversarial verification.">
+<link rel="canonical" href="https://deep-skills.com/deep-code-review.html">
+
+<!-- Open Graph / Twitter -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Deep Skills">
+<meta property="og:title" content="deep-code-review: findings that survive being attacked — Deep Skills">
+<meta property="og:description" content="deep-code-review hunts the last mile — code that looks wired but doesn't behave — with fresh agents, evidence-required findings, and adversarial verification.">
+<meta property="og:url" content="https://deep-skills.com/deep-code-review.html">
+<meta property="og:image" content="https://deep-skills.com/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="deep-code-review: findings that survive being attacked — Deep Skills">
+<meta name="twitter:description" content="deep-code-review hunts the last mile — code that looks wired but doesn't behave — with fresh agents, evidence-required findings, and adversarial verification.">
+<meta name="twitter:image" content="https://deep-skills.com/assets/og-image.png">
+
+<!-- Favicons (files arrive in Phase 5) -->
+<link rel="icon" href="assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#07080c">
+
+<!-- Fonts: preconnect to BOTH origins; display=swap is required -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/site.js" defer></script>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+<div id="progress" aria-hidden="true"></div>
+<div class="glow a" aria-hidden="true"></div>
+<div class="glow b" aria-hidden="true"></div>
+
+<header class="site-nav">
+  <div class="wrap nav-row">
+    <a class="brand" href="index.html"><span class="brand-dot" aria-hidden="true"></span>Deep Skills</a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav id="nav-menu" class="nav-menu" aria-label="Primary">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="how-it-works.html">How it works</a></li>
+        <li class="nav-dropdown">
+          <button class="nav-dropbtn" aria-expanded="false" aria-controls="skills-menu">Skills</button>
+          <ul id="skills-menu" class="dropdown">
+            <li><a href="deep-plan.html">deep-plan</a></li>
+            <li><a href="deep-plan-review.html">deep-plan-review</a></li>
+            <li><a href="deep-implement.html">deep-implement</a></li>
+            <li><a href="deep-code-review.html">deep-code-review</a></li>
+            <li><a href="deep-bugfix.html">deep-bugfix</a></li>
+            <li><a href="deep-docs.html">deep-docs</a></li>
+          </ul>
+        </li>
+        <li><a class="btn btn-primary" href="install.html">Install</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ===== hero ===== -->
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Skill 4 of 6 &middot; Verify</p>
+      <h1><span class="grad">deep-code-review</span></h1>
+      <p style="margin-top:24px"><code class="chip no-prompt">/deep-code-review</code></p>
+      <p class="sub">Fresh agents trace every promised behavior end to end — and the findings that reach you are <b>the ones that survived an adversary trying to refute them</b>.</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="install.html">Install Deep Skills</a>
+        <a class="btn btn-ghost" href="how-it-works.html">How it works</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== benefits ===== -->
+  <section class="band">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">What it does for you</p>
+        <h2>Built to catch what looks finished but isn't</h2>
+        <p>Works on any branch, PR, or set of files — with or without a plan behind it.</p>
+      </div>
+      <div class="grid cols-2">
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#9737;</div>
+          <h3>Hunts the last mile</h3>
+          <p>Optimistic UI with no real call behind it, leftover mocks, swallowed errors, unregistered routes — every promised behavior is traced hop by hop through the full chain.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#9878;</div>
+          <h3>Evidence or it doesn't ship</h3>
+          <p>"Save might not work" doesn't qualify as a finding. "The chain breaks at hop 4 — this handler calls a route that's never registered" does. No cited chain, no finding.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#9678;</div>
+          <h3>Fresh eyes on your diff</h3>
+          <p>Reviewers never see the implementation conversation — an agent that watched the code get written rationalizes the same gaps. Independence is what makes the catch.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#10530;</div>
+          <h3>Scales with the stakes</h3>
+          <p>One thorough agent for everyday diffs. For risky ones, a multi-agent fleet of specialized finders whose candidates are then adversarially verified. A maximum mode for release gates.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== credibility ===== -->
+  <section>
+    <div class="wrap narrow">
+      <div class="section-head reveal">
+        <p class="kicker">The standard</p>
+        <h2>Evidence-gated, adversarially verified findings</h2>
+        <p>In multi-agent mode, every significant candidate finding is handed to a fresh agent whose job is to prove it wrong. Only the findings that survive that attack reach your report.</p>
+      </div>
+      <div class="callout reveal">
+        <span class="callout-icon" aria-hidden="true">&#10003;</span>
+        <p><b>The review never touches your code.</b> It produces an evidence-backed report and stops. Deciding what to fix, defer, or reject is a separate, explicit step you control — so an unattended review can run as a gate without side effects.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== loop fit ===== -->
+  <section class="band">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">Where it fits</p>
+        <h2>The independent measurement point</h2>
+        <p>Implementation says "done." deep-code-review checks whether the code agrees.</p>
+      </div>
+      <div class="loop-strip reveal">
+        <a class="loop-cell" href="deep-implement.html">
+          <span class="loop-label">Receives &larr;</span>
+          <span class="loop-name">deep-implement</span>
+          <span class="loop-desc">an implemented, committed diff</span>
+        </a>
+        <div class="loop-cell current">
+          <span class="loop-label">This skill</span>
+          <span class="loop-name">deep-code-review</span>
+          <span class="loop-desc">evidence-backed, verified findings</span>
+        </div>
+        <a class="loop-cell" href="deep-bugfix.html">
+          <span class="loop-label">Hands off &rarr;</span>
+          <span class="loop-name">deep-bugfix</span>
+          <span class="loop-desc">accepted findings, ready to remediate</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== prev/next ===== -->
+  <nav class="skillnav wrap" aria-label="Skill navigation">
+    <a href="deep-implement.html">
+      <span class="dir">&larr; Previous skill</span>
+      <span class="name">deep-implement</span>
+    </a>
+    <a class="next" href="deep-bugfix.html">
+      <span class="dir">Next skill &rarr;</span>
+      <span class="name">deep-bugfix</span>
+    </a>
+  </nav>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-cta">
+      <h2>Get started in one command</h2>
+      <p>Install the Deep Skills plugin and run your first <code>/deep-plan</code>.</p>
+      <!-- Install snippet: verbatim from README.md's Claude Code install block (D1 — slug as written) -->
+      <div class="chip-stack">
+        <code class="chip no-prompt">/plugin marketplace add reurgency/marketplace</code>
+        <code class="chip no-prompt">/plugin install deep-skills@reurgency</code>
+      </div>
+      <div class="btn-row" style="margin-top:22px">
+        <a class="btn btn-primary" href="install.html">Install Deep Skills</a>
+      </div>
+    </div>
+    <div class="footer-meta">
+      <span>&copy; 2026 Deep Skills &middot; MIT License</span>
+      <div class="footer-links">
+        <a href="how-it-works.html">How it works</a>
+        <a href="install.html">Install</a>
+        <a href="https://github.com/reurgency/Deep-Skills">GitHub</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

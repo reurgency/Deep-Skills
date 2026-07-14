@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>deep-bugfix: fixes proven before they ship — Deep Skills</title>
+<meta name="description" content="deep-bugfix diagnoses to the confirmed root cause, fixes minimally, then has a fresh adversarial agent prove the bug is gone — before anything is committed.">
+<link rel="canonical" href="https://deep-skills.com/deep-bugfix.html">
+
+<!-- Open Graph / Twitter -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Deep Skills">
+<meta property="og:title" content="deep-bugfix: fixes proven before they ship — Deep Skills">
+<meta property="og:description" content="deep-bugfix diagnoses to the confirmed root cause, fixes minimally, then has a fresh adversarial agent prove the bug is gone — before anything is committed.">
+<meta property="og:url" content="https://deep-skills.com/deep-bugfix.html">
+<meta property="og:image" content="https://deep-skills.com/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="deep-bugfix: fixes proven before they ship — Deep Skills">
+<meta name="twitter:description" content="deep-bugfix diagnoses to the confirmed root cause, fixes minimally, then has a fresh adversarial agent prove the bug is gone — before anything is committed.">
+<meta name="twitter:image" content="https://deep-skills.com/assets/og-image.png">
+
+<!-- Favicons (files arrive in Phase 5) -->
+<link rel="icon" href="assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#07080c">
+
+<!-- Fonts: preconnect to BOTH origins; display=swap is required -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/site.js" defer></script>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+<div id="progress" aria-hidden="true"></div>
+<div class="glow a" aria-hidden="true"></div>
+<div class="glow b" aria-hidden="true"></div>
+
+<header class="site-nav">
+  <div class="wrap nav-row">
+    <a class="brand" href="index.html"><span class="brand-dot" aria-hidden="true"></span>Deep Skills</a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav id="nav-menu" class="nav-menu" aria-label="Primary">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="how-it-works.html">How it works</a></li>
+        <li class="nav-dropdown">
+          <button class="nav-dropbtn" aria-expanded="false" aria-controls="skills-menu">Skills</button>
+          <ul id="skills-menu" class="dropdown">
+            <li><a href="deep-plan.html">deep-plan</a></li>
+            <li><a href="deep-plan-review.html">deep-plan-review</a></li>
+            <li><a href="deep-implement.html">deep-implement</a></li>
+            <li><a href="deep-code-review.html">deep-code-review</a></li>
+            <li><a href="deep-bugfix.html">deep-bugfix</a></li>
+            <li><a href="deep-docs.html">deep-docs</a></li>
+          </ul>
+        </li>
+        <li><a class="btn btn-primary" href="install.html">Install</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ===== hero ===== -->
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Skill 5 of 6 &middot; Remediate</p>
+      <h1><span class="grad">deep-bugfix</span></h1>
+      <p style="margin-top:24px"><code class="chip no-prompt">/deep-bugfix</code></p>
+      <p class="sub">Diagnosis-first remediation: find the real cause, fix it once, <b>prove the bug is gone</b> — and make sure nothing around it broke.</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="install.html">Install Deep Skills</a>
+        <a class="btn btn-ghost" href="how-it-works.html">How it works</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== benefits ===== -->
+  <section class="band">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">What it does for you</p>
+        <h2>No more "fixed" bugs that come right back</h2>
+        <p>Feed it triaged review findings, a pasted bug report or stack trace, or a failing test — it treats them all the same way: diagnose first.</p>
+      </div>
+      <div class="grid cols-2">
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#9906;</div>
+          <h3>Root causes, not symptom patches</h3>
+          <p>The reported explanation is treated as a hypothesis, not a spec. deep-bugfix re-diagnoses independently and fixes minimally at the confirmed cause.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#10070;</div>
+          <h3>One fix closes the family</h3>
+          <p>Findings that share a cause are clustered and fixed together — six symptoms can collapse into one fix, and no sibling gets silently left behind.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#9878;</div>
+          <h3>The fixer never grades itself</h3>
+          <p>A separate fresh agent tries to refute the claim that the bug is fixed — tracing the corrected behavior step by step. Nothing unproven ever ships.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#9737;</div>
+          <h3>Blast radius contained</h3>
+          <p>Everything that depends on the changed code is re-tested before commit — because the real danger in bug-fixing is breaking what relied on the old behavior.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== credibility ===== -->
+  <section>
+    <div class="wrap narrow">
+      <div class="section-head reveal">
+        <p class="kicker">The non-negotiable order</p>
+        <h2>Prove before commit</h2>
+        <p>Per fix, the sequence never changes: apply &rarr; prove the bug is gone &rarr; confirm nothing broke &rarr; commit. Two of the three proof verdicts short-circuit the commit entirely.</p>
+      </div>
+      <div class="callout reveal">
+        <span class="callout-icon" aria-hidden="true">&#10003;</span>
+        <p><b>A regression reverts immediately.</b> If the adversarial proof can't confirm the fix, it gets one more diagnosis attempt — then the changes are reverted and you get a structured report instead of a quiet mess in your working tree.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== loop fit ===== -->
+  <section class="band">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">Where it fits</p>
+        <h2>Closing the review &rarr; fix &rarr; re-review loop</h2>
+        <p>Review finds it, you accept it, deep-bugfix proves it gone — then the docs catch up.</p>
+      </div>
+      <div class="loop-strip reveal">
+        <a class="loop-cell" href="deep-code-review.html">
+          <span class="loop-label">Receives &larr;</span>
+          <span class="loop-name">deep-code-review</span>
+          <span class="loop-desc">accepted findings (or any bug report)</span>
+        </a>
+        <div class="loop-cell current">
+          <span class="loop-label">This skill</span>
+          <span class="loop-name">deep-bugfix</span>
+          <span class="loop-desc">proven fixes, contained blast radius</span>
+        </div>
+        <a class="loop-cell" href="deep-docs.html">
+          <span class="loop-label">Hands off &rarr;</span>
+          <span class="loop-name">deep-docs</span>
+          <span class="loop-desc">a verified codebase, ready to map</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== prev/next ===== -->
+  <nav class="skillnav wrap" aria-label="Skill navigation">
+    <a href="deep-code-review.html">
+      <span class="dir">&larr; Previous skill</span>
+      <span class="name">deep-code-review</span>
+    </a>
+    <a class="next" href="deep-docs.html">
+      <span class="dir">Next skill &rarr;</span>
+      <span class="name">deep-docs</span>
+    </a>
+  </nav>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-cta">
+      <h2>Get started in one command</h2>
+      <p>Install the Deep Skills plugin and run your first <code>/deep-plan</code>.</p>
+      <!-- Install snippet: verbatim from README.md's Claude Code install block (D1 — slug as written) -->
+      <div class="chip-stack">
+        <code class="chip no-prompt">/plugin marketplace add reurgency/marketplace</code>
+        <code class="chip no-prompt">/plugin install deep-skills@reurgency</code>
+      </div>
+      <div class="btn-row" style="margin-top:22px">
+        <a class="btn btn-primary" href="install.html">Install Deep Skills</a>
+      </div>
+    </div>
+    <div class="footer-meta">
+      <span>&copy; 2026 Deep Skills &middot; MIT License</span>
+      <div class="footer-links">
+        <a href="how-it-works.html">How it works</a>
+        <a href="install.html">Install</a>
+        <a href="https://github.com/reurgency/Deep-Skills">GitHub</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

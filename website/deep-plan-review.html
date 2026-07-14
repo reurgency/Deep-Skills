@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>deep-plan-review: independent critique before code exists — Deep Skills</title>
+<meta name="description" content="deep-plan-review sends fresh, codebase-aware agents at a finished plan — catching gaps, conflicts, and duplication at the cheapest moment: before implementation.">
+<link rel="canonical" href="https://deep-skills.com/deep-plan-review.html">
+
+<!-- Open Graph / Twitter -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Deep Skills">
+<meta property="og:title" content="deep-plan-review: independent critique before code exists — Deep Skills">
+<meta property="og:description" content="deep-plan-review sends fresh, codebase-aware agents at a finished plan — catching gaps, conflicts, and duplication at the cheapest moment: before implementation.">
+<meta property="og:url" content="https://deep-skills.com/deep-plan-review.html">
+<meta property="og:image" content="https://deep-skills.com/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="deep-plan-review: independent critique before code exists — Deep Skills">
+<meta name="twitter:description" content="deep-plan-review sends fresh, codebase-aware agents at a finished plan — catching gaps, conflicts, and duplication at the cheapest moment: before implementation.">
+<meta name="twitter:image" content="https://deep-skills.com/assets/og-image.png">
+
+<!-- Favicons (files arrive in Phase 5) -->
+<link rel="icon" href="assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#07080c">
+
+<!-- Fonts: preconnect to BOTH origins; display=swap is required -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/site.js" defer></script>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+<div id="progress" aria-hidden="true"></div>
+<div class="glow a" aria-hidden="true"></div>
+<div class="glow b" aria-hidden="true"></div>
+
+<header class="site-nav">
+  <div class="wrap nav-row">
+    <a class="brand" href="index.html"><span class="brand-dot" aria-hidden="true"></span>Deep Skills</a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav id="nav-menu" class="nav-menu" aria-label="Primary">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="how-it-works.html">How it works</a></li>
+        <li class="nav-dropdown">
+          <button class="nav-dropbtn" aria-expanded="false" aria-controls="skills-menu">Skills</button>
+          <ul id="skills-menu" class="dropdown">
+            <li><a href="deep-plan.html">deep-plan</a></li>
+            <li><a href="deep-plan-review.html">deep-plan-review</a></li>
+            <li><a href="deep-implement.html">deep-implement</a></li>
+            <li><a href="deep-code-review.html">deep-code-review</a></li>
+            <li><a href="deep-bugfix.html">deep-bugfix</a></li>
+            <li><a href="deep-docs.html">deep-docs</a></li>
+          </ul>
+        </li>
+        <li><a class="btn btn-primary" href="install.html">Install</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ===== hero ===== -->
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Skill 2 of 6 &middot; Critique</p>
+      <h1><span class="grad">deep-plan-review</span></h1>
+      <p style="margin-top:24px"><code class="chip no-prompt">/deep-plan-review</code></p>
+      <p class="sub">Fresh agents critique your finished plan against your codebase and your recorded preferences — <b>catching problems while they're still cheap to fix</b>.</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="install.html">Install Deep Skills</a>
+        <a class="btn btn-ghost" href="how-it-works.html">How it works</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== benefits ===== -->
+  <section class="band">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">What it does for you</p>
+        <h2>A second opinion that owes the plan nothing</h2>
+        <p>Authors are too close to their own plans to see the blind spots. This review isn't.</p>
+      </div>
+      <div class="grid cols-2">
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#9678;</div>
+          <h3>Fresh eyes, real independence</h3>
+          <p>Reviewers never see the planning conversation — so they can't inherit its framing, its rationalizations, or its blind spots. They judge the plan against ground truth.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#9707;</div>
+          <h3>Two lenses, two sources of truth</h3>
+          <p>The plan is checked against <b>you</b> — your taste, preferences, and recorded decisions — and against <b>your codebase</b> — patterns, duplicated behavior, and conflicts.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#9776;</div>
+          <h3>Findings you can act on</h3>
+          <p>Every finding is severity-ranked and carries evidence plus a concrete recommendation. Clean lenses are called clean — no findings invented to look thorough.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#10530;</div>
+          <h3>Scales to the plan</h3>
+          <p>One fresh agent covers most plans; for large, multi-phase work, a parallel multi-agent fan-out reviews every dimension independently, then synthesizes one clean report.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== credibility ===== -->
+  <section>
+    <div class="wrap narrow">
+      <div class="section-head reveal">
+        <p class="kicker">Why it pays</p>
+        <h2>The cheapest catch in the whole pipeline</h2>
+        <p>A misaligned plan caught here costs a document edit. The same problem caught at code review costs a rewrite — and caught in production, far more.</p>
+      </div>
+      <div class="callout reveal">
+        <span class="callout-icon" aria-hidden="true">&#10003;</span>
+        <p><b>No hand-waving allowed:</b> every finding must cite a file path, a plan section, or a named existing function — vague "consider improving" advisories are banned outright. Accepted fixes are folded back into the plan so nothing gets lost.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== loop fit ===== -->
+  <section class="band">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">Where it fits</p>
+        <h2>The gate between planning and building</h2>
+        <p>Nothing gets implemented until an independent reviewer has had its say.</p>
+      </div>
+      <div class="loop-strip reveal">
+        <a class="loop-cell" href="deep-plan.html">
+          <span class="loop-label">Receives &larr;</span>
+          <span class="loop-name">deep-plan</span>
+          <span class="loop-desc">a finished, execution-ready plan</span>
+        </a>
+        <div class="loop-cell current">
+          <span class="loop-label">This skill</span>
+          <span class="loop-name">deep-plan-review</span>
+          <span class="loop-desc">independent, codebase-aware critique</span>
+        </div>
+        <a class="loop-cell" href="deep-implement.html">
+          <span class="loop-label">Hands off &rarr;</span>
+          <span class="loop-name">deep-implement</span>
+          <span class="loop-desc">a reviewed plan, ready to execute</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== prev/next ===== -->
+  <nav class="skillnav wrap" aria-label="Skill navigation">
+    <a href="deep-plan.html">
+      <span class="dir">&larr; Previous skill</span>
+      <span class="name">deep-plan</span>
+    </a>
+    <a class="next" href="deep-implement.html">
+      <span class="dir">Next skill &rarr;</span>
+      <span class="name">deep-implement</span>
+    </a>
+  </nav>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-cta">
+      <h2>Get started in one command</h2>
+      <p>Install the Deep Skills plugin and run your first <code>/deep-plan</code>.</p>
+      <!-- Install snippet: verbatim from README.md's Claude Code install block (D1 — slug as written) -->
+      <div class="chip-stack">
+        <code class="chip no-prompt">/plugin marketplace add reurgency/marketplace</code>
+        <code class="chip no-prompt">/plugin install deep-skills@reurgency</code>
+      </div>
+      <div class="btn-row" style="margin-top:22px">
+        <a class="btn btn-primary" href="install.html">Install Deep Skills</a>
+      </div>
+    </div>
+    <div class="footer-meta">
+      <span>&copy; 2026 Deep Skills &middot; MIT License</span>
+      <div class="footer-links">
+        <a href="how-it-works.html">How it works</a>
+        <a href="install.html">Install</a>
+        <a href="https://github.com/reurgency/Deep-Skills">GitHub</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

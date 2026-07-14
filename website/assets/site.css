@@ -325,6 +325,45 @@ a.card:hover{transform:translateY(-4px);border-color:var(--accent-line);box-shad
 }
 .flow .arrow{color:var(--faint)}
 
+/* ---------- loop strip (skill pages: receives / hands off) ---------- */
+.loop-strip{
+  display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:16px;align-items:stretch;
+  max-width:920px;margin:0 auto;
+}
+.loop-cell{
+  display:flex;flex-direction:column;gap:6px;
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:18px 20px;color:inherit;
+  transition:transform .18s ease,border-color .18s ease;
+}
+a.loop-cell:hover{transform:translateY(-3px);border-color:var(--accent-line);color:inherit}
+.loop-cell.current{background:var(--accent-soft);border-color:var(--accent-line)}
+.loop-label{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--faint);
+}
+.loop-cell.current .loop-label{color:var(--accent)}
+.loop-name{font-family:var(--display);font-weight:600;font-size:16px;color:var(--text)}
+.loop-desc{font-size:13px;color:var(--muted)}
+@media(max-width:760px){.loop-strip{grid-template-columns:1fr}}
+
+/* ---------- prev/next skill nav ---------- */
+.skillnav{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding-top:8px;padding-bottom:32px}
+.skillnav a{
+  display:flex;flex-direction:column;gap:4px;
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:16px 20px;
+  transition:transform .18s ease,border-color .18s ease;
+}
+.skillnav a:hover{transform:translateY(-3px);border-color:var(--accent-line)}
+.skillnav a.next{text-align:right;align-items:flex-end}
+.skillnav .dir{font-family:var(--mono);font-size:12px;color:var(--faint)}
+.skillnav .name{font-family:var(--display);font-weight:600;font-size:15.5px;color:var(--text)}
+@media(max-width:640px){
+  .skillnav{grid-template-columns:1fr}
+  .skillnav a.next{text-align:left;align-items:flex-start}
+}
+
 /* ---------- footer ---------- */
 .site-footer{
   border-top:1px solid var(--line);background:var(--bg-raise);
@@ -353,7 +392,7 @@ html.js .reveal.in{opacity:1;transform:none}
   html{scroll-behavior:auto}
   *,*::before,*::after{transition-duration:.01ms !important;animation-duration:.01ms !important;animation-iteration-count:1 !important}
   html.js .reveal{opacity:1;transform:none}
-  .btn-primary:hover,a.card:hover{transform:none}
+  .btn-primary:hover,a.card:hover,a.loop-cell:hover,.skillnav a:hover{transform:none}
 }
 
 /* ---------- small screens ---------- */

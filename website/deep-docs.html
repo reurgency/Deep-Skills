@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>deep-docs: documentation that matches the code — Deep Skills</title>
+<meta name="description" content="deep-docs builds a tiered, token-budget-aware map of your codebase where every claim is anchored to a real file and line — and verified before publish.">
+<link rel="canonical" href="https://deep-skills.com/deep-docs.html">
+
+<!-- Open Graph / Twitter -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Deep Skills">
+<meta property="og:title" content="deep-docs: documentation that matches the code — Deep Skills">
+<meta property="og:description" content="deep-docs builds a tiered, token-budget-aware map of your codebase where every claim is anchored to a real file and line — and verified before publish.">
+<meta property="og:url" content="https://deep-skills.com/deep-docs.html">
+<meta property="og:image" content="https://deep-skills.com/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="deep-docs: documentation that matches the code — Deep Skills">
+<meta name="twitter:description" content="deep-docs builds a tiered, token-budget-aware map of your codebase where every claim is anchored to a real file and line — and verified before publish.">
+<meta name="twitter:image" content="https://deep-skills.com/assets/og-image.png">
+
+<!-- Favicons (files arrive in Phase 5) -->
+<link rel="icon" href="assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#07080c">
+
+<!-- Fonts: preconnect to BOTH origins; display=swap is required -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/site.js" defer></script>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+<div id="progress" aria-hidden="true"></div>
+<div class="glow a" aria-hidden="true"></div>
+<div class="glow b" aria-hidden="true"></div>
+
+<header class="site-nav">
+  <div class="wrap nav-row">
+    <a class="brand" href="index.html"><span class="brand-dot" aria-hidden="true"></span>Deep Skills</a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav id="nav-menu" class="nav-menu" aria-label="Primary">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="how-it-works.html">How it works</a></li>
+        <li class="nav-dropdown">
+          <button class="nav-dropbtn" aria-expanded="false" aria-controls="skills-menu">Skills</button>
+          <ul id="skills-menu" class="dropdown">
+            <li><a href="deep-plan.html">deep-plan</a></li>
+            <li><a href="deep-plan-review.html">deep-plan-review</a></li>
+            <li><a href="deep-implement.html">deep-implement</a></li>
+            <li><a href="deep-code-review.html">deep-code-review</a></li>
+            <li><a href="deep-bugfix.html">deep-bugfix</a></li>
+            <li><a href="deep-docs.html">deep-docs</a></li>
+          </ul>
+        </li>
+        <li><a class="btn btn-primary" href="install.html">Install</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ===== hero ===== -->
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Skill 6 of 6 &middot; Orient</p>
+      <h1><span class="grad">deep-docs</span></h1>
+      <p style="margin-top:24px"><code class="chip no-prompt">/deep-docs</code></p>
+      <p class="sub">A standing, queryable map of what your codebase has <b>actually built</b> — priced for agents on a token budget, verified claim by claim.</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="install.html">Install Deep Skills</a>
+        <a class="btn btn-ghost" href="how-it-works.html">How it works</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== benefits ===== -->
+  <section class="band">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">What it does for you</p>
+        <h2>Docs your agents can afford to read</h2>
+        <p>Runs after a build or standalone on any repo. It documents what exists — it never edits source.</p>
+      </div>
+      <div class="grid cols-2">
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#9776;</div>
+          <h3>Load only what you need</h3>
+          <p>Three tiers: a tiny always-loaded index, per-subsystem cards loaded on touch, deep references on demand. An agent pays only for the slice its task touches.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#9875;</div>
+          <h3>Anchored or it's fiction</h3>
+          <p>Every claim cites a real file, line, and symbol in your codebase. No intent-prose that describes what the code was supposed to do instead of what it does.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#10003;</div>
+          <h3>Verified before publish</h3>
+          <p>Fresh agents re-check every single anchor against the code — no sampling. One dead anchor blocks its card from publishing. If the map says it, the code shows it.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#8635;</div>
+          <h3>Stays current cheaply</h3>
+          <p>Refresh detects drifted anchors and undocumented additions, then regenerates only the stale and new subsystems — not the whole map.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== credibility ===== -->
+  <section>
+    <div class="wrap narrow">
+      <div class="section-head reveal">
+        <p class="kicker">The guarantee</p>
+        <h2>Every anchor checked — no sampling</h2>
+        <p>Anchor verification is exhaustive because the guarantee is binary: if even one claim is unverified, the whole map can't be trusted. So every claim gets checked, every time.</p>
+      </div>
+      <div class="callout reveal">
+        <span class="callout-icon" aria-hidden="true">&#10003;</span>
+        <p><b>Honest about its edges.</b> Alongside the map, a coverage report states exactly what was documented, what wasn't and why, and which existing human docs were referenced but never absorbed as verified fact.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== loop fit ===== -->
+  <section class="band">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">Where it fits</p>
+        <h2>The last stop — and the head start on the next</h2>
+        <p>Once the code is verified, deep-docs maps what got built — so the next effort starts oriented, not lost.</p>
+      </div>
+      <div class="loop-strip reveal">
+        <a class="loop-cell" href="deep-bugfix.html">
+          <span class="loop-label">Receives &larr;</span>
+          <span class="loop-name">deep-bugfix</span>
+          <span class="loop-desc">a verified, remediated codebase</span>
+        </a>
+        <div class="loop-cell current">
+          <span class="loop-label">This skill</span>
+          <span class="loop-name">deep-docs</span>
+          <span class="loop-desc">a verified map of what's been built</span>
+        </div>
+        <a class="loop-cell" href="how-it-works.html">
+          <span class="loop-label">Hands off &rarr;</span>
+          <span class="loop-name">Your next idea</span>
+          <span class="loop-desc">back to the top of the loop, better oriented</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== prev/next ===== -->
+  <nav class="skillnav wrap" aria-label="Skill navigation">
+    <a href="deep-bugfix.html">
+      <span class="dir">&larr; Previous skill</span>
+      <span class="name">deep-bugfix</span>
+    </a>
+    <a class="next" href="how-it-works.html">
+      <span class="dir">Back to the loop &rarr;</span>
+      <span class="name">How it works</span>
+    </a>
+  </nav>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-cta">
+      <h2>Get started in one command</h2>
+      <p>Install the Deep Skills plugin and run your first <code>/deep-plan</code>.</p>
+      <!-- Install snippet: verbatim from README.md's Claude Code install block (D1 — slug as written) -->
+      <div class="chip-stack">
+        <code class="chip no-prompt">/plugin marketplace add reurgency/marketplace</code>
+        <code class="chip no-prompt">/plugin install deep-skills@reurgency</code>
+      </div>
+      <div class="btn-row" style="margin-top:22px">
+        <a class="btn btn-primary" href="install.html">Install Deep Skills</a>
+      </div>
+    </div>
+    <div class="footer-meta">
+      <span>&copy; 2026 Deep Skills &middot; MIT License</span>
+      <div class="footer-links">
+        <a href="how-it-works.html">How it works</a>
+        <a href="install.html">Install</a>
+        <a href="https://github.com/reurgency/Deep-Skills">GitHub</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
