@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!-- PHASE 1 STUB — exercises the shared skeleton + design system.
+     Fully replaced with real marketing copy in Phase 2.
+     Skeleton source of truth: website/_shared/README.md -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deep Skills — idea to verified code</title>
+<meta name="description" content="Deep Skills: a pipeline of agent skills that turns an idea into trusted, verified code.">
+<link rel="canonical" href="https://deep-skills.com/">
+
+<!-- Open Graph / Twitter -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Deep Skills">
+<meta property="og:title" content="Deep Skills — idea to verified code">
+<meta property="og:description" content="Deep Skills: a pipeline of agent skills that turns an idea into trusted, verified code.">
+<meta property="og:url" content="https://deep-skills.com/">
+<meta property="og:image" content="https://deep-skills.com/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Deep Skills — idea to verified code">
+<meta name="twitter:description" content="Deep Skills: a pipeline of agent skills that turns an idea into trusted, verified code.">
+<meta name="twitter:image" content="https://deep-skills.com/assets/og-image.png">
+
+<!-- Favicons (files arrive in Phase 5) -->
+<link rel="icon" href="assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#07080c">
+
+<!-- Fonts: preconnect to BOTH origins; display=swap is required -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/site.js" defer></script>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+<div id="progress" aria-hidden="true"></div>
+<div class="glow a" aria-hidden="true"></div>
+<div class="glow b" aria-hidden="true"></div>
+
+<header class="site-nav">
+  <div class="wrap nav-row">
+    <a class="brand" href="index.html"><span class="brand-dot" aria-hidden="true"></span>Deep Skills</a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav id="nav-menu" class="nav-menu" aria-label="Primary">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="how-it-works.html">How it works</a></li>
+        <li class="nav-dropdown">
+          <button class="nav-dropbtn" aria-expanded="false" aria-controls="skills-menu">Skills</button>
+          <ul id="skills-menu" class="dropdown">
+            <li><a href="deep-plan.html">deep-plan</a></li>
+            <li><a href="deep-plan-review.html">deep-plan-review</a></li>
+            <li><a href="deep-implement.html">deep-implement</a></li>
+            <li><a href="deep-code-review.html">deep-code-review</a></li>
+            <li><a href="deep-bugfix.html">deep-bugfix</a></li>
+            <li><a href="deep-docs.html">deep-docs</a></li>
+          </ul>
+        </li>
+        <li><a class="btn btn-primary" href="install.html">Install</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- hero -->
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Six skills, one pipeline</p>
+      <h1>From idea to <span class="grad">verified code</span></h1>
+      <p class="sub">Phase 1 stub copy — a pipeline of agent skills that plans, reviews, implements, and verifies so you can hand off <b>trusted</b> code.</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="install.html">Install Deep Skills</a>
+        <a class="btn btn-ghost" href="how-it-works.html">How it works</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- sample card grid -->
+  <section class="band">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">Design-system check</p>
+        <h2>Cards, chips, and callouts</h2>
+        <p>Throwaway content exercising the component inventory. Replaced in Phase 2.</p>
+      </div>
+      <div class="grid cols-3">
+        <a class="card reveal" href="deep-plan.html">
+          <span class="cmd">/deep-plan</span>
+          <h3>deep-plan</h3>
+          <p>Stub card — a plan a fresh agent can execute cold.</p>
+          <span class="tag">01 · plan</span>
+        </a>
+        <a class="card reveal" href="deep-code-review.html">
+          <span class="cmd">/deep-code-review</span>
+          <h3>deep-code-review</h3>
+          <p>Stub card — evidence-gated, adversarially verified findings.</p>
+          <span class="tag">04 · review</span>
+        </a>
+        <a class="card reveal" href="deep-docs.html">
+          <span class="cmd">/deep-docs</span>
+          <h3>deep-docs</h3>
+          <p>Stub card — documentation that matches the code that shipped.</p>
+          <span class="tag">06 · docs</span>
+        </a>
+      </div>
+      <div class="callout reveal" style="margin-top:28px">
+        <span class="callout-icon" aria-hidden="true">&#9670;</span>
+        <p><b>Callout check.</b> One strong accent, no per-skill rainbow. This block validates callout styling and reveal-on-scroll.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- pipeline strip + chip -->
+  <section>
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">Pipeline strip</p>
+        <h2>One clean loop</h2>
+      </div>
+      <div class="flow reveal">
+        <span class="step">plan</span><span class="arrow" aria-hidden="true">&rarr;</span>
+        <span class="step">plan-review</span><span class="arrow" aria-hidden="true">&rarr;</span>
+        <span class="step">implement</span><span class="arrow" aria-hidden="true">&rarr;</span>
+        <span class="step">code-review</span><span class="arrow" aria-hidden="true">&rarr;</span>
+        <span class="step">bugfix</span><span class="arrow" aria-hidden="true">&rarr;</span>
+        <span class="step">docs</span>
+      </div>
+      <p class="center reveal" style="margin-top:26px">
+        <code class="chip">git clone https://github.com/reurgency/Deep-Skills.git</code>
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-cta">
+      <h2>Get started in one command</h2>
+      <p>Install the Deep Skills plugin and run your first <code>/deep-plan</code>.</p>
+      <!-- Install snippet: Phase 4 lifts the exact command verbatim from README.md (D1) -->
+      <code class="chip no-prompt">/plugin marketplace add reurgency/marketplace</code>
+      <div class="btn-row" style="margin-top:22px">
+        <a class="btn btn-primary" href="install.html">Install Deep Skills</a>
+      </div>
+    </div>
+    <div class="footer-meta">
+      <span>&copy; 2026 Deep Skills &middot; MIT License</span>
+      <div class="footer-links">
+        <a href="how-it-works.html">How it works</a>
+        <a href="install.html">Install</a>
+        <a href="https://github.com/reurgency/Deep-Skills">GitHub</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
