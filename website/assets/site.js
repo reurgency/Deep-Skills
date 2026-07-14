@@ -1,4 +1,4 @@
-/* Deep Skills — marketing site shared interactions.
+/* Deep Skills - marketing site shared interactions.
    Zero dependencies. Every feature is guarded so a page that
    omits a component (or an old browser) degrades gracefully. */
 (function () {
@@ -38,7 +38,26 @@
         dropBtn.focus();
       }
     });
+    // close before navigating away so bfcache doesn't restore it open
+    drop.addEventListener('click', function (e) {
+      if (e.target.closest && e.target.closest('a')) {
+        drop.classList.remove('open');
+        dropBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
   }
+
+  // bfcache restores DOM state as-is; reset transient nav state on every show
+  window.addEventListener('pageshow', function () {
+    if (drop && dropBtn) {
+      drop.classList.remove('open');
+      dropBtn.setAttribute('aria-expanded', 'false');
+    }
+    if (toggle && menu) {
+      menu.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+  });
 
   // ---- current-page nav highlighting (aria-current) ----
   var path = window.location.pathname;

@@ -1,14 +1,14 @@
-# Shared page skeleton — copy-paste convention
+# Shared page skeleton - copy-paste convention
 
 This is a static site with **no build step and no server-side includes**. Every page
 copies the three blocks below verbatim and fills in the per-page placeholders.
-This file is the single source of truth for that skeleton — if the nav or footer
+This file is the single source of truth for that skeleton - if the nav or footer
 changes, update it here first, then apply to all nine pages.
 
 `_shared/` is a documentation folder only. Nothing in it is linked from the site,
 and it is excluded from the sitemap.
 
-## Link convention (decided Phase 1 — follow everywhere)
+## Link convention (decided Phase 1 - follow everywhere)
 
 - **Internal page links are plain relative filenames**: `deep-plan.html`,
   `install.html`, `how-it-works.html`, `index.html`. All nine pages live flat in
@@ -41,24 +41,24 @@ grep -rEi "deep-goal|deep goal|deep-learn|production-guide|roadmap" website/
 ## 1. Canonical `<head>` block
 
 Replace the `{{...}}` placeholders per page. Favicon/manifest/OG-image files land
-in Phase 5 — keep the links in place from day one so pages don't need re-editing.
+in Phase 5 - keep the links in place from day one so pages don't need re-editing.
 
 ```html
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{PAGE_TITLE}} — Deep Skills</title>
+<title>{{PAGE_TITLE}} - Deep Skills</title>
 <meta name="description" content="{{PAGE_DESCRIPTION}}">
 <link rel="canonical" href="https://deep-skills.com/{{PAGE}}.html">
 
 <!-- Open Graph / Twitter -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Deep Skills">
-<meta property="og:title" content="{{PAGE_TITLE}} — Deep Skills">
+<meta property="og:title" content="{{PAGE_TITLE}} - Deep Skills">
 <meta property="og:description" content="{{PAGE_DESCRIPTION}}">
 <meta property="og:url" content="https://deep-skills.com/{{PAGE}}.html">
 <meta property="og:image" content="https://deep-skills.com/assets/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="{{PAGE_TITLE}} — Deep Skills">
+<meta name="twitter:title" content="{{PAGE_TITLE}} - Deep Skills">
 <meta name="twitter:description" content="{{PAGE_DESCRIPTION}}">
 <meta name="twitter:image" content="https://deep-skills.com/assets/og-image.png">
 
@@ -85,7 +85,7 @@ Homepage exception: canonical and `og:url` are `https://deep-skills.com/`
 ## 2. Canonical nav block (first thing inside `<body>`)
 
 Identical on all nine pages. `site.js` sets `aria-current="page"` on the matching
-link at runtime — do not hardcode it. The Install link is the primary CTA button.
+link at runtime - do not hardcode it. The Install link is the primary CTA button.
 
 ```html
 <a class="skip-link" href="#main">Skip to content</a>
@@ -131,7 +131,7 @@ Page content goes in `<main id="main">…</main>` (the skip-link target).
     <div class="footer-cta">
       <h2>Get started in one command</h2>
       <p>Install the Deep Skills plugin and run your first <code>/deep-plan</code>.</p>
-      <!-- Install snippet: verbatim from README.md's Claude Code install block (D1 — slug as written) -->
+      <!-- Install snippet: verbatim from README.md's Claude Code install block (D1 - slug as written) -->
       <div class="chip-stack">
         <code class="chip no-prompt">/plugin marketplace add reurgency/marketplace</code>
         <code class="chip no-prompt">/plugin install deep-skills@reurgency</code>

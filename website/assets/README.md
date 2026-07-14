@@ -6,7 +6,7 @@ the network; no online converters. Everything below runs from the **repo root**.
 
 Tooling used: ImageMagick 7 (`magick`, Homebrew) and Python 3 + Pillow.
 Fallback if ImageMagick is absent: `sips -Z <size>` for the PNGs plus a small
-struct-packed Python ICO writer (PNG-in-ICO is valid) — not needed here.
+struct-packed Python ICO writer (PNG-in-ICO is valid) - not needed here.
 
 ## Favicon set
 

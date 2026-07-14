@@ -1,5 +1,5 @@
 # Netlify configuration for the Deep Skills marketing site.
-# Static site — no build step. Netlify publishes the website/ directory as-is.
+# Static site - no build step. Netlify publishes the website/ directory as-is.
 
 [build]
   publish = "website"
