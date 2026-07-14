@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Install on Claude Code, Codex, Cursor &amp; Copilot — Deep Skills</title>
+<meta name="description" content="Install the Deep Skills plugin on Claude Code, Codex, Cursor, or GitHub Copilot — copy-paste commands for every host, plus how to run your first /deep-plan.">
+<link rel="canonical" href="https://deep-skills.com/install.html">
+
+<!-- Open Graph / Twitter -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Deep Skills">
+<meta property="og:title" content="Install on Claude Code, Codex, Cursor &amp; Copilot — Deep Skills">
+<meta property="og:description" content="Install the Deep Skills plugin on Claude Code, Codex, Cursor, or GitHub Copilot — copy-paste commands for every host, plus how to run your first /deep-plan.">
+<meta property="og:url" content="https://deep-skills.com/install.html">
+<meta property="og:image" content="https://deep-skills.com/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Install on Claude Code, Codex, Cursor &amp; Copilot — Deep Skills">
+<meta name="twitter:description" content="Install the Deep Skills plugin on Claude Code, Codex, Cursor, or GitHub Copilot — copy-paste commands for every host, plus how to run your first /deep-plan.">
+<meta name="twitter:image" content="https://deep-skills.com/assets/og-image.png">
+
+<!-- Favicons (files arrive in Phase 5) -->
+<link rel="icon" href="assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#07080c">
+
+<!-- Fonts: preconnect to BOTH origins; display=swap is required -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/site.js" defer></script>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+<div id="progress" aria-hidden="true"></div>
+<div class="glow a" aria-hidden="true"></div>
+<div class="glow b" aria-hidden="true"></div>
+
+<header class="site-nav">
+  <div class="wrap nav-row">
+    <a class="brand" href="index.html"><span class="brand-dot" aria-hidden="true"></span>Deep Skills</a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav id="nav-menu" class="nav-menu" aria-label="Primary">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="how-it-works.html">How it works</a></li>
+        <li class="nav-dropdown">
+          <button class="nav-dropbtn" aria-expanded="false" aria-controls="skills-menu">Skills</button>
+          <ul id="skills-menu" class="dropdown">
+            <li><a href="deep-plan.html">deep-plan</a></li>
+            <li><a href="deep-plan-review.html">deep-plan-review</a></li>
+            <li><a href="deep-implement.html">deep-implement</a></li>
+            <li><a href="deep-code-review.html">deep-code-review</a></li>
+            <li><a href="deep-bugfix.html">deep-bugfix</a></li>
+            <li><a href="deep-docs.html">deep-docs</a></li>
+          </ul>
+        </li>
+        <li><a class="btn btn-primary" href="install.html">Install</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ===== hero: quick install ===== -->
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Install</p>
+      <h1>Up and running in <span class="grad">one command</span></h1>
+      <p class="sub">Two lines in Claude Code — the reference host. Using Codex, Cursor, or Copilot? Your host is <a href="#hosts">right below</a>.</p>
+      <!-- Install snippet: verbatim from README.md's Claude Code install block (D1 — slug as written) -->
+      <div class="cmd-stack center" style="margin-top:34px">
+        <div class="cmdline">
+          <code class="chip no-prompt">/plugin marketplace add reurgency/marketplace</code>
+          <button class="copy-btn" type="button" aria-label="Copy command">Copy</button>
+        </div>
+        <div class="cmdline">
+          <code class="chip no-prompt">/plugin install deep-skills@reurgency</code>
+          <button class="copy-btn" type="button" aria-label="Copy command">Copy</button>
+        </div>
+      </div>
+      <p class="faint" style="margin-top:18px;font-size:13.5px">Update later with <code>/plugin marketplace update reurgency</code>.</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="#quickstart">Run your first /deep-plan</a>
+        <a class="btn btn-ghost" href="how-it-works.html">How it works</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== host matrix ===== -->
+  <section class="band" id="hosts">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">Every host</p>
+        <h2>One plugin, five ways in</h2>
+        <p>The same six skills install natively on each host — no forks, no per-host rewrites. Full commands, the capability matrix, and per-host caveats live in the repo's <a href="https://github.com/reurgency/Deep-Skills/blob/main/plugins/deep-skills/HOSTS.md">HOSTS.md</a>.</p>
+      </div>
+
+      <div class="table-scroll reveal" tabindex="0" role="region" aria-label="Cross-assistant install matrix">
+        <table class="matrix">
+          <thead>
+            <tr>
+              <th scope="col">Host</th>
+              <th scope="col">Skills</th>
+              <th scope="col">Parallel fan-out</th>
+              <th scope="col">Per-agent model</th>
+              <th scope="col">Install</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Claude Code</th>
+              <td class="yes">&#10003;</td>
+              <td class="yes">&#10003;</td>
+              <td class="yes">&#10003;</td>
+              <td><code>/plugin marketplace add reurgency/marketplace</code> &rarr; <code>/plugin install deep-skills@reurgency</code></td>
+            </tr>
+            <tr>
+              <th scope="row">Codex</th>
+              <td class="yes">&#10003;</td>
+              <td class="yes">&#10003;</td>
+              <td class="yes">&#10003;</td>
+              <td><code>codex plugin marketplace add reurgency/marketplace</code> &rarr; <code>/plugins</code> &rarr; install <sup class="fnm">1</sup></td>
+            </tr>
+            <tr>
+              <th scope="row">Cursor</th>
+              <td class="yes">&#10003;</td>
+              <td class="yes">&#10003;</td>
+              <td class="yes">&#10003;</td>
+              <td><code>/add-plugin deep-skills</code> (or Customize &rarr; Marketplace) <sup class="fnm">1</sup></td>
+            </tr>
+            <tr>
+              <th scope="row">Copilot CLI</th>
+              <td class="yes">&#10003;</td>
+              <td class="warn">gate <sup class="fnm">2</sup></td>
+              <td class="yes">&#10003;</td>
+              <td><code>copilot plugin marketplace add reurgency/marketplace</code> &rarr; <code>copilot plugin install deep-skills@reurgency</code></td>
+            </tr>
+            <tr>
+              <th scope="row">Copilot / VS Code</th>
+              <td class="yes">&#10003;</td>
+              <td class="warn">&#9888; sequential <sup class="fnm">2</sup></td>
+              <td class="yes">&#10003;</td>
+              <td>file-based: set <code>chat.agentSkillsLocations</code> &rarr; <code>plugins/deep-skills/skills</code> (no marketplace)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="fn reveal"><sup>1</sup>&nbsp;Manifest authored; the empirical capability gate (install + run a full cycle, confirm fan-out + model binding) is pending. Fast-moving schema/command details are marked RE-VERIFY in <a href="https://github.com/reurgency/Deep-Skills/blob/main/plugins/deep-skills/HOSTS.md">HOSTS.md</a> — check them against your host's current docs at install time.</p>
+      <p class="fn reveal"><sup>2</sup>&nbsp;VS Code Copilot's docs show only sequential handoffs. If the gate confirms no parallel fan-out, the single-agent skills (<a href="deep-plan.html">deep-plan</a>, <a href="deep-implement.html">deep-implement</a>, <a href="deep-docs.html">deep-docs</a>) run fully, and the fleet skills (<a href="deep-code-review.html">deep-code-review</a>, <a href="deep-plan-review.html">deep-plan-review</a>, <a href="deep-bugfix.html">deep-bugfix</a>) route to a single-agent fallback on that host only.</p>
+    </div>
+  </section>
+
+  <!-- ===== per-host details ===== -->
+  <section>
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">Step by step</p>
+        <h2>Pick your host</h2>
+        <p>Copy-paste commands per host. Each one installs the identical skills — one shared source of truth, thin per-host manifests.</p>
+      </div>
+      <div class="grid cols-2">
+        <div class="card reveal">
+          <span class="cmd">Claude Code &middot; reference host</span>
+          <h3>Claude Code</h3>
+          <p>Add the marketplace, install the plugin — done.</p>
+          <div class="cmd-stack">
+            <div class="cmdline">
+              <code class="chip no-prompt">/plugin marketplace add reurgency/marketplace</code>
+              <button class="copy-btn" type="button" aria-label="Copy command">Copy</button>
+            </div>
+            <div class="cmdline">
+              <code class="chip no-prompt">/plugin install deep-skills@reurgency</code>
+              <button class="copy-btn" type="button" aria-label="Copy command">Copy</button>
+            </div>
+          </div>
+          <span class="tag">update later &rarr; <code>/plugin marketplace update reurgency</code></span>
+        </div>
+
+        <div class="card reveal">
+          <span class="cmd">Codex</span>
+          <h3>Codex</h3>
+          <p>Codex reads the skills natively. Add the marketplace from your shell, then install inside Codex: <code>/plugins</code> &rarr; search &ldquo;deep-skills&rdquo; &rarr; Install.</p>
+          <div class="cmd-stack">
+            <div class="cmdline">
+              <code class="chip">codex plugin marketplace add reurgency/marketplace</code>
+              <button class="copy-btn" type="button" aria-label="Copy command">Copy</button>
+            </div>
+          </div>
+          <span class="tag">capability gate pending &sup1; &middot; re-verify subcommand/flags against current Codex docs</span>
+        </div>
+
+        <div class="card reveal">
+          <span class="cmd">Cursor</span>
+          <h3>Cursor</h3>
+          <p>Install from Agent chat — or through the Customize panel &rarr; Marketplace &rarr; install.</p>
+          <div class="cmd-stack">
+            <div class="cmdline">
+              <code class="chip no-prompt">/add-plugin deep-skills</code>
+              <button class="copy-btn" type="button" aria-label="Copy command">Copy</button>
+            </div>
+          </div>
+          <span class="tag">capability gate pending &sup1; &middot; re-verify the command against current Cursor docs</span>
+        </div>
+
+        <div class="card reveal">
+          <span class="cmd">GitHub Copilot &middot; CLI</span>
+          <h3>Copilot CLI</h3>
+          <p>Copilot CLI consumes the same marketplace directly. Verify afterwards with <code>/skills list</code>.</p>
+          <div class="cmd-stack">
+            <div class="cmdline">
+              <code class="chip">copilot plugin marketplace add reurgency/marketplace</code>
+              <button class="copy-btn" type="button" aria-label="Copy command">Copy</button>
+            </div>
+            <div class="cmdline">
+              <code class="chip">copilot plugin install deep-skills@reurgency</code>
+              <button class="copy-btn" type="button" aria-label="Copy command">Copy</button>
+            </div>
+          </div>
+          <span class="tag">fan-out gate pending &sup2;</span>
+        </div>
+
+        <div class="card reveal" style="grid-column:1/-1">
+          <span class="cmd">GitHub Copilot &middot; VS Code editor</span>
+          <h3>Copilot in VS Code</h3>
+          <p>The VS Code editor has no skills marketplace — it's file-based. Point the <code>chat.agentSkillsLocations</code> setting at the repo's <code>plugins/deep-skills/skills</code> directory (preferred — no duplication), or copy/symlink the skill directories into <code>.github/skills/</code>.</p>
+          <span class="tag">sequential handoffs only &sup2; &middot; single-agent skills run fully; fleet skills fall back</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== natural-language-first ===== -->
+  <section class="band">
+    <div class="wrap narrow">
+      <div class="section-head reveal">
+        <p class="kicker">No slash required</p>
+        <h2>Plain English is the primary interface</h2>
+        <p>Slash commands and flags are conveniences, not the way in. Every skill answers to natural language.</p>
+      </div>
+      <div class="callout reveal">
+        <span class="callout-icon" aria-hidden="true">&#128172;</span>
+        <p><b>Just ask.</b> &ldquo;Make a deep plan for the export feature&rdquo; invokes <a href="deep-plan.html">deep-plan</a> exactly like typing <code>/deep-plan</code> — and &ldquo;run a deep code review on this branch&rdquo; invokes <a href="deep-code-review.html">deep-code-review</a>. On hosts without slash commands or CLI flags — Codex and Copilot chat among them — plain language isn't a fallback, it's the primary path. Say what you want at whatever rigor you want; the skill sorts out the rest.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== quickstart ===== -->
+  <section id="quickstart">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">Quickstart</p>
+        <h2>Run your first <code style="font-size:.8em;vertical-align:middle">/deep-plan</code></h2>
+        <p>Five minutes from install to a plan a fresh agent could execute cold.</p>
+      </div>
+      <ol class="steps reveal">
+        <li>
+          <b>Open your assistant in a real repo.</b> Deep Skills plans against your actual codebase — its questions get sharp because it explores your code first.
+        </li>
+        <li>
+          <b>Describe the change you want.</b> Type the command with your idea — or just say it in plain English.
+          <div class="cmd-stack">
+            <div class="cmdline">
+              <code class="chip no-prompt">/deep-plan add rate limiting to the public API</code>
+              <button class="copy-btn" type="button" aria-label="Copy command">Copy</button>
+            </div>
+          </div>
+        </li>
+        <li>
+          <b>Answer only what the code can't.</b> It explores first, then asks the few questions that remain — one at a time, in batches, or all at once. Steer it live; it always returns to where it left off.
+        </li>
+        <li>
+          <b>Collect the artifact.</b> Your plan lands in your repo at <code>.deep-skills/&lt;effort-name&gt;/01-Plan/plan.md</code> — self-contained, resumable, ready to hand off.
+        </li>
+        <li>
+          <b>Keep the loop going.</b> Hand the plan to <a href="deep-plan-review.html">deep-plan-review</a> for independent critique, then <a href="deep-implement.html">deep-implement</a>, <a href="deep-code-review.html">deep-code-review</a>, <a href="deep-bugfix.html">deep-bugfix</a>, and <a href="deep-docs.html">deep-docs</a>. <a href="how-it-works.html">See the whole loop &rarr;</a>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ===== what you installed ===== -->
+  <section class="band">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">What you just installed</p>
+        <h2>Six skills, one pipeline</h2>
+        <p>Each does exactly one job — run the whole chain or reach for any one on its own.</p>
+      </div>
+      <div class="flow reveal">
+        <a class="step" href="deep-plan.html">deep-plan</a><span class="arrow" aria-hidden="true">&rarr;</span>
+        <a class="step" href="deep-plan-review.html">deep-plan-review</a><span class="arrow" aria-hidden="true">&rarr;</span>
+        <a class="step" href="deep-implement.html">deep-implement</a><span class="arrow" aria-hidden="true">&rarr;</span>
+        <a class="step" href="deep-code-review.html">deep-code-review</a><span class="arrow" aria-hidden="true">&rarr;</span>
+        <a class="step" href="deep-bugfix.html">deep-bugfix</a><span class="arrow" aria-hidden="true">&rarr;</span>
+        <a class="step" href="deep-docs.html">deep-docs</a>
+      </div>
+      <div class="btn-row reveal" style="margin-top:34px">
+        <a class="btn btn-ghost" href="how-it-works.html">How the loop works</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-cta">
+      <h2>Get started in one command</h2>
+      <p>Install the Deep Skills plugin and run your first <code>/deep-plan</code>.</p>
+      <!-- Install snippet: verbatim from README.md's Claude Code install block (D1 — slug as written) -->
+      <div class="chip-stack">
+        <code class="chip no-prompt">/plugin marketplace add reurgency/marketplace</code>
+        <code class="chip no-prompt">/plugin install deep-skills@reurgency</code>
+      </div>
+      <div class="btn-row" style="margin-top:22px">
+        <a class="btn btn-primary" href="install.html">Install Deep Skills</a>
+      </div>
+    </div>
+    <div class="footer-meta">
+      <span>&copy; 2026 Deep Skills &middot; MIT License</span>
+      <div class="footer-links">
+        <a href="how-it-works.html">How it works</a>
+        <a href="install.html">Install</a>
+        <a href="https://github.com/reurgency/Deep-Skills">GitHub</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

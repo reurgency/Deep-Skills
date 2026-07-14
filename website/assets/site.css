@@ -364,6 +364,64 @@ a.loop-cell:hover{transform:translateY(-3px);border-color:var(--accent-line);col
   .skillnav a.next{text-align:left;align-items:flex-start}
 }
 
+/* ---------- host matrix table (install) ---------- */
+.table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--panel)}
+table.matrix{width:100%;min-width:820px;border-collapse:collapse;font-size:14px;text-align:left}
+.matrix th,.matrix td{padding:14px 18px;border-bottom:1px solid var(--line);vertical-align:top}
+.matrix thead th{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--faint);font-weight:500;background:var(--panel-2);white-space:nowrap;
+}
+.matrix tbody tr:last-child th,.matrix tbody tr:last-child td{border-bottom:none}
+.matrix tbody th{font-family:var(--display);font-weight:600;color:var(--text);white-space:nowrap}
+.matrix td{color:var(--muted)}
+.matrix .yes{color:var(--good)}
+.matrix .warn{color:var(--accent)}
+.fn{font-size:13px;color:var(--faint);margin-top:16px;line-height:1.6}
+.fn sup,sup.fnm{color:var(--accent);font-family:var(--mono);font-size:.75em}
+
+/* ---------- command line + optional copy button ---------- */
+.cmd-stack{display:flex;flex-direction:column;gap:10px}
+.cmd-stack.center{max-width:560px;margin-left:auto;margin-right:auto}
+.cmdline{display:flex;align-items:stretch;gap:8px;width:100%;min-width:0}
+.cmdline .chip{flex:1;justify-content:flex-start;min-width:0}
+.copy-btn{
+  flex:none;font-family:var(--mono);font-size:12px;color:var(--muted);
+  background:var(--panel);border:1px solid var(--line-2);border-radius:10px;
+  padding:0 14px;cursor:pointer;
+  transition:color .16s ease,border-color .16s ease;
+}
+.copy-btn:hover{color:var(--text);border-color:var(--accent-line)}
+.copy-btn.copied{color:var(--good);border-color:var(--good)}
+html:not(.js) .copy-btn{display:none}
+
+/* ---------- quickstart steps ---------- */
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:16px;max-width:800px;margin:0 auto}
+.steps > li{
+  counter-increment:step;position:relative;
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:20px 24px 20px 66px;color:var(--muted);font-size:15px;
+}
+.steps > li::before{
+  content:counter(step,decimal-leading-zero);
+  position:absolute;left:20px;top:23px;
+  font-family:var(--mono);font-size:13px;color:var(--accent);
+}
+.steps > li b{color:var(--text)}
+.steps .cmd-stack{margin-top:12px}
+@media(max-width:640px){.steps > li{padding-left:24px;padding-top:44px}.steps > li::before{top:18px;left:24px}}
+
+/* ---------- stage number (how-it-works cards) ---------- */
+.card .num{font-family:var(--mono);font-size:12px;letter-spacing:.16em;color:var(--faint)}
+
+/* ---------- flow steps as links ---------- */
+.flow a.step{color:var(--text);transition:border-color .16s ease,color .16s ease}
+.flow a.step:hover{border-color:var(--accent-line);color:var(--accent)}
+
+/* ---------- pre highlights (artifact tree) ---------- */
+pre .c{color:var(--faint)}
+pre .a{color:var(--accent)}
+
 /* ---------- footer ---------- */
 .site-footer{
   border-top:1px solid var(--line);background:var(--bg-raise);

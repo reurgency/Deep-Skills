@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How it works: the idea-to-verified-code loop — Deep Skills</title>
+<meta name="description" content="Inside the Deep Skills pipeline: six single-job stages, independent review with fresh eyes, adversarially verified findings, and a resumable artifact tree that lives in your repo.">
+<link rel="canonical" href="https://deep-skills.com/how-it-works.html">
+
+<!-- Open Graph / Twitter -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Deep Skills">
+<meta property="og:title" content="How it works: the idea-to-verified-code loop — Deep Skills">
+<meta property="og:description" content="Inside the Deep Skills pipeline: six single-job stages, independent review with fresh eyes, adversarially verified findings, and a resumable artifact tree that lives in your repo.">
+<meta property="og:url" content="https://deep-skills.com/how-it-works.html">
+<meta property="og:image" content="https://deep-skills.com/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How it works: the idea-to-verified-code loop — Deep Skills">
+<meta name="twitter:description" content="Inside the Deep Skills pipeline: six single-job stages, independent review with fresh eyes, adversarially verified findings, and a resumable artifact tree that lives in your repo.">
+<meta name="twitter:image" content="https://deep-skills.com/assets/og-image.png">
+
+<!-- Favicons (files arrive in Phase 5) -->
+<link rel="icon" href="assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#07080c">
+
+<!-- Fonts: preconnect to BOTH origins; display=swap is required -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/site.js" defer></script>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+<div id="progress" aria-hidden="true"></div>
+<div class="glow a" aria-hidden="true"></div>
+<div class="glow b" aria-hidden="true"></div>
+
+<header class="site-nav">
+  <div class="wrap nav-row">
+    <a class="brand" href="index.html"><span class="brand-dot" aria-hidden="true"></span>Deep Skills</a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav id="nav-menu" class="nav-menu" aria-label="Primary">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="how-it-works.html">How it works</a></li>
+        <li class="nav-dropdown">
+          <button class="nav-dropbtn" aria-expanded="false" aria-controls="skills-menu">Skills</button>
+          <ul id="skills-menu" class="dropdown">
+            <li><a href="deep-plan.html">deep-plan</a></li>
+            <li><a href="deep-plan-review.html">deep-plan-review</a></li>
+            <li><a href="deep-implement.html">deep-implement</a></li>
+            <li><a href="deep-code-review.html">deep-code-review</a></li>
+            <li><a href="deep-bugfix.html">deep-bugfix</a></li>
+            <li><a href="deep-docs.html">deep-docs</a></li>
+          </ul>
+        </li>
+        <li><a class="btn btn-primary" href="install.html">Install</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ===== hero ===== -->
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow">How it works</p>
+      <h1>Why the code that comes out is <span class="grad">code you can trust</span></h1>
+      <p class="sub">Deep Skills runs your idea through six single-job stages. Each hands a <b>self-contained artifact</b> to the next, every claim needs evidence, and nothing ships on vibes.</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="install.html">Install Deep Skills</a>
+        <a class="btn btn-ghost" href="#pipeline">See the pipeline</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== pipeline ===== -->
+  <section class="band" id="pipeline">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">The pipeline</p>
+        <h2>Six stages, one clean loop</h2>
+        <p>No do-everything agent quietly cutting corners. Each stage does exactly one job, then hands off — so every step is predictable, inspectable, and easy to rerun on its own.</p>
+      </div>
+
+      <div class="flow reveal" style="margin-bottom:44px">
+        <a class="step" href="deep-plan.html">plan</a><span class="arrow" aria-hidden="true">&rarr;</span>
+        <a class="step" href="deep-plan-review.html">plan-review</a><span class="arrow" aria-hidden="true">&rarr;</span>
+        <a class="step" href="deep-implement.html">implement</a><span class="arrow" aria-hidden="true">&rarr;</span>
+        <a class="step" href="deep-code-review.html">code-review</a><span class="arrow" aria-hidden="true">&rarr;</span>
+        <a class="step" href="deep-bugfix.html">bugfix</a><span class="arrow" aria-hidden="true">&rarr;</span>
+        <a class="step" href="deep-docs.html">docs</a>
+      </div>
+
+      <div class="grid cols-3">
+        <a class="card reveal" href="deep-plan.html">
+          <span class="num">STAGE 01 &middot; PLAN</span>
+          <span class="cmd">/deep-plan</span>
+          <h3>Plan</h3>
+          <p>A steerable planning session that ends in a plan so complete a fresh agent could execute it cold. It plans — it never writes code.</p>
+          <span class="tag">hands off &rarr; the plan document</span>
+        </a>
+        <a class="card reveal" href="deep-plan-review.html">
+          <span class="num">STAGE 02 &middot; CRITIQUE</span>
+          <span class="cmd">/deep-plan-review</span>
+          <h3>Review the plan</h3>
+          <p>Fresh, codebase-aware agents critique the plan against what you asked for and what the repo actually supports — before any code exists, when problems are cheapest to fix.</p>
+          <span class="tag">hands off &rarr; an independent critique</span>
+        </a>
+        <a class="card reveal" href="deep-implement.html">
+          <span class="num">STAGE 03 &middot; EXECUTE</span>
+          <span class="cmd">/deep-implement</span>
+          <h3>Implement</h3>
+          <p>Executes the plan phase by phase — implement, validate, fix, commit — with every phase landing as a clean, resumable checkpoint. The only stage allowed to write source.</p>
+          <span class="tag">hands off &rarr; validated, committed phases</span>
+        </a>
+        <a class="card reveal" href="deep-code-review.html">
+          <span class="num">STAGE 04 &middot; VERIFY</span>
+          <span class="cmd">/deep-code-review</span>
+          <h3>Review the code</h3>
+          <p>A multi-agent review where every finding must cite evidence — and the serious ones are adversarially attacked before you ever see them. What survives is what's real.</p>
+          <span class="tag">hands off &rarr; evidence-backed findings</span>
+        </a>
+        <a class="card reveal" href="deep-bugfix.html">
+          <span class="num">STAGE 05 &middot; REMEDIATE</span>
+          <span class="cmd">/deep-bugfix</span>
+          <h3>Fix for real</h3>
+          <p>Clusters findings by root cause and fixes minimally at the cause — then a separate fresh agent must prove the fix works. The fixer never grades itself.</p>
+          <span class="tag">hands off &rarr; proven fixes</span>
+        </a>
+        <a class="card reveal" href="deep-docs.html">
+          <span class="num">STAGE 06 &middot; ORIENT</span>
+          <span class="cmd">/deep-docs</span>
+          <h3>Document</h3>
+          <p>Maps what actually got built — every claim anchored to a real file and line and verified against the code, sized for agents reading under a token budget.</p>
+          <span class="tag">hands off &rarr; docs that match the code</span>
+        </a>
+      </div>
+
+      <div class="callout reveal" style="margin-top:30px">
+        <span class="callout-icon" aria-hidden="true">&#8635;</span>
+        <p><b>The tight loop before anything ships:</b> review &rarr; fix &rarr; re-review. Findings don't get argued away — they get fixed at the root cause and put back in front of fresh reviewers until the work holds up.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== resumability ===== -->
+  <section>
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">Fresh-agent resumability</p>
+        <h2>The chat is disposable. The artifact isn't.</h2>
+        <p>Every stage passes one acceptance test: could a fresh agent — given only the artifact and the repo, with zero conversation history — pick this up cold?</p>
+      </div>
+      <div class="grid cols-3">
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#9208;</div>
+          <h3>Walk away mid-effort</h3>
+          <p>Close the laptop after planning, resume implementation tomorrow — in a new session, on a new machine, with zero re-explaining. The artifact carries all the context.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#10150;</div>
+          <h3>Hand it to anyone</h3>
+          <p>A teammate — or a different assistant entirely — continues from the same artifact. Work stops being trapped in one person's chat history.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#9678;</div>
+          <h3>Reviews stay honest</h3>
+          <p>Because reviewers start fresh, they never inherit the author's reasoning — or its blind spots. They see the artifact and the codebase, not the argument that produced them.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== artifact tree ===== -->
+  <section class="band">
+    <div class="wrap narrow">
+      <div class="section-head reveal">
+        <p class="kicker">Where everything lands</p>
+        <h2>An artifact tree in <em>your</em> repo</h2>
+        <p>Every run writes to a per-effort directory in the repo you're working on — not a chat log, not a vendor dashboard. Version it, diff it, hand it off.</p>
+      </div>
+      <pre class="reveal"><code><span class="c"># one directory per effort, in the target repo</span>
+.deep-skills/&lt;effort-name&gt;/
+  <span class="a">00-Manifest/</span>        manifest.md   <span class="c">&#8592; every stage's status, one table</span>
+  <span class="a">01-Plan/</span>            plan.md       <span class="c">&#8592; /deep-plan — the durable spine</span>
+  <span class="a">02-Plan-Review/</span>     review.md     <span class="c">&#8592; /deep-plan-review</span>
+  <span class="a">03-Implementation/</span>  summary.md    <span class="c">&#8592; /deep-implement</span>
+  <span class="a">04-Code-Review/</span>     report.md &middot; findings.json &middot; certificate.md
+  <span class="a">06-Bug-Fix/</span>         round-N/ scope.json &middot; fix-summary.md</code></pre>
+      <div class="callout reveal" style="margin-top:26px">
+        <span class="callout-icon" aria-hidden="true">&#9635;</span>
+        <p><b>The plan is the spine.</b> It accumulates phase summaries, deferred decisions, and review outcomes as the effort progresses — so the whole history of a change is legible from one document, and the manifest tells any newcomer exactly where things stand.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== trust mechanics ===== -->
+  <section>
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">The trust mechanics</p>
+        <h2>Four rules that make the output defensible</h2>
+        <p>Trustworthy code isn't a promise — it's a set of structural constraints no stage is allowed to skip.</p>
+      </div>
+      <div class="grid cols-2">
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#9998;</div>
+          <h3>One writer of source</h3>
+          <p><a href="deep-implement.html">deep-implement</a> is the only stage that writes code. Planners plan, reviewers review, fixers fix — when a stage is tempted to cross its boundary, it stops and points to the right sibling instead.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#9678;</div>
+          <h3>Independence by construction</h3>
+          <p>Both review stages run in fresh agents that never see the upstream conversation. Independent critique isn't a policy anyone has to remember — it's how the pipeline is wired.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#9876;</div>
+          <h3>Findings must survive attack</h3>
+          <p>Serious review findings are adversarially verified before they reach you — and every fix must be proven by an agent that didn't write it. Nothing grades its own work.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#10003;</div>
+          <h3>Evidence or it didn't happen</h3>
+          <p>The system hunts the last mile — code that <i>looks</i> wired but doesn't actually behave. Every claim must cite a file and line, a named symbol, or an observed behavior.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section class="band">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">Try it</p>
+        <h2>Run the loop on something real</h2>
+        <p>Install once, then start with a plan — the rest of the pipeline builds on it. Works in Claude Code, Codex, Cursor, and GitHub Copilot.</p>
+      </div>
+      <div class="btn-row reveal">
+        <a class="btn btn-primary" href="install.html">Install Deep Skills</a>
+        <a class="btn btn-ghost" href="deep-plan.html">Start with deep-plan</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-cta">
+      <h2>Get started in one command</h2>
+      <p>Install the Deep Skills plugin and run your first <code>/deep-plan</code>.</p>
+      <!-- Install snippet: verbatim from README.md's Claude Code install block (D1 — slug as written) -->
+      <div class="chip-stack">
+        <code class="chip no-prompt">/plugin marketplace add reurgency/marketplace</code>
+        <code class="chip no-prompt">/plugin install deep-skills@reurgency</code>
+      </div>
+      <div class="btn-row" style="margin-top:22px">
+        <a class="btn btn-primary" href="install.html">Install Deep Skills</a>
+      </div>
+    </div>
+    <div class="footer-meta">
+      <span>&copy; 2026 Deep Skills &middot; MIT License</span>
+      <div class="footer-links">
+        <a href="how-it-works.html">How it works</a>
+        <a href="install.html">Install</a>
+        <a href="https://github.com/reurgency/Deep-Skills">GitHub</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

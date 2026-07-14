@@ -71,6 +71,31 @@
     onScroll();
   }
 
+  // ---- copy-to-clipboard (install command chips) ----
+  var copyBtns = [].slice.call(document.querySelectorAll('.copy-btn'));
+  if (copyBtns.length) {
+    var canCopy = false;
+    try {
+      canCopy = !!(navigator.clipboard && typeof navigator.clipboard.writeText === 'function');
+    } catch (err) { /* ignore */ }
+    copyBtns.forEach(function (btn) {
+      if (!canCopy) { btn.hidden = true; return; }
+      btn.addEventListener('click', function () {
+        var row = btn.closest ? btn.closest('.cmdline') : null;
+        var chip = row ? row.querySelector('code') : null;
+        if (!chip) return;
+        navigator.clipboard.writeText(chip.textContent.trim()).then(function () {
+          btn.classList.add('copied');
+          btn.textContent = 'Copied';
+          setTimeout(function () {
+            btn.classList.remove('copied');
+            btn.textContent = 'Copy';
+          }, 1600);
+        }).catch(function () { /* ignore */ });
+      });
+    });
+  }
+
   // ---- reveal on scroll (fallback: visible) ----
   var reveals = [].slice.call(document.querySelectorAll('.reveal'));
   var reduceMotion = false;
