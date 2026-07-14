@@ -60,12 +60,17 @@
   });
 
   // ---- current-page nav highlighting (aria-current) ----
+  // normalize so it works both as authored (deep-plan.html) and after
+  // Netlify's pretty-URL rewrite (/deep-plan)
+  function pageKey(s) {
+    return s.replace(/^\.?\//, '').replace(/\.html$/, '') || 'index';
+  }
   var path = window.location.pathname;
-  var page = path.substring(path.lastIndexOf('/') + 1) || 'index.html';
+  var page = pageKey(path.substring(path.lastIndexOf('/') + 1) || 'index.html');
   var navLinks = [].slice.call(document.querySelectorAll('.nav-menu a[href]'));
   navLinks.forEach(function (a) {
     var href = a.getAttribute('href');
-    if (href === page) {
+    if (href.indexOf('://') === -1 && pageKey(href) === page) {
       a.setAttribute('aria-current', 'page');
       // if the current page lives in the dropdown, mark the trigger too
       var parentDrop = a.closest ? a.closest('.nav-dropdown') : null;

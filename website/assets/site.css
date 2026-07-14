@@ -122,7 +122,7 @@ main,section,footer{position:relative;z-index:1}
   background:linear-gradient(135deg,var(--accent),var(--accent-deep));
   box-shadow:0 0 16px var(--accent-glow);
 }
-.nav-menu ul{display:flex;align-items:center;gap:26px;font-size:14px}
+.nav-menu > ul{display:flex;align-items:center;gap:26px;font-size:14px}
 .nav-menu a{color:var(--muted);font-weight:500}
 .nav-menu a:hover{color:var(--text)}
 .nav-menu a[aria-current="page"]{color:var(--accent)}
@@ -182,9 +182,9 @@ html:not(.js) .nav-dropdown:focus-within .dropdown{display:flex}
   }
   html.js .nav-menu{display:none}
   html.js .nav-menu.open{display:block}
-  .nav-menu ul{flex-direction:column;align-items:stretch;gap:0;padding:8px 0}
-  .nav-menu ul > li > a,.nav-dropbtn{display:block;width:100%;text-align:left;padding:13px 24px;border-top:1px solid var(--line)}
-  .nav-menu ul > li:first-child > a{border-top:none}
+  .nav-menu > ul{flex-direction:column;align-items:stretch;gap:0;padding:8px 0}
+  .nav-menu > ul > li > a,.nav-dropbtn{display:block;width:100%;text-align:left;padding:13px 24px;border-top:1px solid var(--line)}
+  .nav-menu > ul > li:first-child > a{border-top:none}
   .nav-dropbtn{display:flex;justify-content:space-between}
   .dropdown{
     position:static;transform:none;min-width:0;display:none;
