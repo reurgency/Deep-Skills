@@ -1,0 +1,11 @@
+# Vanity short paths for the six skill pages.
+/plan          /deep-plan.html          301
+/plan-review   /deep-plan-review.html   301
+/implement     /deep-implement.html     301
+/code-review   /deep-code-review.html   301
+/bugfix        /deep-bugfix.html        301
+/docs          /deep-docs.html          301
+
+# No wildcard 404 rule: a styled 404.html is deferred (plan D3).
+# Netlify serves its default 404 page for unmatched URLs meanwhile.
+# When 404.html lands, add:  /*  /404.html  404
