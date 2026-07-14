@@ -131,8 +131,11 @@ Page content goes in `<main id="main">…</main>` (the skip-link target).
     <div class="footer-cta">
       <h2>Get started in one command</h2>
       <p>Install the Deep Skills plugin and run your first <code>/deep-plan</code>.</p>
-      <!-- Install snippet: Phase 4 lifts the exact command verbatim from README.md (D1) -->
-      <code class="chip no-prompt">/plugin marketplace add reurgency/marketplace</code>
+      <!-- Install snippet: verbatim from README.md's Claude Code install block (D1 — slug as written) -->
+      <div class="chip-stack">
+        <code class="chip no-prompt">/plugin marketplace add reurgency/marketplace</code>
+        <code class="chip no-prompt">/plugin install deep-skills@reurgency</code>
+      </div>
       <div class="btn-row" style="margin-top:22px">
         <a class="btn btn-primary" href="install.html">Install Deep Skills</a>
       </div>

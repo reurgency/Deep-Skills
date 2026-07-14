@@ -296,6 +296,24 @@ a.card:hover{transform:translateY(-4px);border-color:var(--accent-line);box-shad
 .chip::before{content:"$";color:var(--accent);font-weight:600;flex:none}
 .chip.no-prompt::before{content:none}
 
+/* ---------- chip stack (multi-line install snippets) ---------- */
+.chip-stack{display:flex;flex-direction:column;gap:10px;align-items:center}
+.chip-stack .chip{width:100%;max-width:480px;justify-content:flex-start}
+
+/* ---------- text badges (host / cross-assistant band) ---------- */
+.badge-row{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px}
+.badge{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--display);font-weight:600;font-size:14.5px;color:var(--text);
+  background:var(--panel);border:1px solid var(--line-2);border-radius:100px;
+  padding:10px 22px;white-space:nowrap;
+}
+.badge::before{
+  content:"";width:7px;height:7px;border-radius:50%;flex:none;
+  background:linear-gradient(135deg,var(--accent),var(--accent-deep));
+  box-shadow:0 0 10px var(--accent-glow);
+}
+
 /* ---------- pipeline strip ---------- */
 .flow{
   display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px;
