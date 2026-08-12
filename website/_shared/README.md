@@ -23,18 +23,21 @@ and it is excluded from the sitemap.
 
 ## Exclusions (repo-wide gate)
 
-No page may reference **deep-goal, deep-learn, production-guide, or roadmap** in
-any form (link, nav item, copy, meta, sitemap). Verify with:
+deep-goal is now a free, bundled plugin and **is** part of the site (its own
+`deep-goal.html` page, a Skills-dropdown entry, and homepage/install mentions).
+The remaining exclusions stand: no page may reference **deep-learn,
+production-guide, or roadmap** in any form (link, nav item, copy, meta, sitemap).
+Verify with:
 
 ```
-grep -rEi "deep-goal|deep goal|deep-learn|production-guide|roadmap" website/
+grep -rEi "deep-learn|production-guide|roadmap" website/
 ```
 
-## Nine public pages
+## Ten public pages
 
 `index.html`, `how-it-works.html`, `deep-plan.html`, `deep-plan-review.html`,
 `deep-implement.html`, `deep-code-review.html`, `deep-bugfix.html`,
-`deep-docs.html`, `install.html`.
+`deep-docs.html`, `deep-goal.html`, `install.html`.
 
 ---
 
@@ -112,6 +115,8 @@ link at runtime - do not hardcode it. The Install link is the primary CTA button
             <li><a href="deep-code-review.html">deep-code-review</a></li>
             <li><a href="deep-bugfix.html">deep-bugfix</a></li>
             <li><a href="deep-docs.html">deep-docs</a></li>
+            <li class="dropdown-sep" aria-hidden="true"></li>
+            <li><a href="deep-goal.html">deep-goal</a></li>
           </ul>
         </li>
         <li><a class="btn btn-primary" href="install.html">Install</a></li>

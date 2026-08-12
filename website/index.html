@@ -61,6 +61,8 @@
             <li><a href="deep-code-review.html">deep-code-review</a></li>
             <li><a href="deep-bugfix.html">deep-bugfix</a></li>
             <li><a href="deep-docs.html">deep-docs</a></li>
+            <li class="dropdown-sep" aria-hidden="true"></li>
+            <li><a href="deep-goal.html">deep-goal</a></li>
           </ul>
         </li>
         <li><a class="btn btn-primary" href="install.html">Install</a></li>
@@ -80,6 +82,27 @@
       <div class="btn-row">
         <a class="btn btn-primary" href="install.html">Install Deep Skills</a>
         <a class="btn btn-ghost" href="how-it-works.html">How it works</a>
+      </div>
+
+      <!-- ===== agent installer: copy-paste prompt per platform ===== -->
+      <div class="agent-install" hidden>
+        <div class="agent-install-head">
+          <span class="ai-label">Or let your agent install it &mdash; pick your platform, copy, paste</span>
+          <span class="ai-select-wrap">
+            <label class="visually-hidden" for="ai-platform">Pick your platform</label>
+            <select id="ai-platform" class="ai-select">
+              <option value="claude">Claude Code</option>
+              <option value="codex">Codex</option>
+              <option value="cursor">Cursor</option>
+              <option value="copilot-cli">Copilot CLI</option>
+              <option value="copilot-vscode">Copilot / VS Code</option>
+            </select>
+          </span>
+        </div>
+        <div class="ai-prompt">
+          <pre id="ai-prompt-text" class="ai-prompt-text" aria-live="polite"></pre>
+          <button id="ai-copy" class="ai-copy" type="button" aria-label="Copy install instruction">Copy</button>
+        </div>
       </div>
     </div>
   </section>
@@ -213,6 +236,22 @@
       </div>
       <div class="btn-row reveal" style="margin-top:34px">
         <a class="btn btn-ghost" href="how-it-works.html">See how the loop works</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== deep-goal conductor ===== -->
+  <section class="theme-goal">
+    <div class="wrap narrow">
+      <div class="section-head reveal">
+        <p class="kicker">The conductor &middot; optional &amp; free</p>
+        <h2>Or run all six from one command</h2>
+        <p>Want the whole relay hands-free? <a href="deep-goal.html">deep-goal</a> conducts the entire series from a single invocation - plan through docs - at a rigor level you choose, verifying each stage's real artifact before it advances. It sits above the six; it never replaces them.</p>
+      </div>
+      <p class="center reveal" style="margin-top:4px"><code class="chip no-prompt">/deep-goal &lt;your feature&gt; --rigor=mvp</code></p>
+      <div class="btn-row reveal" style="justify-content:center;margin-top:26px">
+        <a class="btn btn-primary" href="deep-goal.html">Meet deep-goal</a>
+        <a class="btn btn-ghost" href="how-it-works.html">How the loop works</a>
       </div>
     </div>
   </section>

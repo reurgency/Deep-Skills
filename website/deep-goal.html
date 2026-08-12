@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>deep-goal: run the whole series from one command - Deep Skills</title>
+<meta name="description" content="deep-goal is the optional conductor for the Deep-* series - one invocation runs plan, review, implement, code-review, bugfix, and docs end-to-end at a rigor level you choose. Free, bundled with Deep Skills.">
+<link rel="canonical" href="https://deep-skills.com/deep-goal.html">
+
+<!-- Open Graph / Twitter -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Deep Skills">
+<meta property="og:title" content="deep-goal: run the whole series from one command - Deep Skills">
+<meta property="og:description" content="deep-goal is the optional conductor for the Deep-* series - one invocation runs plan, review, implement, code-review, bugfix, and docs end-to-end at a rigor level you choose. Free, bundled with Deep Skills.">
+<meta property="og:url" content="https://deep-skills.com/deep-goal.html">
+<meta property="og:image" content="https://deep-skills.com/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="deep-goal: run the whole series from one command - Deep Skills">
+<meta name="twitter:description" content="deep-goal is the optional conductor for the Deep-* series - one invocation runs plan, review, implement, code-review, bugfix, and docs end-to-end at a rigor level you choose. Free, bundled with Deep Skills.">
+<meta name="twitter:image" content="https://deep-skills.com/assets/og-image.png">
+
+<!-- Favicons (files arrive in Phase 5) -->
+<link rel="icon" href="assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#07080c">
+
+<!-- Fonts: preconnect to BOTH origins; display=swap is required -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/site.js" defer></script>
+</head>
+<body class="theme-goal">
+
+<a class="skip-link" href="#main">Skip to content</a>
+<div id="progress" aria-hidden="true"></div>
+<div class="glow a" aria-hidden="true"></div>
+<div class="glow b" aria-hidden="true"></div>
+
+<header class="site-nav">
+  <div class="wrap nav-row">
+    <a class="brand" href="index.html"><span class="brand-dot" aria-hidden="true"></span>Deep Skills</a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav id="nav-menu" class="nav-menu" aria-label="Primary">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="how-it-works.html">How it works</a></li>
+        <li class="nav-dropdown">
+          <button class="nav-dropbtn" aria-expanded="false" aria-controls="skills-menu">Skills</button>
+          <ul id="skills-menu" class="dropdown">
+            <li><a href="deep-plan.html">deep-plan</a></li>
+            <li><a href="deep-plan-review.html">deep-plan-review</a></li>
+            <li><a href="deep-implement.html">deep-implement</a></li>
+            <li><a href="deep-code-review.html">deep-code-review</a></li>
+            <li><a href="deep-bugfix.html">deep-bugfix</a></li>
+            <li><a href="deep-docs.html">deep-docs</a></li>
+            <li class="dropdown-sep" aria-hidden="true"></li>
+            <li><a href="deep-goal.html">deep-goal</a></li>
+          </ul>
+        </li>
+        <li><a class="btn btn-primary" href="install.html">Install</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ===== hero ===== -->
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow">The conductor &middot; free add-on</p>
+      <h1><span class="grad">deep-goal</span></h1>
+      <p style="margin-top:24px"><code class="chip no-prompt">/deep-goal &lt;your feature&gt; --rigor=mvp</code></p>
+      <p class="sub">The whole Deep-* series from <b>one invocation</b> - plan &rarr; review &rarr; implement &rarr; code-review &rarr; bugfix &rarr; docs - run hands-free at a rigor level you choose. deep-goal doesn't do the work; it <b>conducts</b> the six skills that do.</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="install.html">Install Deep Skills</a>
+        <a class="btn btn-ghost" href="how-it-works.html">See the loop</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== what it does ===== -->
+  <section class="band">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">What it does for you</p>
+        <h2>One command, the whole pipeline - on your terms</h2>
+        <p>The six skills already chain together. deep-goal is the thin layer on top that walks the chain for you: it sequences the stages, hands each one a clean briefing, and checks the work before moving on.</p>
+      </div>
+      <div class="grid cols-2">
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#9654;</div>
+          <h3>One invocation, end to end</h3>
+          <p>Kick off the entire relay with a single command - or plain English: &ldquo;take the export feature through the whole pipeline at mvp rigor.&rdquo; Interactive stages run inline; the rest run hands-free.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#9673;</div>
+          <h3>One dial: rigor</h3>
+          <p>A single <code>--rigor</code> level - <b>yolo</b>, <b>poc</b>, <b>mvp</b>, or <b>prod</b> - sets which stages run, how interactive planning is, what review accepts automatically, and how many review&rarr;fix rounds the loop may take. One knob, from quick spike to production bar.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#10003;</div>
+          <h3>Verifies artifacts, not claims</h3>
+          <p>The conductor advances only when a stage's real artifact exists <i>and</i> that skill flipped its own status line - never on a sub-agent's say-so. A stage that didn't actually produce its output doesn't get to pass.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#8635;</div>
+          <h3>Kill it, resume it</h3>
+          <p>Pipeline state lives in a file, not the conversation. Close the session mid-run and re-invoke later - it resumes at the first unfinished stage, honoring your gates, budget, and worktree exactly as set.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== rigor levels ===== -->
+  <section>
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">The rigor dial</p>
+        <h2>Four levels, from spike to production</h2>
+        <p>Rigor is config-as-data: the shipped levels below are a starting point, and a repo can reshape or add its own without touching the skill. Omit the level and deep-goal asks once, recommending mvp.</p>
+      </div>
+      <div class="table-scroll reveal" tabindex="0" role="region" aria-label="Rigor levels">
+        <table class="matrix">
+          <thead>
+            <tr>
+              <th scope="col">Rigor</th>
+              <th scope="col">Planning</th>
+              <th scope="col">Runs</th>
+              <th scope="col">Best for</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">yolo</th>
+              <td>autonomous</td>
+              <td>plan &rarr; implement</td>
+              <td>throwaway spikes, fastest path to running code</td>
+            </tr>
+            <tr>
+              <th scope="row">poc</th>
+              <td>autonomous</td>
+              <td>plan &rarr; implement &rarr; code-review &rarr; bugfix</td>
+              <td>proofs of concept that still get a review pass</td>
+            </tr>
+            <tr>
+              <th scope="row">mvp</th>
+              <td>interactive</td>
+              <td>plan &rarr; plan-review &rarr; implement &rarr; code-review &rarr; bugfix &rarr; docs</td>
+              <td>real features - the recommended default</td>
+            </tr>
+            <tr>
+              <th scope="row">prod</th>
+              <td>interactive</td>
+              <td>full series + deeper review and more re-review rounds</td>
+              <td>production work that has to hold up</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fn reveal">Exact stage lists, review thresholds, and round caps per level live in the skill's rigor map - the table above is the shipped shape, summarized.</p>
+    </div>
+  </section>
+
+  <!-- ===== you stay in control ===== -->
+  <section class="band">
+    <div class="wrap narrow">
+      <div class="section-head reveal">
+        <p class="kicker">Hands-free, not hands-off</p>
+        <h2>You keep the controls that matter</h2>
+        <p>Autonomous doesn't mean opaque. Every human decision happens in the planning window up front; after that, three optional controls let you keep a hand on the wheel.</p>
+      </div>
+      <div class="grid cols-3">
+        <div class="card reveal">
+          <span class="cmd">--gate=&lt;stage&gt;</span>
+          <h3>Pause where you want</h3>
+          <p>Inject a checkpoint before any stage - &ldquo;pause before implement&rdquo; - even in an otherwise hands-free run. It survives resume.</p>
+        </div>
+        <div class="card reveal">
+          <span class="cmd">--budget=&lt;band&gt;</span>
+          <h3>Cap the spend</h3>
+          <p>A soft token ceiling checked at stage boundaries. Cross it and the run pauses and notifies; re-invoke to continue.</p>
+        </div>
+        <div class="card reveal">
+          <span class="cmd">--worktree</span>
+          <h3>Build in isolation</h3>
+          <p>Run every post-planning stage in one dedicated git worktree; the final report ends with the merge instructions.</p>
+        </div>
+      </div>
+      <div class="callout reveal" style="margin-top:26px">
+        <span class="callout-icon" aria-hidden="true">&#128172;</span>
+        <p><b>Want to look before you leap?</b> Add <code>--dry-run</code> (or ask &ldquo;preview an mvp run&rdquo;) and deep-goal prints the resolved pipeline and cost bands for your chosen rigor - dispatching nothing. It even works before Deep Skills is installed.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== where it fits ===== -->
+  <section>
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">Where it fits</p>
+        <h2>It sits above the six - it doesn't replace them</h2>
+        <p>Every skill still does exactly one job, still writes the same artifacts, still runs perfectly well on its own. deep-goal just walks the same loop end-to-end. Coupling is one-directional: deep-goal knows the six; the six never require deep-goal.</p>
+      </div>
+      <div class="flow reveal">
+        <a class="step" href="deep-plan.html">plan</a><span class="arrow" aria-hidden="true">&rarr;</span>
+        <a class="step" href="deep-plan-review.html">plan-review</a><span class="arrow" aria-hidden="true">&rarr;</span>
+        <a class="step" href="deep-implement.html">implement</a><span class="arrow" aria-hidden="true">&rarr;</span>
+        <a class="step" href="deep-code-review.html">code-review</a><span class="arrow" aria-hidden="true">&rarr;</span>
+        <a class="step" href="deep-bugfix.html">bugfix</a><span class="arrow" aria-hidden="true">&rarr;</span>
+        <a class="step" href="deep-docs.html">docs</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== host honesty ===== -->
+  <section class="band">
+    <div class="wrap narrow">
+      <div class="section-head reveal">
+        <p class="kicker">An honest caveat</p>
+        <h2>Best on Claude Code</h2>
+        <p>deep-goal is designed and verified on Claude Code, where each autonomous stage runs as a fresh background agent with its own clean context - the isolation the fresh-eyes guarantee depends on.</p>
+      </div>
+      <div class="callout reveal">
+        <span class="callout-icon" aria-hidden="true">&#9888;</span>
+        <p><b>On Codex, Cursor, and Copilot</b> it runs the same stages in the same order, but <b>inline and sequentially</b> - one shared context window instead of a fresh agent per stage. Quick runs (yolo/poc) are comfortable; large <b>prod-rigor</b> runs can hit context limits and lose some reviewer independence. It's functional and honestly caveated, not yet gate-verified. If the pipeline matters, run it on Claude Code - and on any host you can end a session at a stage boundary and resume fresh.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== install / requires ===== -->
+  <section id="get-it">
+    <div class="wrap narrow">
+      <div class="section-head reveal">
+        <p class="kicker">Getting it</p>
+        <h2>Free, and bundled with Deep Skills</h2>
+        <p>deep-goal ships free in the same marketplace. It requires the Deep Skills plugin (v0.2.0 or newer) installed alongside - it verifies this at launch and declines politely if it's missing.</p>
+      </div>
+      <div class="cmd-stack reveal">
+        <div class="cmdline">
+          <code class="chip no-prompt">/plugin marketplace add reurgency/marketplace</code>
+          <button class="copy-btn" type="button" aria-label="Copy command">Copy</button>
+        </div>
+        <div class="cmdline">
+          <code class="chip no-prompt">/plugin install deep-skills@reurgency</code>
+          <button class="copy-btn" type="button" aria-label="Copy command">Copy</button>
+        </div>
+        <div class="cmdline">
+          <code class="chip no-prompt">/plugin install deep-goal@reurgency</code>
+          <button class="copy-btn" type="button" aria-label="Copy command">Copy</button>
+        </div>
+      </div>
+      <p class="faint" style="margin-top:18px;font-size:13.5px">Already have Deep Skills? Just the last line adds the conductor. Other hosts: see the <a href="install.html">install page</a>.</p>
+    </div>
+  </section>
+
+  <!-- ===== prev/next ===== -->
+  <nav class="skillnav wrap" aria-label="Skill navigation">
+    <a href="deep-docs.html">
+      <span class="dir">&larr; Last skill</span>
+      <span class="name">deep-docs</span>
+    </a>
+    <a class="next" href="install.html">
+      <span class="dir">Get started &rarr;</span>
+      <span class="name">Install</span>
+    </a>
+  </nav>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-cta">
+      <h2>Get started in one command</h2>
+      <p>Install the Deep Skills plugin and run your first <code>/deep-plan</code>.</p>
+      <!-- Install snippet: verbatim from README.md's Claude Code install block (D1 - slug as written) -->
+      <div class="chip-stack">
+        <code class="chip no-prompt">/plugin marketplace add reurgency/marketplace</code>
+        <code class="chip no-prompt">/plugin install deep-skills@reurgency</code>
+      </div>
+      <div class="btn-row" style="margin-top:22px">
+        <a class="btn btn-primary" href="install.html">Install Deep Skills</a>
+      </div>
+    </div>
+    <div class="footer-meta">
+      <span>&copy; 2026 Deep Skills &middot; MIT License</span>
+      <div class="footer-links">
+        <a href="how-it-works.html">How it works</a>
+        <a href="install.html">Install</a>
+        <a href="https://github.com/reurgency/Deep-Skills">GitHub</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

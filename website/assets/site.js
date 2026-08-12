@@ -140,4 +140,62 @@
   } else {
     reveals.forEach(function (el) { el.classList.add('in'); });
   }
+
+  // ---- agent installer (hero: copy-paste prompt per platform) ----
+  var aiInstall = document.querySelector('.agent-install');
+  var aiSelect = document.getElementById('ai-platform');
+  var aiText = document.getElementById('ai-prompt-text');
+  var aiCopy = document.getElementById('ai-copy');
+  if (aiInstall && aiSelect && aiText && aiCopy) {
+    var aiPrompts = {
+      'claude':
+        'Install the Deep Skills plugin in Claude Code. Add the marketplace and install the plugin by running these two commands:\n' +
+        '  /plugin marketplace add reurgency/marketplace\n' +
+        '  /plugin install deep-skills@reurgency\n' +
+        'Then confirm the deep-plan, deep-plan-review, deep-implement, deep-code-review, deep-bugfix, and deep-docs skills are available.',
+      'codex':
+        'Install the Deep Skills plugin for Codex. From my shell, run:\n' +
+        '  codex plugin marketplace add reurgency/marketplace\n' +
+        'Then open /plugins inside Codex, search "deep-skills", and install it. Confirm the six deep-* skills are available.',
+      'cursor':
+        'Install the Deep Skills plugin in Cursor. Run:\n' +
+        '  /add-plugin deep-skills\n' +
+        '(or open Customize → Marketplace and install "deep-skills"). Then confirm the six deep-* skills are available.',
+      'copilot-cli':
+        'Install the Deep Skills plugin for GitHub Copilot CLI. Run:\n' +
+        '  copilot plugin marketplace add reurgency/marketplace\n' +
+        '  copilot plugin install deep-skills@reurgency\n' +
+        'Then verify with /skills list that the six deep-* skills are installed.',
+      'copilot-vscode':
+        'Install the Deep Skills skills in VS Code Copilot. This host is file-based (no marketplace):\n' +
+        '  1. Clone https://github.com/reurgency/Deep-Skills\n' +
+        '  2. Set the chat.agentSkillsLocations setting to point at the repo\'s plugins/deep-skills/skills directory\n' +
+        'Then confirm the six deep-* skills load in Copilot chat.'
+    };
+    var setPrompt = function () {
+      aiText.textContent = aiPrompts[aiSelect.value] || aiPrompts.claude;
+    };
+    setPrompt();
+    aiInstall.hidden = false;
+    aiSelect.addEventListener('change', setPrompt);
+
+    var aiCanCopy = false;
+    try {
+      aiCanCopy = !!(navigator.clipboard && typeof navigator.clipboard.writeText === 'function');
+    } catch (err) { /* ignore */ }
+    if (!aiCanCopy) {
+      aiCopy.hidden = true;
+    } else {
+      aiCopy.addEventListener('click', function () {
+        navigator.clipboard.writeText(aiText.textContent).then(function () {
+          aiCopy.classList.add('copied');
+          aiCopy.textContent = 'Copied';
+          setTimeout(function () {
+            aiCopy.classList.remove('copied');
+            aiCopy.textContent = 'Copy';
+          }, 1600);
+        }).catch(function () { /* ignore */ });
+      });
+    }
+  }
 })();

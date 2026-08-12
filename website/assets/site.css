@@ -53,6 +53,7 @@
 .theme-code-review{--accent:#ffb24d;--accent-deep:#f5972a;--accent-bright:#ffd49b;--accent-soft:rgba(255,178,77,.12);--accent-line:rgba(255,178,77,.34);--accent-glow:rgba(255,178,77,.30)}
 .theme-bugfix     {--accent:#ff6b6b;--accent-deep:#ec4f4f;--accent-bright:#ffa8a8;--accent-soft:rgba(255,107,107,.12);--accent-line:rgba(255,107,107,.34);--accent-glow:rgba(255,107,107,.28)}
 .theme-docs       {--accent:#46d5d0;--accent-deep:#27b3ae;--accent-bright:#8ceae6;--accent-soft:rgba(70,213,208,.12);--accent-line:rgba(70,213,208,.34);--accent-glow:rgba(70,213,208,.26)}
+.theme-goal       {--accent:#e8b64a;--accent-deep:#cf9a2c;--accent-bright:#f5d98c;--accent-soft:rgba(232,182,74,.12);--accent-line:rgba(232,182,74,.34);--accent-glow:rgba(232,182,74,.26)}
 
 /* ---------- base ---------- */
 *{box-sizing:border-box;margin:0;padding:0}
@@ -405,6 +406,55 @@ table.matrix{width:100%;min-width:820px;border-collapse:collapse;font-size:14px;
 .copy-btn.copied{color:var(--good);border-color:var(--good)}
 html:not(.js) .copy-btn{display:none}
 
+/* ---------- agent installer (hero: copy-paste prompt per platform) ---------- */
+.visually-hidden{
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0;
+}
+.agent-install{
+  max-width:640px;margin:40px auto 0;text-align:left;
+  background:var(--bg-raise);border:1px solid var(--line);
+  border-radius:var(--radius);padding:16px;
+}
+.agent-install-head{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:14px;flex-wrap:wrap;margin-bottom:12px;
+}
+.ai-label{font-size:13.5px;color:var(--muted);line-height:1.4}
+.ai-select-wrap{position:relative;flex:none}
+.ai-select{
+  appearance:none;-webkit-appearance:none;
+  font-family:var(--body);font-size:13.5px;font-weight:600;color:var(--text);
+  background:var(--panel);border:1px solid var(--line-2);border-radius:var(--radius-sm);
+  padding:8px 34px 8px 14px;cursor:pointer;
+  transition:border-color .16s ease;
+}
+.ai-select:hover,.ai-select:focus-visible{border-color:var(--accent-line);outline:none}
+.ai-select-wrap::after{
+  content:"";position:absolute;right:14px;top:50%;
+  width:8px;height:8px;margin-top:-5px;pointer-events:none;
+  border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);
+  transform:rotate(45deg);
+}
+.ai-prompt{
+  display:flex;align-items:stretch;gap:8px;
+  background:var(--bg);border:1px solid var(--line-2);
+  border-radius:var(--radius-sm);padding:14px;
+}
+.ai-prompt-text{
+  flex:1;min-width:0;margin:0;
+  font-family:var(--mono);font-size:12.5px;line-height:1.6;color:#e3e7f2;
+  white-space:pre-wrap;word-break:break-word;
+}
+.ai-copy{
+  flex:none;align-self:flex-start;font-family:var(--mono);font-size:12px;color:var(--muted);
+  background:var(--panel);border:1px solid var(--line-2);border-radius:10px;
+  padding:6px 14px;cursor:pointer;
+  transition:color .16s ease,border-color .16s ease;
+}
+.ai-copy:hover{color:var(--text);border-color:var(--accent-line)}
+.ai-copy.copied{color:var(--good);border-color:var(--good)}
+
 /* ---------- quickstart steps ---------- */
 .steps{counter-reset:step;display:flex;flex-direction:column;gap:16px;max-width:800px;margin:0 auto}
 .steps > li{
@@ -470,3 +520,6 @@ html.js .reveal.in{opacity:1;transform:none}
   .btn{width:100%;max-width:340px}
   .nav-menu .btn{width:auto;max-width:none}
 }
+
+/* deep-goal separator in the Skills dropdown (conductor sits apart from the six) */
+.dropdown .dropdown-sep{height:1px;margin:6px 12px;background:var(--line);padding:0;list-style:none}
