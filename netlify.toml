@@ -3,6 +3,9 @@
 
 [build]
   publish = "website"
+  # Skip the deploy when nothing under website/ changed on this push.
+  # Exit 0 (no diff) => Netlify cancels the build; exit 1 (diff) => build proceeds.
+  ignore = "git diff --quiet HEAD^ HEAD -- website/"
 
 [[headers]]
   for = "/*"
