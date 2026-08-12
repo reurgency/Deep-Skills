@@ -86,9 +86,9 @@ Say these any time *while a skill is running*; it services the command and retur
 | | `/show-proof` | Print the current cluster's proof verdict with its full hop-by-hop chain (or test evidence). |
 | | `/widen` | Escalate the current cluster's containment from 1 hop to 2 hops and re-run it. |
 
-## The deep-goal add-on (optional, paid)
+## The deep-goal add-on (optional)
 
-**`/deep-goal`** is a separate, optional **paid add-on plugin** that runs the whole relay above from **one invocation** — an autonomous, rigor-gated **conductor**. It is *not* part of the deep-skills plugin (which stays exactly six skills): deep-goal knows the six core skills; the core skills never require deep-goal.
+**`/deep-goal`** is a separate, optional **add-on plugin** — bundled free in the same marketplace — that runs the whole relay above from **one invocation** — an autonomous, rigor-gated **conductor**. It is *not* part of the deep-skills plugin (which stays exactly six skills): deep-goal knows the six core skills; the core skills never require deep-goal.
 
 ```
             ┌──────────────────────────  /deep-goal (conductor — optional add-on)  ─────────────────────────┐
@@ -113,7 +113,7 @@ A single `--rigor=<yolo|poc|mvp|prod>` dial selects — from data, repo-overrida
 | `--gate=<stage>` | *"pause before implement"* | Human checkpoint before a named stage, even in an autonomous run (repeatable; survives resume). |
 | `--worktree` | *"build in a worktree"* | One conductor-owned worktree for all post-planning stages; the run report ends with merge instructions. |
 
-Requires **deep-skills ≥ 0.2.0** installed alongside (verified at launch). deep-goal is a paid add-on and is **not yet in the storefront** — `/plugin install deep-goal@reurgency` will be the install command at launch. Training page: [`docs/Training/deep-goal.md`](docs/Training/deep-goal.md).
+Requires **deep-skills ≥ 0.2.0** installed alongside (verified at launch). deep-goal ships free in the same marketplace — install it with `/plugin install deep-goal@reurgency` (after `/plugin marketplace add reurgency/marketplace`). Training page: [`docs/Training/deep-goal.md`](docs/Training/deep-goal.md).
 
 ## Learn the skills
 
@@ -153,7 +153,7 @@ Update later with `/plugin marketplace update reurgency`.
 ```
 Deep-Skills/
 ├── .claude-plugin/
-│   └── marketplace.json            # install catalog (deep-skills only; deep-goal ships unlisted for now)
+│   └── marketplace.json            # install catalog (deep-skills + deep-goal)
 ├── plugins/
 │   ├── deep-skills/
 │   │   ├── .claude-plugin/plugin.json   # Claude Code manifest
@@ -169,7 +169,7 @@ Deep-Skills/
 │   │   │   └── deep-docs/
 │   │   └── directives/             # Deep-Learn registry — sibling of skills/ so the
 │   │                               #   self-locating loader resolves it on every host
-│   └── deep-goal/                  # OPTIONAL PAID ADD-ON — the pipeline conductor
+│   └── deep-goal/                  # OPTIONAL ADD-ON — the pipeline conductor
 │       ├── HOSTS.md                #   (own plugin, own manifests, own HOSTS.md;
 │       └── skills/deep-goal/       #    requires deep-skills ≥ 0.2.0, never vice versa)
 ├── docs/

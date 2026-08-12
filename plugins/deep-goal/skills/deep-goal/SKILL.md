@@ -1,6 +1,6 @@
 ---
 name: deep-goal
-description: Run a full Deep-* effort end-to-end from one invocation — plan → review → implement → code-review → bugfix → docs — as an autonomous, rigor-gated conductor. Use when the user wants to "run deep-goal", build a feature hands-free at a chosen rigor (yolo/poc/mvp/prod), or automate the deep-* relay in one command. Triggers on /deep-goal and on requests like "run deep-goal at mvp rigor" or "take this feature through the whole pipeline". Paid add-on — requires the deep-skills plugin ≥ 0.2.0.
+description: Run a full Deep-* effort end-to-end from one invocation — plan → review → implement → code-review → bugfix → docs — as an autonomous, rigor-gated conductor. Use when the user wants to "run deep-goal", build a feature hands-free at a chosen rigor (yolo/poc/mvp/prod), or automate the deep-* relay in one command. Triggers on /deep-goal and on requests like "run deep-goal at mvp rigor" or "take this feature through the whole pipeline". Requires the deep-skills plugin ≥ 0.2.0.
 argument-hint: describe the goal/feature · --rigor=<yolo|poc|mvp|prod> · --dry-run · --budget=<band> · --gate=<stage> · --worktree
 ---
 

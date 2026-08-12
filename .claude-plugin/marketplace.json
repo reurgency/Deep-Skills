@@ -1,9 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "deep-skills",
-  "description": "The Deep-* series — /deep-plan, /deep-plan-review, /deep-implement, /deep-code-review, /deep-bugfix, and /deep-docs: a planning → review → implementation → code-review → bug-fix → docs workflow for Claude Code, Codex, Cursor, and GitHub Copilot, with a self-improving directive loop.",
+  "description": "The Deep-* series — /deep-plan, /deep-plan-review, /deep-implement, /deep-code-review, /deep-bugfix, and /deep-docs: a planning → review → implementation → code-review → bug-fix → docs workflow for Claude Code, Codex, Cursor, and GitHub Copilot, with a self-improving directive loop. Plus /deep-goal — an autonomous conductor that runs the whole series end-to-end at a chosen rigor.",
   "metadata": {
-    "description": "The Deep-* series — /deep-plan, /deep-plan-review, /deep-implement, /deep-code-review, /deep-bugfix, and /deep-docs: a planning → review → implementation → code-review → bug-fix → docs workflow for Claude Code, Codex, Cursor, and GitHub Copilot, with a self-improving directive loop.",
+    "description": "The Deep-* series — /deep-plan, /deep-plan-review, /deep-implement, /deep-code-review, /deep-bugfix, and /deep-docs: a planning → review → implementation → code-review → bug-fix → docs workflow for Claude Code, Codex, Cursor, and GitHub Copilot, with a self-improving directive loop. Plus /deep-goal — an autonomous conductor that runs the whole series end-to-end at a chosen rigor.",
     "version": "0.2.0"
   },
   "owner": {
@@ -18,6 +18,14 @@
       "description": "Bundles /deep-plan, /deep-plan-review, /deep-implement, /deep-code-review, /deep-bugfix, and /deep-docs — the full Deep-* workflow as one coherent install.",
       "category": "workflow",
       "keywords": ["planning", "code-review", "implementation", "multi-agent", "workflow"]
+    },
+    {
+      "name": "deep-goal",
+      "source": "./plugins/deep-goal",
+      "version": "0.2.0",
+      "description": "/deep-goal — an autonomous, rigor-gated conductor that runs a full Deep-* effort end-to-end from one invocation (plan → review → implement → code-review → bugfix → docs) at a chosen rigor level (yolo/poc/mvp/prod). Requires the deep-skills plugin ≥ 0.2.0.",
+      "category": "workflow",
+      "keywords": ["orchestration", "autonomous", "pipeline", "conductor", "workflow", "deep-skills", "deep-goal"]
     }
   ]
 }
