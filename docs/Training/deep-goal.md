@@ -1,7 +1,7 @@
 # Training: `/deep-goal` (optional add-on)
 
 > Part of the [Deep Skills Training Program](README.md). **Not one of the six bundled skills** —
-> `/deep-goal` is an **optional, paid add-on plugin** that conducts the six.
+> `/deep-goal` is an **optional, free add-on plugin** that conducts the six.
 > Source: [`plugins/deep-goal/skills/deep-goal/SKILL.md`](../../plugins/deep-goal/skills/deep-goal/SKILL.md)
 > · Hosts: [`plugins/deep-goal/HOSTS.md`](../../plugins/deep-goal/HOSTS.md) (Claude Code is the verified floor)
 

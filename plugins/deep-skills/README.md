@@ -59,7 +59,7 @@ The fleet skills (`deep-code-review`, `deep-plan-review`, `deep-bugfix`) bind ea
 
 ## Optional companion
 
-**deep-goal** is a separately-installed paid pipeline conductor that runs these six skills end-to-end from a single invocation. It **works with** deep-skills but is never required by it, and nothing here depends on it. If you don't have it, everything above works exactly the same.
+**deep-goal** is a separately-installed, free pipeline conductor that runs these six skills end-to-end from a single invocation. It **works with** deep-skills but is never required by it, and nothing here depends on it. If you don't have it, everything above works exactly the same.
 
 ## License
 

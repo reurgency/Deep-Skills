@@ -43,7 +43,7 @@ vocabulary from earlier ones.
 | 5 | `/deep-bugfix` | [deep-bugfix.md](deep-bugfix.md) | Remediate defects diagnosis-first: cluster → diagnose → fix at the cause → prove → contain. |
 | 6 | `/deep-docs` | [deep-docs.md](deep-docs.md) | Generate context-window-aware, anchored, verified documentation of what's been built. |
 
-> **Optional add-on (paid, separate plugin):** [`/deep-goal`](deep-goal.md) — an autonomous,
+> **Optional add-on (free, separate plugin):** [`/deep-goal`](deep-goal.md) — an autonomous,
 > rigor-gated **conductor** that runs the whole six-skill relay from one invocation. It is
 > **not a seventh bundled skill**: it ships as its own plugin, requires deep-skills ≥ 0.2.0,
 > and the six core skills never require it. Learn the six by hand first — its page assumes
@@ -174,7 +174,7 @@ what was reviewed, and what remains deferred.
 
 > **Add-on shortcut:** or run the capstone with one command via
 > [`deep-goal`](deep-goal.md) — *"run deep-goal at mvp rigor"* conducts the same six-skill
-> loop end-to-end (optional paid add-on; do it by hand at least once first — the run report
+> loop end-to-end (optional free add-on; do it by hand at least once first — the run report
 > only means something if you know what each stage should have produced).
 
 ---
