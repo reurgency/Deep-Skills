@@ -1,5 +1,5 @@
 {
-  "_doc": "deep-docs Deep-Learn signal; forward-dependent reader (Distiller/Pattern Ledger) — Display-only today; see references/learn-signal.md",
+  "_doc": "deep-docs Deep-Learn signal; forward-dependent reader (Distiller/Pattern Ledger) - Display-only today; see references/learn-signal.md",
   "generated": {
     "indexed_against_commit": "<git SHA the map was built against, or null on a non-git/unusable-git tree>",
     "round": 1                          // refresh round; default generation is round 1, each --refresh increments
@@ -27,8 +27,8 @@
   ]
 }
 // `_`-prefixed keys (here, `_doc`) follow finding.json's annotation convention. The EMITTED
-// docs/ai-map/learn-signal.json is strict JSON — NO `//` comments, only the `_doc` string key
+// docs/ai-map/learn-signal.json is strict JSON - NO `//` comments, only the `_doc` string key
 // (exactly like the committed docs/ai-map/index.json). Every array is always present even when
 // empty: an empty drift/undocumented/churn list is a true signal ("no drift yet"), not a missing
-// key. The machine reader (Distiller / Pattern Ledger) is a FORWARD DEPENDENCY (plan Deferred #1) —
+// key. The machine reader (Distiller / Pattern Ledger) is a FORWARD DEPENDENCY (plan Deferred #1) -
 // Display-only today, surfaced to humans via coverage.md. See references/learn-signal.md.

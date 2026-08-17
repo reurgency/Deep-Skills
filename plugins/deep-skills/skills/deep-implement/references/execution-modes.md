@@ -12,7 +12,7 @@ Per phase:
 3. **Gate**: user approves or requests a fix.
    - *Request fix* → relay to the phase agent, re-validate, re-present.
    - *Approve* → append the phase summary to the plan, write the next-phase hand-off, commit **only if the user asks**, then continue to the next phase.
-4. No notifications needed — the user is present.
+4. No notifications needed - the user is present.
 
 ## Autonomous
 

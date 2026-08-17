@@ -8,13 +8,13 @@
 
 ## Worktree documentation rule (reuse from story-implementer)
 
-When working in a worktree (path contains `/trees/`), **code changes stay in the worktree**, but **plan/Phase-Summary/hand-off updates go to the source branch root** — the worktree's `.maudel`/plan copies are ephemeral and lost on removal.
+When working in a worktree (path contains `/trees/`), **code changes stay in the worktree**, but **plan/Phase-Summary/hand-off updates go to the source branch root** - the worktree's `.maudel`/plan copies are ephemeral and lost on removal.
 
 ## Commits
 
 - **Autonomous:** after a phase passes validation, commit a checkpoint. Only ever commit green code.
 - **Collaborative:** commit only when the user asks.
-- **Message:** conventional `type(scope): <phase title>` (`feat`/`fix`/`refactor`/`doc`/`chore`), matching repo history. End every commit message with the host-aware attribution trailer (`Co-Authored-By: <agent-name> <email>` — per-host defaults in `references/host-affordances.md`; on Claude Code, `Co-Authored-By: Claude <noreply@anthropic.com>`):
+- **Message:** conventional `type(scope): <phase title>` (`feat`/`fix`/`refactor`/`doc`/`chore`), matching repo history. End every commit message with the host-aware attribution trailer (`Co-Authored-By: <agent-name> <email>` - per-host defaults in `references/host-affordances.md`; on Claude Code, `Co-Authored-By: Claude <noreply@anthropic.com>`):
 
   ```
   Co-Authored-By: Claude <noreply@anthropic.com>
@@ -33,7 +33,7 @@ After each phase, append to the plan's **Phase Summaries** appendix:
 ## Implementation summary (`03-Implementation/summary.md`)
 
 At run completion (and incrementally if useful), write a work summary to `.deep-skills/<effort>/03-Implementation/summary.md` (see `references/artifact-structure.md`):
-- what was built, at the effort level (the per-phase detail stays in the plan's Phase Summaries — this does not replace them),
+- what was built, at the effort level (the per-phase detail stays in the plan's Phase Summaries - this does not replace them),
 - the plan's acceptance/validation criteria **checked off** (or your own checklist if the plan lacks them),
 - open deferreds / known gaps.
 
@@ -45,4 +45,4 @@ Write a slim hand-off (`templates/phase-handoff.md`) so a fresh agent can resume
 
 ## Resume
 
-To resume an interrupted run: read the plan's Phase Summaries appendix, find the first phase not marked done, and continue from there. The plan is the source of truth — no conversation memory required.
+To resume an interrupted run: read the plan's Phase Summaries appendix, find the first phase not marked done, and continue from there. The plan is the source of truth - no conversation memory required.

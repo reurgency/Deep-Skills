@@ -2,7 +2,7 @@
 
 A planning → review → implementation → code-review → bug-fix → docs workflow for AI coding agents. Six skills that hand off to each other, each producing a **self-contained, fresh-agent-resumable artifact** so any step can be picked up later by an agent with zero prior context. Fleet steps fan out independent, evidence-driven agents; a **self-improving directive loop** feeds lessons from each review back into the next run.
 
-Works natively across Claude Code, Codex, Cursor, and GitHub Copilot / VS Code — one set of skills, thin per-host manifests. See [`HOSTS.md`](./HOSTS.md) for per-host install and capability details.
+Works natively across Claude Code, Codex, Cursor, and GitHub Copilot / VS Code - one set of skills, thin per-host manifests. See [`HOSTS.md`](./HOSTS.md) for per-host install and capability details.
 
 ## The workflow
 
@@ -12,7 +12,7 @@ Works natively across Claude Code, Codex, Cursor, and GitHub Copilot / VS Code �
                      /deep-docs  ◄───────  /deep-bugfix ◄── (triage) ─┘
 ```
 
-Each skill also runs standalone — you don't have to start at `/deep-plan`. Run `/deep-code-review` on any branch, `/deep-bugfix` on a stack trace, or `/deep-docs` on any repo.
+Each skill also runs standalone - you don't have to start at `/deep-plan`. Run `/deep-code-review` on any branch, `/deep-bugfix` on a stack trace, or `/deep-docs` on any repo.
 
 ## The six skills
 
@@ -51,11 +51,11 @@ deep-skills/
 └── .cursor-plugin/   # Cursor manifest
 ```
 
-`skills/` and `directives/` are **siblings by design** — the directive loader resolves the shared registry relative to its own file, so the two must stay together under this plugin root. See [`HOSTS.md`](./HOSTS.md) § *The vendoring invariant*.
+`skills/` and `directives/` are **siblings by design** - the directive loader resolves the shared registry relative to its own file, so the two must stay together under this plugin root. See [`HOSTS.md`](./HOSTS.md) § *The vendoring invariant*.
 
 ## Model-tier routing
 
-The fleet skills (`deep-code-review`, `deep-plan-review`, `deep-bugfix`) bind each agent's model from that skill's `references/model-map.md` before fan-out — keyed by the orchestrator's own model, so one host-agnostic map resolves everywhere. All tiers are reasoning tiers, and the ceiling is your selected model. Details in [`HOSTS.md`](./HOSTS.md) § *Model-tier routing*.
+The fleet skills (`deep-code-review`, `deep-plan-review`, `deep-bugfix`) bind each agent's model from that skill's `references/model-map.md` before fan-out - keyed by the orchestrator's own model, so one host-agnostic map resolves everywhere. All tiers are reasoning tiers, and the ceiling is your selected model. Details in [`HOSTS.md`](./HOSTS.md) § *Model-tier routing*.
 
 ## Optional companion
 

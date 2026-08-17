@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# load-active-cards.sh — print the active Deep-Learn directive cards for a phase.
+# load-active-cards.sh - print the active Deep-Learn directive cards for a phase.
 #
 # Self-locating: it finds the shared directives registry RELATIVE TO ITS OWN
 # location, so it works no matter where the plugin is installed and no matter
 # what the caller's working directory is. (Bash always knows its own path.)
 #
 # This file is copied byte-identically into each deep-* skill's scripts/ dir
-# (the "standalone rule" — skills self-contain; only the shared registry is shared).
+# (the "standalone rule" - skills self-contain; only the shared registry is shared).
 #
 # Usage:  load-active-cards.sh <phase>     e.g. load-active-cards.sh deep-plan
 set -euo pipefail
@@ -22,7 +22,7 @@ here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 active="$here/../../../directives/cards/active"
 
 if [ ! -d "$active" ]; then
-  echo "[deep-learn] registry not found at $active — proceeding with no cards." >&2
+  echo "[deep-learn] registry not found at $active - proceeding with no cards." >&2
   exit 0
 fi
 

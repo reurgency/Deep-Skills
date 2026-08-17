@@ -2,7 +2,7 @@
      A findings *summary* + link to this report is recorded in the plan document (see stub at the bottom).
      Date in absolute form. -->
 
-# Review Report — <effort-name>
+# Review Report - <effort-name>
 
 > **Plan:** [plan.md](../01-Plan/plan.md) · **Reviewed:** <YYYY-MM-DD> · **Mode:** <single-agent | multi-agent (N agents)> · **Verdict:** <Blockers: N · Major: N · Minor: N · Nit: N>
 

@@ -1,6 +1,6 @@
 <!-- Written when a phase hits the fix-cap (2 attempts) and stops. Appended to the plan's Phase Summaries appendix. Also drives the notification message. -->
 
-### ⛔ Blocker — Phase <N>: <phase title>
+### ⛔ Blocker - Phase <N>: <phase title>
 
 - **When:** <YYYY-MM-DD>, after <2> fix attempts.
 - **Branch / worktree:** `<branch>` / `<worktree path or none>`. Uncommitted (broken code is never committed).
@@ -11,4 +11,4 @@
 - **To unblock, a human needs to:** <the specific decision or fix required>
 - **Notified:** <notification emitted? y/n> · <hook fired? y/n>
 
-<!-- Autonomous mode stops here — it does NOT proceed to later phases past a blocker. -->
+<!-- Autonomous mode stops here - it does NOT proceed to later phases past a blocker. -->

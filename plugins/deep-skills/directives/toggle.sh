@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# toggle.sh — turn a Deep-Learn directive card on (active) or off (disabled).
+# toggle.sh - turn a Deep-Learn directive card on (active) or off (disabled).
 #
 # This is the one-command on/off switch. It moves the card file between
 # cards/active/ and cards/disabled/ AND updates its `status:` field so the
@@ -45,7 +45,7 @@ if [ ! -f "$src" ]; then
   exit 1
 fi
 
-# move — prefer git mv for clean history, but only if the file is actually
+# move - prefer git mv for clean history, but only if the file is actually
 # tracked (a brand-new, uncommitted card isn't); otherwise plain mv.
 if git -C "$here" ls-files --error-unmatch "$src" >/dev/null 2>&1; then
   git -C "$here" mv "$src" "$dst"

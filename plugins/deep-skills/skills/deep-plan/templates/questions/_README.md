@@ -16,10 +16,10 @@ These specs are host-neutral: they render via the host's structured-question too
 
 Common fields (modeled on `apps/shared/types/blueprint-qa.types.ts` → `BlueprintQuestion`):
 
-- `questionType` *(string)* — the type id; matches the filename.
-- `question` *(string)* — the prompt shown to the user.
-- `context` *(string, optional)* — brief rationale for why this is being asked.
-- `header` *(string, optional)* — short chip label (≤12 chars) for the structured-question tool.
+- `questionType` *(string)* - the type id; matches the filename.
+- `question` *(string)* - the prompt shown to the user.
+- `context` *(string, optional)* - brief rationale for why this is being asked.
+- `header` *(string, optional)* - short chip label (≤12 chars) for the structured-question tool.
 
 Type-specific fields are documented inside each file via an `_comment`.
 
@@ -30,4 +30,4 @@ Type-specific fields are documented inside each file via an `_comment`.
 3. Add an `_comment` describing the type-specific fields and how to render it.
 4. Add a row to the table above.
 
-`_comment` / `_*` keys are documentation only — strip them before rendering.
+`_comment` / `_*` keys are documentation only - strip them before rendering.

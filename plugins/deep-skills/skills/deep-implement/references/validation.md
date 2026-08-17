@@ -1,10 +1,10 @@
 # Validation
 
-Validate every phase before committing or gating. Reuse the **`test-runner`** skill for tests. Scope validation to the **changed files and their imports** — pre-existing errors elsewhere are expected noise; block only on **new** failures introduced by the phase.
+Validate every phase before committing or gating. Reuse the **`test-runner`** skill for tests. Scope validation to the **changed files and their imports** - pre-existing errors elsewhere are expected noise; block only on **new** failures introduced by the phase.
 
 ## Commands (monorepo)
 
-Run per-app binaries with **`bunx` from inside the app directory**. Never run `npx tsc` (or `ng`, `vitest`) from the repo root — there is no root TypeScript install, so `npx` fetches a placeholder `tsc` that prints a stub message and hangs until timeout.
+Run per-app binaries with **`bunx` from inside the app directory**. Never run `npx tsc` (or `ng`, `vitest`) from the repo root - there is no root TypeScript install, so `npx` fetches a placeholder `tsc` that prints a stub message and hangs until timeout.
 
 | Check | Command |
 |---|---|
@@ -21,14 +21,14 @@ If the phase changed anything under `.maudel/pipeline_stages/**`, any `.maudel/a
 cd apps/api && bun test src/tests/prompt-assembly-evaluation.test.ts
 ```
 
-(Per root `CLAUDE.md` — it asserts zone structure/token budgets and writes assembled-prompt snapshots for diff review.)
+(Per root `CLAUDE.md` - it asserts zone structure/token budgets and writes assembled-prompt snapshots for diff review.)
 
 ## Test output capture
 
-Use `test-runner`'s `node -e execSync` wrapper with `CI=true` — bun's TTY output doesn't survive plain shell redirection. Treat the run as passed only on an explicit `SUCCESS` marker; on `FAILED`, read `stderr` for the real failure.
+Use `test-runner`'s `node -e execSync` wrapper with `CI=true` - bun's TTY output doesn't survive plain shell redirection. Treat the run as passed only on an explicit `SUCCESS` marker; on `FAILED`, read `stderr` for the real failure.
 
 ## Verdict
 
 A phase passes when: typecheck of changed apps is clean (no new errors), relevant tests are green, and (if applicable) the snapshot test passes. Behavioral validation (run the app / Playwright) only when the phase's acceptance criteria call for it. Record the verdict in the phase summary.
 
-**Green ≠ verified for external shapes.** If the phase produces a payload an external consumer reads (CLI/binary, third-party API, SDK, AI harness/model endpoint), a clean typecheck and green tests do **not** confirm the consumer accepts that shape — repo checks aren't ground truth for an out-of-repo contract (see the construction rules in `references/phase-execution.md`). When the phase's shape was verified against ground truth (sibling client, schema/docs, real probe), note it in the summary; when it wasn't reachable, record the shape as **unverified** rather than letting green imply confirmation.
+**Green ≠ verified for external shapes.** If the phase produces a payload an external consumer reads (CLI/binary, third-party API, SDK, AI harness/model endpoint), a clean typecheck and green tests do **not** confirm the consumer accepts that shape - repo checks aren't ground truth for an out-of-repo contract (see the construction rules in `references/phase-execution.md`). When the phase's shape was verified against ground truth (sibling client, schema/docs, real probe), note it in the summary; when it wasn't reachable, record the shape as **unverified** rather than letting green imply confirmation.

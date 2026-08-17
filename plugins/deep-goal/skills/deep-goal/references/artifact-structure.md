@@ -1,4 +1,4 @@
-# Artifact structure — the `.deep-skills/` convention
+# Artifact structure - the `.deep-skills/` convention
 
 > **Series-shared reference.** This file is copied **verbatim** into every deep-* skill's `references/` directory (the series standalone rule forbids cross-skill references). All copies must stay byte-identical, or be intentionally marked divergent at the top of the changed copy. A series consistency sweep verifies this.
 
@@ -14,19 +14,19 @@ All deep-* skills read and write their **artifacts** under the host project's `.
   03-Implementation/  deep-implement work summary + acceptance check-off
   04-Code-Review/     deep-code-review report, findings.json, certificate
   05-Security/        deep-security artifacts (future effort)
-  06-Bug-Fix/         deep-bugfix rounds — round-N/ per fix round (append-only)
+  06-Bug-Fix/         deep-bugfix rounds - round-N/ per fix round (append-only)
   07-Docs/            deep-docs pointer → in-repo docs/ai-map/ (the canonical map output)
-  08–09               reserved
+  08-09               reserved
 ```
 
 Canonical file names per stage:
 
-- `01-Plan/plan.md` — the plan document (deep-plan).
-- `02-Plan-Review/review.md` — the full review report (deep-plan-review).
-- `03-Implementation/summary.md` — work summary + acceptance check-off (deep-implement).
-- `04-Code-Review/report.md`, `findings.json`, `certificate.md` — code review artifacts (deep-code-review).
-- `06-Bug-Fix/round-N/scope.json`, `round-N/fix-summary.md`, `round-N/root-causes.json` (under `--learn`) — round scope + per-cluster fix records + root-cause records (deep-bugfix; rounds are append-only, next round = max existing + 1).
-- `07-Docs/` — in effort mode, a **pointer** to the canonical in-repo `docs/ai-map/` (deep-docs writes the map to `docs/ai-map/`, not into the effort dir): `MAP.md`, `index.json`, `subsystems/`, `references/`, `coverage.md`, `learn-signal.json`.
+- `01-Plan/plan.md` - the plan document (deep-plan).
+- `02-Plan-Review/review.md` - the full review report (deep-plan-review).
+- `03-Implementation/summary.md` - work summary + acceptance check-off (deep-implement).
+- `04-Code-Review/report.md`, `findings.json`, `certificate.md` - code review artifacts (deep-code-review).
+- `06-Bug-Fix/round-N/scope.json`, `round-N/fix-summary.md`, `round-N/root-causes.json` (under `--learn`) - round scope + per-cluster fix records + root-cause records (deep-bugfix; rounds are append-only, next round = max existing + 1).
+- `07-Docs/` - in effort mode, a **pointer** to the canonical in-repo `docs/ai-map/` (deep-docs writes the map to `docs/ai-map/`, not into the effort dir): `MAP.md`, `index.json`, `subsystems/`, `references/`, `coverage.md`, `learn-signal.json`.
 
 ## `00-Manifest/manifest.md` format
 
@@ -51,24 +51,24 @@ Each skill updates its own stage's status line (and the summary, if it changes t
 
 ## Manifest creation rule
 
-**Any deep-* skill creates `00-Manifest/manifest.md` if it is absent** when the skill first writes to the effort directory. Manifest creation is *not* deep-plan-exclusive — a mid-series entry (e.g. reviewing code on a branch that never had a deep-plan) creates the manifest itself, with earlier stages marked `pending` or `n/a`.
+**Any deep-* skill creates `00-Manifest/manifest.md` if it is absent** when the skill first writes to the effort directory. Manifest creation is *not* deep-plan-exclusive - a mid-series entry (e.g. reviewing code on a branch that never had a deep-plan) creates the manifest itself, with earlier stages marked `pending` or `n/a`.
 
 ## Effort-name rules
 
 - `<effort-name>` is a **kebab-case slug**.
 - **deep-plan** proposes the slug derived from the feature name; the **user confirms** (or supplies their own) before anything is written.
-- **Autonomous-mode carve-out (deep-plan `--autonomous`):** an autonomous planning run never asks — the slug is either supplied up front via `--effort=<slug>` (e.g. by a caller naming the effort dir before dispatch) or auto-derived by the skill and **stated** in its output, not asked.
+- **Autonomous-mode carve-out (deep-plan `--autonomous`):** an autonomous planning run never asks - the slug is either supplied up front via `--effort=<slug>` (e.g. by a caller naming the effort dir before dispatch) or auto-derived by the skill and **stated** in its output, not asked.
 - **Mid-series entry without a plan** (any other deep-* skill starting fresh): ask the user for the effort name, **defaulting to the current branch name** (slugified).
 
 ## Add-on extensions
 
 Orchestrator add-ons that drive the deep-* series (dispatching the core skills over this same artifact tree) may extend the layout **without changing any core skill's behavior**:
 
-- `00-Manifest/pipeline.md` — orchestrator-owned pipeline state (rigor level, resolved stage list, dispatch records, gates, blockers, spend). Written only by the orchestrator.
-- `00-Manifest/run-report.md` — orchestrator-owned final run report.
-- `.deep-skills/rigor-map.json` (**repo level**, sibling of the effort dirs, not per-effort) — an optional user-edited override of an orchestrator's shipped rigor defaults.
+- `00-Manifest/pipeline.md` - orchestrator-owned pipeline state (rigor level, resolved stage list, dispatch records, gates, blockers, spend). Written only by the orchestrator.
+- `00-Manifest/run-report.md` - orchestrator-owned final run report.
+- `.deep-skills/rigor-map.json` (**repo level**, sibling of the effort dirs, not per-effort) - an optional user-edited override of an orchestrator's shipped rigor defaults.
 
-Ownership rule: core skills never read or write these files, and treat unknown files in `00-Manifest/` as opaque — each skill updates its own stage line in `manifest.md` and leaves everything else untouched. Likewise, an orchestrator never writes a core skill's stage line (it reads statuses; the summary paragraph is its only manifest write).
+Ownership rule: core skills never read or write these files, and treat unknown files in `00-Manifest/` as opaque - each skill updates its own stage line in `manifest.md` and leaves everything else untouched. Likewise, an orchestrator never writes a core skill's stage line (it reads statuses; the summary paragraph is its only manifest write).
 
 ## Legacy note
 
