@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How deep-goal picks models - model allocation - Deep Skills</title>
+<meta name="description" content="Three fixed model levels - smartest, smarter, smart - and one choice, --max, decide the exact model every deep-goal stage and helper runs on. Your current model runs deep-goal itself and interactive planning, and sets the default.">
+<link rel="canonical" href="https://deep-skills.com/deep-goal-models.html">
+
+<!-- Open Graph / Twitter -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Deep Skills">
+<meta property="og:title" content="How deep-goal picks models - model allocation - Deep Skills">
+<meta property="og:description" content="Three fixed model levels - smartest, smarter, smart - and one choice, --max, decide the exact model every deep-goal stage and helper runs on.">
+<meta property="og:url" content="https://deep-skills.com/deep-goal-models.html">
+<meta property="og:image" content="https://deep-skills.com/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How deep-goal picks models - model allocation - Deep Skills">
+<meta name="twitter:description" content="Three fixed model levels and one choice, --max, decide the exact model every deep-goal stage runs on.">
+<meta name="twitter:image" content="https://deep-skills.com/assets/og-image.png">
+
+<!-- Favicons (files arrive in Phase 5) -->
+<link rel="icon" href="assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#07080c">
+
+<!-- Fonts: preconnect to BOTH origins; display=swap is required -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/site.js" defer></script>
+</head>
+<body class="theme-goal">
+
+<a class="skip-link" href="#main">Skip to content</a>
+<div id="progress" aria-hidden="true"></div>
+<div class="glow a" aria-hidden="true"></div>
+<div class="glow b" aria-hidden="true"></div>
+
+<header class="site-nav">
+  <div class="wrap nav-row">
+    <a class="brand" href="index.html"><span class="brand-dot" aria-hidden="true"></span>Deep Skills</a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav id="nav-menu" class="nav-menu" aria-label="Primary">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="how-it-works.html">How it works</a></li>
+        <li class="nav-dropdown">
+          <button class="nav-dropbtn" aria-expanded="false" aria-controls="skills-menu">Skills</button>
+          <ul id="skills-menu" class="dropdown">
+            <li><a href="deep-plan.html">deep-plan</a></li>
+            <li><a href="deep-plan-review.html">deep-plan-review</a></li>
+            <li><a href="deep-implement.html">deep-implement</a></li>
+            <li><a href="deep-code-review.html">deep-code-review</a></li>
+            <li><a href="deep-bugfix.html">deep-bugfix</a></li>
+            <li><a href="deep-docs.html">deep-docs</a></li>
+            <li class="dropdown-sep" aria-hidden="true"></li>
+            <li><a href="deep-goal.html">deep-goal</a></li>
+            <li><a href="deep-goal-models.html">&rarr; model allocation</a></li>
+          </ul>
+        </li>
+        <li><a class="btn btn-primary" href="install.html">Install</a></li>
+        <li><a class="nav-gh" href="https://github.com/reurgency/Deep-Skills" aria-label="Deep Skills on GitHub" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82A7.65 7.65 0 018 4.5c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg></a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ===== hero ===== -->
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Advanced &middot; the conductor</p>
+      <h1>How <span class="grad">deep-goal</span> picks models</h1>
+      <p class="sub">Rigor decides <b>which</b> stages run. One more choice - <code>--max</code> - decides <b>how smart</b> the models get. From those two, every stage and every helper agent gets a named model, set explicitly. You see the whole list on the launch card before anything runs.</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="deep-goal.html">Back to deep-goal</a>
+        <a class="btn btn-ghost" href="#by-max">Jump to the stage table</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== the idea in plain words ===== -->
+  <section class="band">
+    <div class="wrap narrow">
+      <div class="section-head reveal">
+        <p class="kicker">In plain words</p>
+        <h2>Three levels, one choice, a named model everywhere</h2>
+        <p>There are three model levels - <b>smartest</b>, <b>smarter</b>, and <b>smart</b> - and each is pinned to specific models. You choose the highest level a run may use with <code>--max</code> (or answer the question deep-goal asks at launch). A fixed table then says which model each stage runs on, and each stage's own helpers pick their models the same way the skill does when you run it on its own.</p>
+      </div>
+      <div class="callout reveal">
+        <span class="callout-icon" aria-hidden="true">&#129504;</span>
+        <p><b>Your current model is not the model your stages run on.</b> The model you're chatting in runs deep-goal itself and interactive planning, and it sets the <i>suggested</i> <code>--max</code>. Everything deep-goal launches - plan review, implementation, code review, bug fixing, docs - runs on the model the table names, which can be smarter than your session. That's intended.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== the three levels ===== -->
+  <section>
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">The levels</p>
+        <h2>Smartest, smarter, smart</h2>
+        <p>Each level names a current model and the previous one to fall back to. A run stays in your session's model family - a Claude session uses the Claude column, a GPT session the GPT column.</p>
+      </div>
+      <div class="table-scroll reveal" tabindex="0" role="region" aria-label="The three model levels">
+        <table class="matrix">
+          <thead>
+            <tr>
+              <th scope="col">Level</th>
+              <th scope="col">Claude</th>
+              <th scope="col">GPT</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">smartest</th><td><b>Fable 5.2</b> <span class="faint">(then Fable 5)</span></td><td><b>Astra-6</b> <span class="faint">(then GPT-5.6 Sol)</span></td></tr>
+            <tr><th scope="row">smarter</th><td><b>Opus 5.5</b> <span class="faint">(then Opus 5)</span></td><td><b>GPT-6-Sol</b> <span class="faint">(then GPT-5.6 Terra)</span></td></tr>
+            <tr><th scope="row">smart</th><td><b>Sonnet 5.5</b> <span class="faint">(then Sonnet 5)</span></td><td><b>GPT-6.1-Terra</b> <span class="faint">(then GPT-5.6 Luna)</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fn reveal">Smart is the lowest level any agent uses - small models (Haiku, GPT mini/nano) never run, because every job in the pipeline is reasoning work. GPT names are display names until the host model IDs are confirmed. The exact IDs live in the skills' shared model map.</p>
+    </div>
+  </section>
+
+  <!-- ===== your current model ===== -->
+  <section class="band">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">Your current model</p>
+        <h2>What the model you're chatting in actually does</h2>
+      </div>
+      <div class="grid cols-3">
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#9881;</div>
+          <h3>Runs deep-goal itself</h3>
+          <p>The conductor - sequencing stages, checking artifacts, writing the run report - runs in your session, on your current model.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#128172;</div>
+          <h3>Runs interactive planning</h3>
+          <p>At mvp and prod you answer planning questions, so planning runs inline in your session. If your model is below the planning level you chose, the launch card suggests switching with <code>/model</code> (or your assistant's model picker) first.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#127919;</div>
+          <h3>Sets the suggested <code>--max</code></h3>
+          <p>Leave <code>--max</code> off and deep-goal asks, recommending your current model's level - Opus 5.5 suggests smarter, Fable 5.2 suggests smartest. You can pick higher or lower.</p>
+        </div>
+      </div>
+      <p class="fn reveal">On assistants that can't run background agents (Codex, Cursor, and Copilot today), each stage's lead also runs in your session; the helper agents inside a stage still use the level you chose, and the launch card says so.</p>
+    </div>
+  </section>
+
+  <!-- ===== --max x stage ===== -->
+  <section id="by-max">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">Choose the model level</p>
+        <h2>What each stage runs on, for each <code>--max</code></h2>
+        <p>Say <code>--max=smartest</code> or just <i>&ldquo;use the smartest models&rdquo;</i> (<i>&ldquo;keep it to smarter models&rdquo;</i>, <i>&ldquo;max smart&rdquo;</i>). The principle: <b>planners and reviewers &ge; builders &ge; documenters.</b> Claude models shown.</p>
+      </div>
+      <div class="table-scroll reveal" tabindex="0" role="region" aria-label="Stage models by --max choice">
+        <table class="matrix">
+          <thead>
+            <tr>
+              <th scope="col">Stage</th>
+              <th scope="col"><code>--max=smartest</code></th>
+              <th scope="col"><code>--max=smarter</code></th>
+              <th scope="col"><code>--max=smart</code></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">plan</th><td>Fable 5.2</td><td>Opus 5.5</td><td>Sonnet 5.5</td></tr>
+            <tr><th scope="row">plan review</th><td>Fable 5.2</td><td>Opus 5.5</td><td>Sonnet 5.5</td></tr>
+            <tr><th scope="row">implement</th><td>Opus 5.5</td><td>Opus 5.5</td><td>Sonnet 5.5</td></tr>
+            <tr><th scope="row">code review <span class="faint">(+ triage, re-reviews)</span></th><td>Fable 5.2</td><td>Opus 5.5</td><td>Sonnet 5.5</td></tr>
+            <tr><th scope="row">bug fix</th><td>Opus 5.5</td><td>Opus 5.5</td><td>Sonnet 5.5</td></tr>
+            <tr><th scope="row">docs</th><td>Sonnet 5.5</td><td>Sonnet 5.5</td><td>Sonnet 5.5</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fn reveal">Why implement and bug fix stay on Opus 5.5 even at smartest: the builder follows a plan (or a diagnosis) the smartest model already wrote and reviewed. Docs describe code that already exists, so Sonnet 5.5 is enough at every level.</p>
+    </div>
+  </section>
+
+  <!-- ===== helpers inside each stage ===== -->
+  <section class="band">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">Inside each stage</p>
+        <h2>Who the helpers run on</h2>
+        <p>Every stage is told your <code>--max</code>, so its helper agents get exactly the models they'd get if you ran that skill on its own. The jobs that decide the outcome stay on the stage's model; sweeps and checks run lower.</p>
+      </div>
+      <div class="table-scroll reveal" tabindex="0" role="region" aria-label="Helper agent models by --max choice">
+        <table class="matrix">
+          <thead>
+            <tr>
+              <th scope="col">Helper</th>
+              <th scope="col">smartest</th>
+              <th scope="col">smarter</th>
+              <th scope="col">smart</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Plan review: user-alignment checker</th><td>Fable 5.2</td><td>Opus 5.5</td><td>Sonnet 5.5</td></tr>
+            <tr><th scope="row">Plan review: duplication, patterns, coherence checkers</th><td>Opus 5.5</td><td>Sonnet 5.5</td><td>Sonnet 5.5</td></tr>
+            <tr><th scope="row">Implement: phase builders</th><td>Opus 5.5</td><td>Opus 5.5</td><td>Sonnet 5.5</td></tr>
+            <tr><th scope="row">Code review: main bug-hunting finders</th><td>Fable 5.2</td><td>Opus 5.5</td><td>Sonnet 5.5</td></tr>
+            <tr><th scope="row">Code review: diff-scan, conformance, coherence</th><td>Opus 5.5</td><td>Sonnet 5.5</td><td>Sonnet 5.5</td></tr>
+            <tr><th scope="row">Code review: quality checker</th><td>Sonnet 5.5</td><td>Sonnet 5.5</td><td>Sonnet 5.5</td></tr>
+            <tr><th scope="row">Code review: verifier for findings rated 6+</th><td>Fable 5.2</td><td>Opus 5.5</td><td>Sonnet 5.5</td></tr>
+            <tr><th scope="row">Code review: verifier for findings rated 5</th><td>Sonnet 5.5</td><td>Sonnet 5.5</td><td>Sonnet 5.5</td></tr>
+            <tr><th scope="row">Bug fix: diagnosis</th><td>Fable 5.2</td><td>Opus 5.5</td><td>Sonnet 5.5</td></tr>
+            <tr><th scope="row">Bug fix: the fix</th><td>Opus 5.5</td><td>Opus 5.5</td><td>Sonnet 5.5</td></tr>
+            <tr><th scope="row">Bug fix: proof the fix works</th><td>Fable 5.2</td><td>Opus 5.5</td><td>Sonnet 5.5</td></tr>
+            <tr><th scope="row">Bug fix: tests and side-effect checks</th><td>Sonnet 5.5</td><td>Sonnet 5.5</td><td>Sonnet 5.5</td></tr>
+            <tr><th scope="row">Docs: survey and verify</th><td>Sonnet 5.5</td><td>Sonnet 5.5</td><td>Sonnet 5.5</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="fn reveal">
+        <p><b>Code review</b> with a single reviewer (poc, mvp) runs on the stage's model - Fable 5.2 at smartest. The main bug-hunting finders (removed behavior, write-to-read tracing, last-mile wiring, frozen state) found every serious bug in calibration, so they stay on the stage's model. A finding rated 5 that a verifier raises to 6 or more is re-checked on the stage's model. <code>--mega</code> puts every finder and verifier on the stage's model.</p>
+        <p><b>Bug fix:</b> the smartest model you allow writes the diagnosis; the stage's model implements exactly that. The proof runs on the <code>--max</code> model whenever a defect in the cluster is rated 5 or higher (on the stage's model - Opus 5.5 - when every defect is rated below 5).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== per-rigor breakdown ===== -->
+  <section id="by-rigor">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">Stage &times; rigor</p>
+        <h2>What runs where, at each rigor level</h2>
+        <p>Rigor changes <i>which</i> stages run and <i>whether</i> reviews use a team of helpers - never a stage's model. Shown for <code>--max=smartest</code>; for the other choices, read the stage table above. A dash means the stage doesn't run at that rigor.</p>
+      </div>
+      <div class="table-scroll reveal" tabindex="0" role="region" aria-label="Models by stage and rigor at --max=smartest">
+        <table class="matrix">
+          <thead>
+            <tr>
+              <th scope="col">Stage</th>
+              <th scope="col">yolo</th>
+              <th scope="col">poc</th>
+              <th scope="col">mvp</th>
+              <th scope="col">prod</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">plan</th>
+              <td>smartest &middot; Fable 5.2 <span class="faint">(autonomous)</span></td>
+              <td>smartest &middot; Fable 5.2 <span class="faint">(autonomous)</span></td>
+              <td>your session<sup>1</sup> <span class="faint">(interactive)</span></td>
+              <td>your session<sup>1</sup> <span class="faint">(interactive)</span></td>
+            </tr>
+            <tr>
+              <th scope="row">plan review</th>
+              <td>&mdash;</td>
+              <td>&mdash;</td>
+              <td>smartest &middot; Fable 5.2 <span class="faint">(one reviewer)</span></td>
+              <td>smartest &middot; Fable 5.2 <span class="faint">+ helper team<sup>2</sup></span></td>
+            </tr>
+            <tr>
+              <th scope="row">implement</th>
+              <td>smarter &middot; Opus 5.5</td>
+              <td>smarter &middot; Opus 5.5</td>
+              <td>smarter &middot; Opus 5.5</td>
+              <td>smarter &middot; Opus 5.5</td>
+            </tr>
+            <tr>
+              <th scope="row">code review</th>
+              <td>&mdash;</td>
+              <td>smartest &middot; Fable 5.2 <span class="faint">(one reviewer)</span></td>
+              <td>smartest &middot; Fable 5.2 <span class="faint">(one reviewer)</span></td>
+              <td>smartest &middot; Fable 5.2 <span class="faint">+ helper team<sup>2</sup></span></td>
+            </tr>
+            <tr>
+              <th scope="row">bug fix</th>
+              <td>&mdash;</td>
+              <td>smarter &middot; Opus 5.5<sup>3</sup></td>
+              <td>smarter &middot; Opus 5.5<sup>3</sup></td>
+              <td>smarter &middot; Opus 5.5<sup>3</sup></td>
+            </tr>
+            <tr>
+              <th scope="row">docs</th>
+              <td>&mdash;</td>
+              <td>&mdash;</td>
+              <td>smart &middot; Sonnet 5.5</td>
+              <td>smart &middot; Sonnet 5.5</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="fn reveal">
+        <p><sup>1</sup> <b>Interactive planning runs on your current model.</b> You're present and answering questions, so it runs inline in your session. With <code>--from-plan</code> there's no planning at all - deep-goal adopts the plan you already made and starts at plan review.</p>
+        <p><sup>2</sup> <b>Helper team (prod):</b> the helpers in the table above - the deciding checkers on Fable 5.2, the sweeps on Opus 5.5 and Sonnet 5.5.</p>
+        <p><sup>3</sup> <b>Bug fix</b> diagnosis and proof run on Fable 5.2; the fix itself on Opus 5.5; tests on Sonnet 5.5.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== exceptions ===== -->
+  <section class="band">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">Two honest exceptions</p>
+        <h2>Where reality bends the table - openly</h2>
+      </div>
+      <div class="grid cols-2">
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#128172;</div>
+          <h3>Interactive planning runs on your session</h3>
+          <p>A background agent can't ask you questions, so mvp/prod planning runs inline while you're present - on the model you're chatting in. If that's below the planning level you chose, the launch card says so and suggests switching with <code>/model</code> before you launch.</p>
+        </div>
+        <div class="card reveal">
+          <div class="card-icon" aria-hidden="true">&#9207;</div>
+          <h3>Can't reach a model? Older first, then a level down</h3>
+          <p>If your plan or org blocks a model, that stage first tries the same level's previous model (Fable 5 for Fable 5.2), then the next level down (Opus 5.5) - never below smart, never a small model. The pipeline file and the run report record what actually ran, e.g. &ldquo;smartest ran on Fable 5 (no Fable 5.2 access).&rdquo;</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== customizing ===== -->
+  <section>
+    <div class="wrap narrow">
+      <div class="section-head reveal">
+        <p class="kicker">Make it yours</p>
+        <h2>Repin a model, or move a stage's level</h2>
+        <p>Drop a <code>.deep-skills/model-map.json</code> at your repo root. List only the keys you want to change - it merges over the shipped map, applies to deep-goal <i>and</i> every deep-skills skill run on its own, and is checked at launch: an invalid file stops the run before anything is written, naming the key and the values it accepts.</p>
+      </div>
+      <p class="reveal">Example - when you choose <code>--max=smartest</code>, write docs on Opus 5.5 (smarter) instead of Sonnet 5.5:</p>
+      <pre class="reveal"><code>{"stages":{"smartest":{"docs":"smarter"}}}</code></pre>
+      <p class="fn reveal">Under <code>ladder</code> you can repin a level to different models; under <code>stages</code> you can move a stage to another level, as long as it doesn't go above the <code>--max</code> it sits under (<code>stages.smart.docs = "smartest"</code> is refused). The helper assignments inside each skill aren't configurable.</p>
+      <div class="callout reveal">
+        <span class="callout-icon" aria-hidden="true">&#128200;</span>
+        <p><b>Coming: the Deep Dashboard.</b> A configuration surface to view your active directive cards and edit these model settings without hand-writing JSON. This page describes the defaults it will ship with.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== prev/next ===== -->
+  <nav class="skillnav wrap" aria-label="Skill navigation">
+    <a href="deep-goal.html">
+      <span class="dir">&larr; The conductor</span>
+      <span class="name">deep-goal</span>
+    </a>
+    <a class="next" href="install.html">
+      <span class="dir">Get started &rarr;</span>
+      <span class="name">Install</span>
+    </a>
+  </nav>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-cta">
+      <h2>Get started in one command</h2>
+      <p>Install the Deep Skills plugin and run your first <code>/deep-plan</code>.</p>
+      <!-- Install snippet: verbatim from README.md's Claude Code install block (D1 - slug as written) -->
+      <div class="chip-stack">
+        <code class="chip no-prompt">/plugin marketplace add reurgency/marketplace</code>
+        <code class="chip no-prompt">/plugin install deep-skills@reurgency</code>
+      </div>
+      <div class="btn-row" style="margin-top:22px">
+        <a class="btn btn-primary" href="install.html">Install Deep Skills</a>
+      </div>
+    </div>
+    <div class="footer-meta">
+      <span>&copy; 2026 Deep Skills &middot; MIT License</span>
+      <div class="footer-links">
+        <a href="how-it-works.html">How it works</a>
+        <a href="install.html">Install</a>
+        <a href="https://github.com/reurgency/Deep-Skills">GitHub</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

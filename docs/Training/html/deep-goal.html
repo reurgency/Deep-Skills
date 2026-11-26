@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Add-on · deep-goal — Deep Skills Training</title>
-<meta name="description" content="Run the whole deep-* relay from one invocation — an autonomous, rigor-gated conductor. Optional paid add-on to the six-skill deep-skills plugin; the core skills never require it.">
+<meta name="description" content="Run the whole deep-* relay from one invocation — an autonomous, rigor-gated conductor. Optional free add-on to the six-skill deep-skills plugin; the core skills never require it.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -32,7 +32,7 @@
 </nav>
 
 <section class="hero wrap narrow">
-  <div class="ep-badge"><span class="pill">ADD-ON · PAID</span><span class="label">Conduct</span></div>
+  <div class="ep-badge"><span class="pill">ADD-ON · FREE</span><span class="label">Conduct</span></div>
   <h1><span class="grad">deep-goal</span></h1>
   <p class="kicker"><code>/deep-goal</code> runs one effort through the <b>whole deep-* relay from a single invocation</b> — plan → review → implement → code-review → bugfix → docs — with a <b>rigor level</b> selecting which stages run and how hard they try. A <b>thin conductor</b>: it sequences and verifies; it never writes plans, source, reviews, or docs itself. <b>Optional add-on — not a seventh bundled skill;</b> the six core skills never require it.</p>
   <div class="chips center" style="justify-content:center">
@@ -40,7 +40,8 @@
     <span class="chip"><span class="d"></span> Rigor: yolo · poc · mvp · prod</span>
     <span class="chip"><span class="d"></span> Artifacts, never transcripts</span>
     <span class="chip"><span class="d"></span> Advance test, not narratives</span>
-    <span class="chip"><span class="d"></span> Requires deep-skills ≥ 0.2.0</span>
+    <span class="chip"><span class="d"></span> Models: smartest · smarter · smart</span>
+    <span class="chip"><span class="d"></span> Requires deep-skills ≥ 0.3.0</span>
   </div>
 </section>
 
@@ -52,6 +53,7 @@
   <a href="#objectives">Learning objectives</a>
   <a href="#model">Mental model</a>
   <a href="#rigor">The rigor dial</a>
+  <a href="#models">Model allocation</a>
   <a href="#walkthrough">How a run works</a>
   <a href="#loop">The review→fix loop</a>
   <a href="#blockers">Blocker policy</a>
@@ -75,6 +77,8 @@
     <div class="o"><span class="i">4</span><p>Predict the <b>review→fix loop</b> at each rigor: triage thresholds, the re-review cap, convergence vs halt.</p></div>
     <div class="o"><span class="i">5</span><p>Classify blockers as <b>spine (HALT)</b> vs <b>tail (CONTINUE)</b> and know the conductor's action for each.</p></div>
     <div class="o"><span class="i">6</span><p><b>Resume</b> a killed or paused run from <code>pipeline.md</code>, and audit the <b>run report</b> for every decision made alone.</p></div>
+    <div class="o"><span class="i">7</span><p>Explain <b>model allocation</b>: three fixed model levels, how <code>--max</code> picks each stage's model, what your current model still decides — and read the <b>launch card</b> before anything runs.</p></div>
+    <div class="o"><span class="i">8</span><p><b>Hand off a plan you made yourself</b> — finish an interactive <code>/deep-plan</code>, then let deep-goal run the rest with <code>--from-plan</code>.</p></div>
   </div>
 </section>
 
@@ -107,13 +111,52 @@
   </div>
 </section>
 
+<section class="sec" id="models">
+  <div class="sec-tag">A second dial</div>
+  <h2>Model allocation — three fixed levels, capped by <code>--max</code></h2>
+  <p>Rigor picks <i>which</i> stages run; <b><code>--max</code></b> picks <i>what model each stage runs on</i>. deep-goal uses the same model map as every deep-skills skill (<code>references/model-map.json</code> for the models, <code>references/model-map.md</code> for the rules). Three levels, each pinned to specific models — they don't shift with the model you happen to be chatting in:</p>
+  <div class="tbl-wrap reveal">
+    <table>
+      <thead><tr><th style="width:140px">Level</th><th>Claude</th><th>GPT</th></tr></thead>
+      <tbody>
+        <tr><td><b>smartest</b></td><td>Fable 5.2 (then Fable 5)</td><td>Astra-6 (then GPT-5.6 Sol)</td></tr>
+        <tr><td><b>smarter</b></td><td>Opus 5.5 (then Opus 5)</td><td>GPT-6-Sol (then GPT-5.6 Terra)</td></tr>
+        <tr><td><b>smart</b></td><td>Sonnet 5.5 (then Sonnet 5)</td><td>GPT-6.1-Terra (then GPT-5.6 Luna)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>A run stays in your session's model family. Smart is the floor — small models (Haiku, GPT-mini/nano) never run. What each stage runs on, by <code>--max</code> (Claude models shown):</p>
+  <div class="tbl-wrap reveal">
+    <table>
+      <thead><tr><th style="width:220px">Stage</th><th><code>--max=smartest</code></th><th><code>--max=smarter</code></th><th><code>--max=smart</code></th></tr></thead>
+      <tbody>
+        <tr><td>plan</td><td>Fable 5.2</td><td>Opus 5.5</td><td>Sonnet 5.5</td></tr>
+        <tr><td>plan review</td><td>Fable 5.2</td><td>Opus 5.5</td><td>Sonnet 5.5</td></tr>
+        <tr><td>implement</td><td>Opus 5.5</td><td>Opus 5.5</td><td>Sonnet 5.5</td></tr>
+        <tr><td>code review (+ triage, re-reviews)</td><td>Fable 5.2</td><td>Opus 5.5</td><td>Sonnet 5.5</td></tr>
+        <tr><td>bug fix</td><td>Opus 5.5</td><td>Opus 5.5</td><td>Sonnet 5.5</td></tr>
+        <tr><td>docs</td><td>Sonnet 5.5</td><td>Sonnet 5.5</td><td>Sonnet 5.5</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>The principle: <b>planners and reviewers ≥ builders ≥ documenters.</b> Every stage is also told your <code>--max</code>, so its own helper agents pick their models exactly as the skill would standalone (e.g. code review's quality checker runs on Sonnet 5.5).</p>
+  <div class="grid c2" style="margin-top:8px">
+    <div class="callout decision" style="margin:0"><span class="t">What your current model decides</span><p>Two things: the <b>recommended <code>--max</code></b> (its own level — omit the flag and deep-goal asks), and <b>whatever runs in your session</b> — the conductor and <b>interactive planning at mvp/prod</b>, which runs inline because you're present. Below the planning level you chose? The launch card suggests switching with <code>/model</code> (or your assistant's model picker) first. Stages may run <i>above</i> your current model — that's intended.</p></div>
+    <div class="callout note" style="margin:0"><span class="t">Can't reach a model?</span><p>If your plan or org blocks one, the stage tries the same level's previous generation, then the next level down — never below smart. <code>pipeline.md</code> and the run report record the model that actually ran (e.g. "smartest ran on Fable 5"). On hosts without background agents each stage's lead runs in your session; helper agents still use the level you chose.</p></div>
+  </div>
+  <div class="callout why">
+    <span class="t">Customizing — <code>.deep-skills/model-map.json</code></span>
+    <p>Drop this file at your repo root to repin a model or move a stage's level — for every deep-skills skill and deep-goal. Only the keys you change; it merges over the shipped map and is validated at launch (an invalid file stops the run before anything is written). Example — run docs on Opus 5.5 when you choose smartest: <code>{"stages":{"smartest":{"docs":"smarter"}}}</code></p>
+  </div>
+</section>
+
 <section class="sec" id="walkthrough">
   <div class="sec-tag">How a run works</div>
   <h2>Launch to report, module by module</h2>
   <ol class="steps">
-    <li><span class="module">Module 1</span><h4>Launch: handshake &amp; resolution</h4><p>Re-entry check first (a prior <code>pipeline.md</code> → resume/fresh question) → resolve rigor from the merged map (omitted → one structured question, recommends mvp) → <b>version handshake</b>: deep-skills ≥ 0.2.0 or a polite refusal → settle the effort slug → write the initial <code>pipeline.md</code>. State exists from launch; even a crash during planning is resumable.</p></li>
-    <li><span class="module">Module 2</span><h4>Preview with <code>--dry-run</code></h4><p>Say <i>"preview the run"</i>: prints the resolved stage list with per-stage modes/flags, triage threshold, re-review cap, gates, and uncalibrated cost bands — then stops. Dispatches nothing, writes nothing, needs no handshake. The cheapest question you can ask the add-on.</p></li>
-    <li><span class="module">Module 3</span><h4>The planning window</h4><p>Autonomous (yolo/poc): one dispatched <code>deep-plan --autonomous --effort=&lt;slug&gt;</code> (+ columbo per the map) — zero questions; every self-answered decision lands as an <b>Assumptions</b> row, reproduced verbatim in the run report. Interactive (mvp/prod): <code>/deep-plan</code> inline with the map's <code>--rounds</code>. Planning completes when <code>plan.md</code> exists — the autonomy boundary.</p></li>
+    <li><span class="module">Module 1</span><h4>Launch: handshake, questions &amp; the launch card</h4><p>Re-entry check first (a prior <code>pipeline.md</code> → resume/fresh question) → <b>version handshake</b>: deep-skills ≥ 0.3.0 or a polite refusal → missing rigor and/or <code>--max</code> asked as <b>one batched question set</b> (rigor recommends mvp; max recommends your current model's level, previewing each stage's model) → the <b>launch card</b>: goal, effort name, rigor, max, the model each stage will run on, at most one warning line. At <b>mvp/prod it waits</b> for Launch (also confirms the effort name) · change rigor or max · edit goal or name · cancel — <b>nothing is written before Launch</b>. At yolo/poc it prints and goes. Then the initial <code>pipeline.md</code> is written; even a crash during planning is resumable.</p></li>
+    <li><span class="module">Module 2</span><h4>Preview with <code>--dry-run</code></h4><p>Say <i>"preview the run"</i>: prints the resolved stage list with per-stage modes/flags and models, triage threshold, re-review cap, gates, and uncalibrated cost bands — then stops. Dispatches nothing, writes nothing, needs no handshake. The cheapest question you can ask the add-on.</p></li>
+    <li><span class="module">Module 3</span><h4>The planning window</h4><p>Autonomous (yolo/poc): one dispatched <code>deep-plan --autonomous --effort=&lt;slug&gt;</code> (+ columbo per the map) — zero questions; every self-answered decision lands as an <b>Assumptions</b> row, reproduced verbatim in the run report. Interactive (mvp/prod): <code>/deep-plan</code> inline with the map's <code>--rounds</code> and <code>--confirmed</code> (the card already confirmed the goal), on your current model. Planning completes when <code>plan.md</code> exists — the autonomy boundary. <b>Already planned?</b> An interactive standalone <code>/deep-plan</code> offers to hand off to deep-goal; or say <i>"continue from my plan"</i> (<code>--from-plan</code>) — the plan is adopted and the run starts at plan review (mvp/prod) or implement (yolo/poc).</p></li>
     <li><span class="module">Module 4</span><h4>Dispatch + advance test</h4><p>Per stage: mark <code>in-flight</code> → render the stage briefing (the subagent's <b>entire prompt</b>) → one fresh subagent → advance test → complete the record. One stage in flight at a time. Triage is a <b>second dispatch</b> of deep-code-review, tested on findings.json statuses + the certificate's Triage outcomes table. The conductor is <b>read-only on manifest stage lines</b>.</p></li>
     <li><span class="module">Module 5</span><h4>Boundary machinery</h4><p>At every stage boundary, in order: round accounting → <b>budget check</b> → <b>gate check</b> → next dispatch. Pauses land <i>between</i> stages — a dispatched stage always finishes. Notifications fire on exactly four triggers: halts, gates, budget pauses, completion.</p></li>
     <li><span class="module">Module 6</span><h4>Completion</h4><p>Write <code>00-Manifest/run-report.md</code> → update the manifest effort summary (the conductor's <b>only</b> manifest write, ever) → notify → deliver the full report as the closing message.</p></li>
@@ -155,8 +198,10 @@
       <thead><tr><th style="width:190px">Flag</th><th>Say</th><th>What it does</th></tr></thead>
       <tbody>
         <tr><td><i>(goal argument)</i></td><td><i>"run deep-goal on &lt;feature&gt;"</i></td><td>The feature/goal to take through the pipeline.</td></tr>
-        <tr><td><code>--rigor=&lt;level&gt;</code></td><td><i>"at mvp rigor," "yolo it"</i></td><td>Select the rigor level. Omitted → one structured question (recommends mvp).</td></tr>
-        <tr><td><code>--dry-run</code></td><td><i>"preview the run"</i></td><td>Print the resolved pipeline + cost bands, then stop. Dispatches nothing; exempt from the handshake.</td></tr>
+        <tr><td><code>--rigor=&lt;level&gt;</code></td><td><i>"at mvp rigor," "yolo it"</i></td><td>Select the rigor level. Omitted → asked before launch, together with <code>--max</code> if that's missing too (recommends mvp).</td></tr>
+        <tr><td><code>--max=&lt;level&gt;</code></td><td><i>"use the smartest models," "keep it to smarter models," "max smart"</i></td><td>Highest model level any stage may use (smartest / smarter / smart). With smartest: planning, plan review and code review on Fable 5.2, building and bug fixing on Opus 5.5, docs on Sonnet 5.5. Omitted → asked (recommends your current model's level).</td></tr>
+        <tr><td><code>--from-plan[=&lt;path&gt;]</code></td><td><i>"continue from my plan"</i></td><td>Adopt a plan you already made with <code>/deep-plan</code> instead of planning again; starts at plan review (mvp/prod) or implement (yolo/poc). No path → finds it, or asks which.</td></tr>
+        <tr><td><code>--dry-run</code></td><td><i>"preview the run"</i></td><td>Print the resolved pipeline — each stage with its model — plus cost bands, then stop. Dispatches nothing; exempt from the handshake.</td></tr>
         <tr><td><code>--budget=&lt;band&gt;</code></td><td><i>"cap spend at ~500k tokens"</i></td><td>Soft token ceiling, checked between stages; crossing pauses + notifies; resume continues.</td></tr>
         <tr><td><code>--gate=&lt;stage&gt;</code></td><td><i>"pause before implement"</i></td><td>Human checkpoint before a named stage, even in an autonomous run; persisted; fires once.</td></tr>
         <tr><td><code>--worktree</code></td><td><i>"build in a worktree"</i></td><td>One conductor-owned worktree for every post-planning stage (plan-review's briefing carries it too — inert for a read-only stage); report carries path + merge instructions.</td></tr>
@@ -165,7 +210,7 @@
   </div>
   <div class="callout decision">
     <span class="t">The two core hooks it leans on (free-tier features)</span>
-    <p><code>deep-plan --autonomous --effort=&lt;slug&gt; [--columbo] [--rounds=&lt;n&gt;]</code> and <code>deep-code-review --triage --auto-accept-min=&lt;sev&gt;</code> shipped in deep-skills 0.2.0 as free-standing features — useful without deep-goal, documented on their own skill pages. That's why the handshake requires ≥ 0.2.0.</p>
+    <p><code>deep-plan --autonomous --effort=&lt;slug&gt; [--columbo] [--rounds=&lt;n&gt;]</code> and <code>deep-code-review --triage --auto-accept-min=&lt;sev&gt;</code> are free-standing deep-skills features — useful without deep-goal, documented on their own skill pages. deep-skills 0.3.0 added what this version also relies on: <code>--max</code> on every skill and deep-plan's <code>--confirmed</code>. That's why the handshake requires ≥ 0.3.0.</p>
   </div>
 </section>
 
@@ -197,6 +242,9 @@
   <div class="mistake"><p><b>Expecting mid-run questions</b> — after <code>plan.md</code> exists it won't ask. Want a checkpoint? That's <code>--gate</code>, set at launch.</p></div>
   <div class="mistake"><p><b>Trusting a subagent's "done"</b> — the conductor never does; the advance test is the only evidence.</p></div>
   <div class="mistake"><p><b>Hand-editing <code>pipeline.md</code></b> or another skill's manifest line — pipeline state is conductor-owned; stage lines are each skill's own.</p></div>
+  <div class="mistake"><p><b>Assuming your current model decides every stage</b> — it only sets the recommended <code>--max</code> and what runs in your session. Starting in Sonnet 5.5 with <code>--max=smartest</code> still builds on Opus 5.5 and reviews on Fable 5.2.</p></div>
+  <div class="mistake"><p><b>Planning at mvp/prod below the level you chose</b> — interactive planning runs in your session. If the card warns, switch with <code>/model</code> (or your assistant's model picker) before Launch.</p></div>
+  <div class="mistake"><p><b>Re-planning work you already planned</b> — say <i>"continue from my plan"</i> (<code>--from-plan</code>) instead.</p></div>
   <div class="mistake"><p><b>Ignoring auto-deferred findings</b> because the run "passed" — deferral is loud by design; triage the report's list like any Deferreds row.</p></div>
   <div class="mistake"><p><b>Prod rigor on a non-Claude-Code host</b> — the inline fallback is functional but may hit context limits; see HOSTS.md.</p></div>
 </section>
@@ -211,6 +259,8 @@
     <li>Correctly predicted HALT vs CONTINUE for a spine and a tail blocker.</li>
     <li>Killed and resumed a run with no duplicated stage side effects.</li>
     <li>Authored a repo rigor override that survives launch validation.</li>
+    <li>Read a launch card and predicted each stage's model for a <code>--max</code> you chose.</li>
+    <li>Handed an interactive <code>/deep-plan</code> to deep-goal with <code>--from-plan</code>.</li>
   </ul>
 </section>
 
@@ -223,9 +273,12 @@
       <dt>Input</dt><dd>A goal/feature + a rigor level (yolo / poc / mvp / prod, or a repo-defined level)</dd>
       <dt>Output</dt><dd>The six skills' own artifacts + <code>pipeline.md</code> (state) + <code>run-report.md</code> (accountability)</dd>
       <dt>Interactivity</dt><dd>Planning window only; then gates and budget pauses, nothing else waits</dd>
+      <dt>Models</dt><dd>smartest (Fable 5.2) · smarter (Opus 5.5) · smart (Sonnet 5.5); <code>--max</code> picks each stage's model, default = your current model's level; interactive planning runs in your session</dd>
+      <dt>Launch card</dt><dd>Goal, effort, rigor, max, model per stage, ≤ 1 warning; waits for Launch at mvp/prod</dd>
+      <dt>From a plan</dt><dd><code>--from-plan</code> adopts your <code>/deep-plan</code> plan; starts at plan review (mvp/prod) or implement (yolo/poc)</dd>
       <dt>Advance test</dt><dd>Artifact at canonical path AND manifest line flipped (round-aware in the loop)</dd>
       <dt>Hard rules</dt><dd>Never writes code/plans/reviews/docs; read-only on stage lines; artifacts are the only inter-stage channel; refuses at launch, never mid-run</dd>
-      <dt>Requires</dt><dd>deep-skills ≥ 0.2.0 (verified at launch); core never requires deep-goal back</dd>
+      <dt>Requires</dt><dd>deep-skills ≥ 0.3.0 (verified at launch); core never requires deep-goal back</dd>
     </dl>
   </div>
 </section>

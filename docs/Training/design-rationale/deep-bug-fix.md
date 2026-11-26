@@ -21,6 +21,7 @@
 - [7. A tuned independence model (continuity to diagnose, fresh agent to prove)](#7-tuned-independence-model)
 - [8. Boundary: triage still decides; bug-fix only executes the `accepted` set](#8-boundary-triage-still-decides)
 - [9. Deep-Learn `--learn` emits a cause-truthed record](#9-deep-learn---learn-record)
+- [10. Diagnose and fix as two agents, joined by a written diagnosis (0.3.0)](#10-diagnose-and-fix-split)
 
 ---
 
@@ -108,6 +109,9 @@ that DNA exactly where it pays — the proof stage, so the fixer can't grade its
 where continuity is the whole point. The fix agent still gets evidence + codebase + plan but *not*
 the implementer's transcript, and the recommendation arrives flagged "hypothesis — do not trust"
 (`docs/roadmap/DEEP-BUG-FIX-DESIGN.md:61-67`).
+*(Superseded in part by decision 10: since deep-skills 0.3.0 diagnose and fix are two agents, and
+the continuity this decision protects is carried by a written diagnosis file instead of a shared
+agent. The proof-stage independence is unchanged.)*
 
 ## 8. Boundary: triage still decides
 **What it does.** Triage stays the decision step (fix / defer / reject); deep-bug-fix is the
@@ -134,6 +138,34 @@ carries the review's *guess* at root cause.
 the fix) plus which findings collapsed into one cluster is strictly better signal for the Ledger's
 recurrence and overfitting guards than review's guess. It is opt-in because Deep-Learn isn't built
 yet, making the reader a forward dependency (`docs/roadmap/DEEP-BUG-FIX-DESIGN.md:36,104`).
+
+## 10. Diagnose-and-fix split
+**What it does.** Since deep-skills 0.3.0 (user-approved 2026-11-25) each cluster gets **two agents
+in sequence** (`plugins/deep-skills/skills/deep-bugfix/references/clustering-and-diagnosis.md:27-33`):
+a read-only **diagnose agent** at the run's `--max` level (e.g. Fable 5.2 with smartest) confirms the
+root cause and writes it — cited chain, comparison with the review's hypothesis, fix approach,
+files to touch — to a per-cluster file `06-Bug-Fix/round-N/diagnosis-<CL-K>.md`
+(`clustering-and-diagnosis.md:39-43`, `templates/diagnosis.md`); then a **fix agent** at the bug-fix
+level (Opus 5.5 at smartest or smarter) implements exactly that file and never re-diagnoses
+(`clustering-and-diagnosis.md:65-79`). If the fix agent judges the diagnosis wrong it stops with
+`diagnosis-disputed`. The 2-attempt cap now counts diagnose + fix *pairs*; an `unproven` proof or a
+dispute sends a fresh diagnose agent; a crashed cluster with a diagnosis file resumes at the fix
+agent; split/merge gives new clusters new files and marks the old one superseded
+(`clustering-and-diagnosis.md:84-89`, `:43`). The file is also the fix-summary "Confirmed cause" line
+and, under `--learn`, the `root-causes.json` cause.
+**Alternatives considered / rejected.** (a) Keep the fused agent (decision 7) — it forces one model
+to do both jobs, so either diagnosis runs below the best model available or every line of the fix
+is written on the most expensive one. (b) Pass the diagnose agent's transcript to the fix agent —
+violates the series rule that only artifacts travel between agents, and leaves nothing to resume
+from after a crash. (c) One shared diagnosis file per round — parallel diagnose agents would
+collide; one file per cluster avoids it.
+**Why this choice.** *The smartest model authors the cause; a strong builder implements it* — the
+same "planners and reviewers ≥ builders" principle the `--max` stage table applies across the
+series (implement and bugfix top out at Opus 5.5). Diagnosis is where model strength pays: the
+recommendation is a hypothesis to overturn (decision 2), and a wrong cause makes the fix a claimed
+fix. Continuity moves from "same agent" to "written record", which also makes it auditable,
+resumable, and reusable by the proof agent and `--learn`. **Not yet benchmarked** — the split is a
+judgment call; a benchmark of the split and its model levels is a tracked deferred.
 
 ---
 

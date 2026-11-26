@@ -3,7 +3,7 @@
 This is a static site with **no build step and no server-side includes**. Every page
 copies the three blocks below verbatim and fills in the per-page placeholders.
 This file is the single source of truth for that skeleton - if the nav or footer
-changes, update it here first, then apply to all nine pages.
+changes, update it here first, then apply to all eleven pages.
 
 `_shared/` is a documentation folder only. Nothing in it is linked from the site,
 and it is excluded from the sitemap.
@@ -11,7 +11,7 @@ and it is excluded from the sitemap.
 ## Link convention (decided Phase 1 - follow everywhere)
 
 - **Internal page links are plain relative filenames**: `deep-plan.html`,
-  `install.html`, `how-it-works.html`, `index.html`. All nine pages live flat in
+  `install.html`, `how-it-works.html`, `index.html`. All eleven pages live flat in
   the publish root (`website/`), so plain filenames are unambiguous and work both
   locally via `file://` and deployed on Netlify. **Never** use root-relative
   (`/deep-plan.html`) or directory-style (`./deep-plan.html`) forms.
@@ -33,11 +33,11 @@ Verify with:
 grep -rEi "deep-learn|production-guide|roadmap" website/
 ```
 
-## Ten public pages
+## Eleven public pages
 
 `index.html`, `how-it-works.html`, `deep-plan.html`, `deep-plan-review.html`,
 `deep-implement.html`, `deep-code-review.html`, `deep-bugfix.html`,
-`deep-docs.html`, `deep-goal.html`, `install.html`.
+`deep-docs.html`, `deep-goal.html`, `deep-goal-models.html`, `install.html`.
 
 ---
 
@@ -87,7 +87,7 @@ Homepage exception: canonical and `og:url` are `https://deep-skills.com/`
 
 ## 2. Canonical nav block (first thing inside `<body>`)
 
-Identical on all nine pages. `site.js` sets `aria-current="page"` on the matching
+Identical on all eleven pages. `site.js` sets `aria-current="page"` on the matching
 link at runtime - do not hardcode it. The Install link is the primary CTA button.
 
 ```html
@@ -117,6 +117,7 @@ link at runtime - do not hardcode it. The Install link is the primary CTA button
             <li><a href="deep-docs.html">deep-docs</a></li>
             <li class="dropdown-sep" aria-hidden="true"></li>
             <li><a href="deep-goal.html">deep-goal</a></li>
+            <li><a href="deep-goal-models.html">&rarr; model allocation</a></li>
           </ul>
         </li>
         <li><a class="btn btn-primary" href="install.html">Install</a></li>

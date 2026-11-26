@@ -124,6 +124,7 @@ on Copilot/Codex have no slash-commands or CLI flags); the `--flag` is a conveni
 | *(default)* | "map this codebase," "document what's built" | Runs the full default-mode pipeline above. |
 | put under `<path>` | "write the map to `docs/foo`" | Overrides the default `docs/ai-map/` output location. |
 | `--refresh` | "refresh the docs," "regenerate the map" | Re-resolves anchors **and** diffs the file-set against the stored fingerprint, then regenerates only the stale + new subsystems. |
+| `--max=<smartest\|smarter\|smart>` | "use the smartest models" | Accepted for consistency with the other skills: mapping and anchor-checking run on Sonnet 5.5 at every level, unless a repo `.deep-skills/model-map.json` moves the docs stage up. |
 
 > **Refresh uses a dual git-free signal:** (1) re-resolve all anchors → report drift; (2) diff
 > the current source file-set against `index.json` → catch undocumented additions. Git is an

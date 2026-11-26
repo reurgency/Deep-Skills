@@ -63,6 +63,7 @@
             <li><a href="deep-docs.html">deep-docs</a></li>
             <li class="dropdown-sep" aria-hidden="true"></li>
             <li><a href="deep-goal.html">deep-goal</a></li>
+            <li><a href="deep-goal-models.html">&rarr; model allocation</a></li>
           </ul>
         </li>
         <li><a class="btn btn-primary" href="install.html">Install</a></li>
@@ -168,6 +169,10 @@
         </table>
       </div>
       <p class="fn reveal">Exact stage lists, review thresholds, and round caps per level live in the skill's rigor map - the table above is the shipped shape, summarized.</p>
+      <div class="callout reveal" style="margin-top:26px">
+        <span class="callout-icon" aria-hidden="true">&#129504;</span>
+        <p><b>Rigor picks the stages - <code>--max</code> picks how smart the models get.</b> Choose smartest, smarter, or smart (or let deep-goal suggest your current model's level), and every stage gets a named model: with smartest, planning and review run on Fable 5.2, building and bug fixing on Opus 5.5, and docs on Sonnet 5.5. Your current model runs deep-goal itself and interactive planning. <a href="deep-goal-models.html">See how model allocation works &rarr;</a></p>
+      </div>
     </div>
   </section>
 
@@ -177,7 +182,7 @@
       <div class="section-head reveal">
         <p class="kicker">Hands-free, not hands-off</p>
         <h2>You keep the controls that matter</h2>
-        <p>Autonomous doesn't mean opaque. Every human decision happens in the planning window up front; after that, three optional controls let you keep a hand on the wheel.</p>
+        <p>Autonomous doesn't mean opaque. Every human decision happens up front - the launch card, then the planning window; after that, a few optional controls let you keep a hand on the wheel.</p>
       </div>
       <div class="grid cols-3">
         <div class="card reveal">
@@ -195,10 +200,24 @@
           <h3>Build in isolation</h3>
           <p>Run every post-planning stage in one dedicated git worktree; the final report ends with the merge instructions.</p>
         </div>
+        <div class="card reveal">
+          <span class="cmd">--max=&lt;level&gt;</span>
+          <h3>Choose the model level</h3>
+          <p>Smartest, smarter, or smart - say &ldquo;use the smartest models.&rdquo; The highest model level any stage may use. Leave it off and deep-goal asks, suggesting your current model's level. <a href="deep-goal-models.html">Which model runs where &rarr;</a></p>
+        </div>
+        <div class="card reveal">
+          <span class="cmd">--from-plan[=&lt;path&gt;]</span>
+          <h3>Continue from your plan</h3>
+          <p>&ldquo;Continue from my plan&rdquo; - adopt a plan you already made with <code>/deep-plan</code> instead of planning again. An interactive <code>/deep-plan</code> offers this hand-off when it finishes.</p>
+        </div>
+      </div>
+      <div class="callout reveal" style="margin-top:26px">
+        <span class="callout-icon" aria-hidden="true">&#128203;</span>
+        <p><b>You see the run before it starts.</b> A launch card shows the goal, effort name, rigor, model level, the model each stage will run on, and at most one warning line. At mvp/prod it waits for <b>Launch</b> - or change rigor or level, edit the goal or name, or cancel with nothing written. At yolo/poc it prints and goes.</p>
       </div>
       <div class="callout reveal" style="margin-top:26px">
         <span class="callout-icon" aria-hidden="true">&#128172;</span>
-        <p><b>Want to look before you leap?</b> Add <code>--dry-run</code> (or ask &ldquo;preview an mvp run&rdquo;) and deep-goal prints the resolved pipeline and cost bands for your chosen rigor - dispatching nothing. It even works before Deep Skills is installed.</p>
+        <p><b>Want to look before you leap?</b> Add <code>--dry-run</code> (or ask &ldquo;preview an mvp run&rdquo;) and deep-goal prints the resolved pipeline, the model each stage would run on, and cost bands for your chosen rigor - dispatching nothing. It even works before Deep Skills is installed.</p>
       </div>
     </div>
   </section>
@@ -243,7 +262,7 @@
       <div class="section-head reveal">
         <p class="kicker">Getting it</p>
         <h2>Free, and bundled with Deep Skills</h2>
-        <p>deep-goal ships free in the same marketplace. It requires the Deep Skills plugin (v0.2.0 or newer) installed alongside - it verifies this at launch and declines politely if it's missing.</p>
+        <p>deep-goal ships free in the same marketplace. It requires the Deep Skills plugin (v0.3.0 or newer) installed alongside - it verifies this at launch and declines politely if it's missing.</p>
       </div>
       <div class="cmd-stack reveal">
         <div class="cmdline">

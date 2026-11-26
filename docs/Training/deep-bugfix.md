@@ -81,6 +81,11 @@ Every flag is **natural-language-first** — the plain-language trigger is the p
 - **"fix in a worktree" / `--worktree`** — isolate fix work in a git worktree.
 - **"record the root cause" / `--learn`** — emit `root-causes.json` for the future Deep-Learn
   Pattern Ledger.
+- **"use the smartest models" / `--max=<smartest|smarter|smart>`** — the highest model level.
+  The diagnose agent, and the proof for serious findings (severity 5 and up), run at it; the fix
+  agent runs at the bug-fix level (with smartest: diagnose on Fable 5.2, fix on Opus 5.5;
+  containment test runs on Sonnet 5.5). Default: your current model's level. A
+  `/deep-code-review --triage --fix` chain passes its `--max` on.
 
 ### Module 2 — Directive cards (Deep-Learn)
 Run `scripts/load-active-cards.sh deep-bugfix` at the start; treat each printed directive as a
@@ -104,13 +109,26 @@ on divergent causes and *merges* two on a proven single cause. Review-time dedup
 *duplicate reports of one defect*; cluster grouping is a coarser, **cause-level** grouping
 across genuinely-distinct defects — a different altitude.
 
-### Module 5 — Per cluster: diagnose + fix (one fresh agent)
-**One fresh agent per cluster** — remediation needs continuity: the agent that finds the cause
-authors the fix. Brief it with the finding **evidence** + repo access + the plan (context
-only) — **never** the implementer's or reviewer's transcripts — and the recommendation flagged
-**"hypothesis — do not trust."** It diagnoses to a confirmed root cause, then fixes **minimally
-at the cause.** Attempt cap: **2**. Collaborative mode gates here: present diagnosis + proposed
-fix for approval **before applying.**
+### Module 5 — Per cluster: diagnose, then fix (two fresh agents)
+**Two fresh agents per cluster, in sequence** — the smartest model authors the cause, a strong
+builder implements it:
+
+1. **Diagnose agent** (read-only, at your `--max` level — e.g. Fable 5.2 with smartest). Brief
+   it with the finding **evidence** + repo access + the plan (context only) — **never** the
+   implementer's or reviewer's transcripts — and the recommendation flagged **"hypothesis — do
+   not trust."** It confirms the root cause and writes it, with the cited chain and the fix
+   approach, to **`06-Bug-Fix/round-N/diagnosis-<CL-K>.md`** (one file per cluster, so parallel
+   diagnose agents never share a file).
+2. **Fix agent** (at the bug-fix level — Opus 5.5 with smartest or smarter). Its **only** cause
+   input is that diagnosis file; it fixes **minimally at the cause** and never re-diagnoses.
+   Under `--reproduce` it writes the reproducing test first (red), then the fix (green). If it
+   judges the diagnosis wrong it stops with `diagnosis-disputed` (its edits reverted).
+
+Continuity moves from "same agent" to "written record". Attempt cap: **2** — an attempt is one
+diagnose + fix *pair*; a dispute uses one up. Resuming after a crash reuses an existing
+diagnosis file and runs only the fix agent. Collaborative mode gates here: present the diagnosis
++ proposed fix for approval **before the fix agent runs** (a redirect sends your note to a fresh
+diagnose agent).
 
 ### Module 6 — Adversarial proof
 A **separate fresh agent** carries the burden of *refuting* "fixed." Default tier is the
@@ -118,8 +136,8 @@ A **separate fresh agent** carries the burden of *refuting* "fixed." Default tie
 a fix without a traced chain is rejected (`--reproduce` upgrades this to a dynamic red→green
 test the proof agent re-runs both directions itself). It must show **every finding in the
 cluster** resolved by the one fix, and returns `fixed | unproven | regressed`. **`regressed`
-⇒ revert immediately. `unproven` ⇒ one more diagnose→fix attempt (cap 2 total), then revert +
-blocker report.**
+⇒ revert immediately. `unproven` ⇒ one more diagnose→fix attempt — a fresh diagnose agent
+(given the failed proof) + a fresh fix agent (cap 2 total) — then revert + blocker report.**
 
 ### Module 7 — Containment (blast radius)
 Extract changed symbols from the diff → discover their **direct dependents** (1 hop; LSP/host
@@ -233,7 +251,8 @@ literal `[06-Bug-Fix/](../06-Bug-Fix/)` — a static manifest can't point at "la
 | | |
 |---|---|
 | Input | `accepted` findings (default), a bug report / stack trace, or a failing test |
-| Output | `06-Bug-Fix/round-N/` → `scope.json` · `fix-summary.md` · (`--learn`) `root-causes.json`; findings flipped `fixed` |
+| Output | `06-Bug-Fix/round-N/` → `scope.json` · `diagnosis-<CL-K>.md` per cluster · `fix-summary.md` · (`--learn`) `root-causes.json`; findings flipped `fixed` |
+| Agents per cluster | diagnose (your `--max` level, read-only) → fix (bug-fix level) → adversarial proof (fresh) |
 | Order | apply → proof → containment → commit (never reordered) |
 | Proof | static chain-trace (default) · red→green test (`--reproduce`); a fresh adversarial agent verdict `fixed \| unproven \| regressed` |
 | Hard rules | Fix code only; never triage; never edit the plan; prove before commit; never commit on main/develop |

@@ -99,5 +99,5 @@ A valid override is then the resolved map for everything downstream: `--rigor` p
 ### Authoring tips
 
 - Start by copying a shipped level from `templates/rigor-map.json` and editing - override levels replace whole, so partial levels are the most common authoring mistake.
-- Keep `auto_accept_min` aligned with tier boundaries (9, 7, 5) unless you have a reason: mid-tier thresholds (e.g. 8) are legal but split a presentation tier across accept/defer.
+- Keep `auto_accept_min` aligned with tier boundaries (9, 7, 5) unless you have a reason: middle severity thresholds (e.g. 8) are legal but split a presentation tier across accept/defer.
 - Pairing `"mode": "autonomous"` planning **with** a `plan-review` stage is legal and activates plan-review's conformance lens on the plan's Assumptions section - no shipped level does this; it's a supported custom-override pattern.

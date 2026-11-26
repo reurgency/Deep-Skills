@@ -172,6 +172,7 @@
         <tr><td><i>(default)</i></td><td>“map this codebase,” “document what's built”</td><td>Runs the full default-mode pipeline above.</td></tr>
         <tr><td>put under &lt;path&gt;</td><td>“write the map to <code>docs/foo</code>”</td><td>Overrides the default <code>docs/ai-map/</code> output location.</td></tr>
         <tr><td><code>--refresh</code></td><td>“refresh the docs,” “regenerate the map”</td><td>Re-resolves anchors <b>and</b> diffs the file-set against the stored fingerprint, then regenerates only the stale + new subsystems.</td></tr>
+        <tr><td><code>--max=&lt;level&gt;</code></td><td>“use the smartest models”</td><td>Accepted for consistency with the other skills: mapping and anchor-checking run on Sonnet 5.5 at every level, unless a repo <code>.deep-skills/model-map.json</code> moves the docs stage up.</td></tr>
       </tbody>
     </table>
   </div>

@@ -44,10 +44,12 @@ The single acceptance test for everything you write: **could a fresh agent with 
 ## Curriculum
 
 ### Module 1 — Setup & framing
-- Restate the feature in **one sentence** and confirm it.
+- **Restate and name in one question:** show the goal (one sentence), what's in and out of
+  scope, and a proposed effort name, and let the user confirm or adjust it all at once.
+  (Skipped under `--confirmed` — e.g. when deep-goal's launch card already confirmed the goal.)
 - Pick a **question cadence**: 1-at-a-time · 3-at-a-time · all-at-once. Recommend
   *all-at-once* for small features. (`references/question-cadence.md`)
-- Propose a kebab-case **effort name**; the plan lands at
+- The kebab-case **effort name** is confirmed in that same question; the plan lands at
   `.deep-skills/<effort-name>/01-Plan/plan.md`. An explicit path argument overrides this.
 - State scope, explicit **non-goals**, and your assumptions; get a quick confirm.
 
@@ -131,6 +133,13 @@ Present the plan, fold in feedback, update the doc. Offer `/columbo` **last** as
 completeness check; fix what it surfaces. That's the hand-off point to `/deep-plan-review` /
 `/deep-implement`.
 
+**Optional: hand the rest to deep-goal.** After an *interactive, standalone* session — and only
+when the optional deep-goal add-on is installed — deep-plan offers one more question: *"Run the
+remaining stages autonomously with deep-goal?"* Pick a rigor and deep-goal continues from this
+plan (`/deep-goal --from-plan=<plan path> --rigor=<level>`), starting at plan review (mvp/prod)
+or implement (yolo/poc). The offer never appears in an autonomous run or when deep-plan was
+started with `--confirmed`, `--rounds`, or `--effort` (those mean an orchestrator is driving).
+
 ---
 
 ## Flags (know which to reach for)
@@ -144,6 +153,8 @@ Every flag is **natural-language-first** — say the plain-language form on any 
 | `--columbo` | *"include a columbo pass"* | Self-runs the `/columbo` completeness check at the end and fixes what it surfaces — the unattended counterpart of Module 9's offer. Meaningful primarily with `--autonomous`. |
 | `--effort=<slug>` | *"call the effort auth-refresh"* | Names the effort dir up front, skipping propose-and-confirm — handy for scripted or unattended invocations. Absent, an autonomous run derives the slug itself and **states** it, never asks. |
 | `--rounds=<n>` | *"three rounds of questions"* | Interactive sessions only: skip the cadence question and run exactly *n* front-loaded question rounds, then proceed (gap rounds still available on request). Ignored under `--autonomous`. |
+| `--confirmed` | *"the goal is already confirmed"* | For orchestrators (deep-goal passes it) that already confirmed the goal with you: skips the restate question and the deep-goal hand-off offer. Framing (scope, non-goals) still runs. |
+| `--max=<smartest\|smarter\|smart>` | *"use the smartest models"*, *"keep it to smarter models"* | The highest model level the planning helpers use — exploration, `/breakout`, columbo (smartest: Fable 5.2 · smarter: Opus 5.5 · smart: Sonnet 5.5). Default: your current model's level. The planning conversation itself always runs on your current model. |
 
 ---
 

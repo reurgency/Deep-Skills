@@ -102,7 +102,7 @@
     <li>
       <span class="module">Module 1</span>
       <h4>Setup &amp; framing</h4>
-      <p>Restate the feature in <b>one sentence</b> and confirm it. Pick a question cadence. Propose a kebab-case <b>effort name</b> — the plan lands at <code>.deep-skills/&lt;effort&gt;/01-Plan/plan.md</code>. State scope, explicit <b>non-goals</b>, and your assumptions; get a quick confirm.</p>
+      <p><b>Restate and name in one question:</b> the goal (one sentence), what's in and out of scope, and a proposed kebab-case <b>effort name</b>, confirmed or adjusted all at once (skipped under <code>--confirmed</code>, e.g. when deep-goal's launch card already confirmed the goal). Pick a question cadence. The plan lands at <code>.deep-skills/&lt;effort&gt;/01-Plan/plan.md</code>. State scope, explicit <b>non-goals</b>, and your assumptions; get a quick confirm.</p>
     </li>
     <li>
       <span class="module">Module 2</span>
@@ -137,7 +137,7 @@
     <li>
       <span class="module">Module 8 &amp; 9</span>
       <h4>The contract, then review &amp; hand off</h4>
-      <p>Fill the State / Data-Flow Contract (below). Present the plan, fold in feedback, update the doc. Offer <code>/columbo</code> <b>last</b> as the final completeness check; fix what it surfaces. That's the hand-off point to <a href="deep-plan-review.html">/deep-plan-review</a> and <a href="deep-implement.html">/deep-implement</a>.</p>
+      <p>Fill the State / Data-Flow Contract (below). Present the plan, fold in feedback, update the doc. Offer <code>/columbo</code> <b>last</b> as the final completeness check; fix what it surfaces. That's the hand-off point to <a href="deep-plan-review.html">/deep-plan-review</a> and <a href="deep-implement.html">/deep-implement</a>. <b>Optional:</b> after an interactive, standalone session — and only when the deep-goal add-on is installed — deep-plan offers <i>“Run the remaining stages autonomously with deep-goal?”</i> Pick a rigor and <a href="deep-goal.html">deep-goal</a> continues from this plan (<code>--from-plan</code>), starting at plan review (mvp/prod) or implement (yolo/poc). Never offered in autonomous runs or under <code>--confirmed</code> / <code>--rounds</code> / <code>--effort</code>.</p>
     </li>
   </ol>
 
@@ -184,6 +184,8 @@
         <tr><td><code>--columbo</code></td><td><i>“include a columbo pass”</i></td><td>Self-runs the <code>/columbo</code> completeness check at the end and fixes what it surfaces — the unattended counterpart of the Module 9 offer. Meaningful primarily with <code>--autonomous</code>.</td></tr>
         <tr><td><code>--effort=&lt;slug&gt;</code></td><td><i>“call the effort auth-refresh”</i></td><td>Names the effort dir up front, skipping propose-and-confirm. Absent, an autonomous run derives the slug itself and <b>states</b> it, never asks.</td></tr>
         <tr><td><code>--rounds=&lt;n&gt;</code></td><td><i>“three rounds of questions”</i></td><td>Interactive sessions only: skip the cadence question and run exactly <i>n</i> front-loaded question rounds, then proceed. Ignored under <code>--autonomous</code>.</td></tr>
+        <tr><td><code>--confirmed</code></td><td><i>“the goal is already confirmed”</i></td><td>For orchestrators (deep-goal passes it) that already confirmed the goal with you: skips the restate question and the deep-goal hand-off offer. Framing still runs.</td></tr>
+        <tr><td><code>--max=&lt;level&gt;</code></td><td><i>“use the smartest models”</i></td><td>Highest model level the planning helpers use — exploration, <code>/breakout</code>, columbo (smartest: Fable 5.2 · smarter: Opus 5.5 · smart: Sonnet 5.5). Default: your current model's level. The planning conversation itself always runs on your current model.</td></tr>
       </tbody>
     </table>
   </div>

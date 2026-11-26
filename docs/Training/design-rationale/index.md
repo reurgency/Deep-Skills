@@ -99,7 +99,10 @@ a CLI-flag convention — so natural-language invocation is primary and `--flags
 top. `deep-docs` was built as the reference implementation; the retrofit of the four older skills
 **shipped** — every flag and the six in-session commands gained a natural-language trigger, and the
 non-portable UX surface (questions, notifications, model routing, attribution) was neutralized once
-in `references/host-affordances.md` + `references/model-map.md`, with per-host install via
+in `references/host-affordances.md` + `references/model-map.md` — since 0.3.0 model routing is three
+fixed levels (smartest / smarter / smart, a Claude and a GPT column) in one shared
+`references/model-map.json` copied into every skill, capped per run by `--max` and repinnable per
+repo via `.deep-skills/model-map.json` ([deep-code-review decision 9](deep-code-review.md#9-model-tier-resolution-and-the-haiku-ban)) — with per-host install via
 `plugins/deep-skills/HOSTS.md` (memory `deep-skills-cross-assistant-portability`). One concrete wart
 this surfaced — the `.claude/commands/` references in `deep-plan/references/in-session-commands.md` —
 was **clarified** (Claude-Code slash shortcut vs. keyword/NL invocation on other hosts), not deleted.

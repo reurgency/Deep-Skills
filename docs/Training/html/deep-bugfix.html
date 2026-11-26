@@ -115,7 +115,7 @@
     <li><span class="module">Module 1</span><h4>Intake &amp; normalize</h4><p>Accept a <code>findings.json</code>, a pasted bug report / stack trace, or a failing test → a uniform defect list. Findings pass through losslessly; raw reports get synthesized <code>BF-001…</code> ids with evidence extracted from the trace. Resolve the effort home; no effort ⇒ ask for a name (default: slugified branch), create it + the manifest.</p></li>
     <li><span class="module">Module 2</span><h4>Scope &amp; round start</h4><p>Series mode loads the <code>accepted</code> set — <b>triage already decided; don't re-ask</b>. Only <code>open</code> findings ⇒ an interactive <b>scope pick</b> grouped by tier (<i>scoping is selection, not triage</i>; unselected stay <code>open</code>). <b>Re-entry check first</b>, then write <code>round-N/scope.json</code> — selection + provisional cluster plan — <b>before any cluster work</b>.</p></li>
     <li><span class="module">Module 3</span><h4>Cluster by suspected shared cause</h4><p>Group defects whose evidence points at one underlying cause (same subsystem + failure shape + overlapping evidence paths). <b>Clusters are hypotheses</b> — diagnosis <i>splits</i> on divergent causes and <i>merges</i> two on a proven single cause.</p></li>
-    <li><span class="module">Module 4</span><h4>Per cluster: diagnose + fix (one fresh agent)</h4><p><b>One fresh agent per cluster</b> — remediation needs continuity: the agent that finds the cause authors the fix. Briefed with finding <b>evidence</b> + repo + the plan (context only), <b>never</b> the implementer's or reviewer's transcripts, the recommendation flagged "hypothesis — do not trust." It diagnoses to a confirmed cause, then fixes <b>minimally at the cause</b>. Attempt cap: <b>2</b>. Collaborative mode gates here — approve <i>before</i> applying.</p></li>
+    <li><span class="module">Module 4</span><h4>Per cluster: diagnose, then fix (two fresh agents)</h4><p>A read-only <b>diagnose agent</b> at your <code>--max</code> level (e.g. Fable 5.2 with smartest) — briefed with finding <b>evidence</b> + repo + the plan (context only), <b>never</b> the implementer's or reviewer's transcripts, the recommendation flagged "hypothesis — do not trust" — confirms the cause and writes it, with the fix approach, to <code>round-N/diagnosis-&lt;CL-K&gt;.md</code> (one file per cluster). Then a <b>fix agent</b> at the bug-fix level (Opus 5.5 with smartest or smarter) fixes <b>minimally at the cause</b> from that file alone; if it judges the diagnosis wrong it stops with <code>diagnosis-disputed</code>. Continuity lives in the written record. Attempt cap: <b>2</b> diagnose + fix pairs. Collaborative mode gates here — approve <i>before</i> the fix agent runs.</p></li>
     <li><span class="module">Module 5</span><h4>Adversarial proof</h4><p>A <b>separate fresh agent</b> carries the burden of <i>refuting</i> "fixed." Default tier is the <b>static chain-trace</b> — walk the corrected chain hop-by-hop, a cited <code>path:line</code> per hop; a fix without a traced chain is rejected. It must show <b>every finding in the cluster</b> resolved by the one fix, and returns <code>fixed | unproven | regressed</code>.</p></li>
     <li><span class="module">Module 6</span><h4>Containment (blast radius)</h4><p>Extract changed symbols → discover their <b>direct dependents</b> (1 hop; LSP/host index, else grep/import-walk) → run the dependents' tests + a full typecheck. <b>Block only on <i>new</i> failures.</b> Exported/shared symbol ⇒ escalate to <b>2 hops</b>. Commands discovered from the host — <b>never</b> <code>.env</code>.</p></li>
     <li><span class="module">Module 7</span><h4>Gate / commit — prove before commit</h4><p>Order per cluster, never reordered: <b>apply → proof verdict → containment → commit</b>. Collaborative presents fix + proof + containment; autonomous commits on <code>fixed</code> + clean containment (<code>fix(&lt;scope&gt;): &lt;cause&gt; — resolves CR-00X, CR-00Y</code>). <b>Nothing unproven ever ships.</b></p></li>
@@ -132,7 +132,7 @@
 <pre><span class="a">apply fix</span> → <span class="a">proof verdict</span> → containment → commit
 
 proof = <span class="a">fixed</span>      → containment clean → commit the cluster
-proof = unproven   → one more diagnose→fix (cap 2 total), then revert + blocker report
+proof = unproven   → one more diagnose→fix pair (cap 2 total), then revert + blocker report
 proof = <span class="a">regressed</span>  → <span class="a">revert immediately</span></pre>
   </div>
   <div class="callout why">
@@ -157,6 +157,7 @@ proof = <span class="a">regressed</span>  → <span class="a">revert immediately
         <tr><td><code>--worktree</code></td><td>Risky / parallel fixes</td><td>Isolates fix work in a git worktree; code + reproduction tests stay on the branch, effort artifacts go to the source root; branch offered for merge/PR at the end.</td></tr>
         <tr><td><code>--learn</code></td><td>Feeding Deep-Learn</td><td>Emits <code>root-causes.json</code> — one cause-truthed record per proven cluster with a taxonomy class — for the future Pattern Ledger.</td></tr>
         <tr><td><code>--autonomous</code> / <code>--collaborative</code></td><td>Unattended vs gated</td><td>Run all clusters unattended, or check in per cluster before applying. Omitted on a multi-cluster run ⇒ <b>ask</b>.</td></tr>
+        <tr><td><code>--max=&lt;level&gt;</code></td><td>Choosing the model level — say <i>“use the smartest models”</i></td><td>Highest model level (smartest / smarter / smart): the diagnose agent and the proof for serious findings run at it; the fix agent runs at the bug-fix level. With smartest: diagnose on Fable 5.2, fix on Opus 5.5. Default: your current model's level.</td></tr>
       </tbody>
     </table>
   </div>
@@ -166,7 +167,7 @@ proof = <span class="a">regressed</span>  → <span class="a">revert immediately
   </div>
   <div class="callout warn">
     <span class="t">Model routing is load-bearing</span>
-    <p>Every agent's model is resolved from the skill's <code>references/model-map.md</code> and set <b>explicitly per launch</b> — never a bare alias, never a host default. The diagnose/fix and proof stages are tiered by what each must do.</p>
+    <p>Every agent's model is resolved from the shared model map (<code>references/model-map.json</code> + <code>model-map.md</code>) and set <b>explicitly per launch</b> as a pinned full ID — never a bare alias, never a host default, never Haiku. Agents are tiered by what each must do. With <code>--max=smartest</code>: <b>diagnose on Fable 5.2</b>, <b>fix on Opus 5.5</b>, the adversarial proof on Fable 5.2 when the cluster has any finding at severity 5 or up (else Opus 5.5), containment test runs on Sonnet 5.5. With smarter (e.g. an Opus 5.5 session): diagnose, fix and proof on Opus 5.5, containment on Sonnet 5.5. With smart: everything on Sonnet 5.5.</p>
   </div>
 </section>
 
@@ -232,7 +233,7 @@ proof = <span class="a">regressed</span>  → <span class="a">revert immediately
   <details class="decision-block reveal">
     <summary><span class="dn">7</span><span class="dt">A tuned independence model — continuity to diagnose, fresh agent to prove</span><span class="chev">›</span></summary>
     <div class="body">
-      <div class="row"><span class="rl what">What it does</span><p>Independence is tuned per stage: <b>diagnose + fix is one agent per cluster</b> (the agent that found the cause authors the fix), while <b>proof is a fresh, adversarial agent</b> that tries to refute "fixed" and returns <code>fixed | unproven | regressed</code>.</p></div>
+      <div class="row"><span class="rl what">What it does</span><p><i>(Superseded in part by decision 10 in 0.3.0 — diagnose and fix are now two agents joined by a written diagnosis.)</i> Independence is tuned per stage: <b>diagnose + fix was one agent per cluster</b> (the agent that found the cause authored the fix), while <b>proof is a fresh, adversarial agent</b> that tries to refute "fixed" and returns <code>fixed | unproven | regressed</code>.</p></div>
       <div class="row"><span class="rl rej">Rejected alternative</span><p>The series' default applied uniformly — split every stage across fresh agents. That would sever the diagnose→fix continuity bug-fixing depends on.</p></div>
       <div class="row"><span class="rl why">Why this choice</span><p>The series enforces independence by withholding transcripts; deep-bugfix keeps that DNA exactly where it pays — the proof stage, so the fixer can't grade itself — but relaxes it where continuity is the whole point. The fix agent still gets evidence + codebase + plan but not the implementer's transcript, and the recommendation arrives flagged "hypothesis — do not trust."</p></div>
     </div>
@@ -253,6 +254,15 @@ proof = <span class="a">regressed</span>  → <span class="a">revert immediately
       <div class="row"><span class="rl what">What it does</span><p>Under <code>--learn</code> (opt-in), emits <code>root-causes.json</code> — cluster → confirmed cause → taxonomy class → fix → findings resolved — to feed the future Deep-Learn Pattern Ledger.</p></div>
       <div class="row"><span class="rl rej">Rejected alternative</span><p>Continuing to feed the Distiller only <code>findings.json</code>, which carries the review's <i>guess</i> at root cause.</p></div>
       <div class="row"><span class="rl why">Why this choice</span><p>Fix-time is where cause becomes <i>ground truth</i> — the confirmed cause (proven by the fix) plus which findings collapsed into one cluster is strictly better signal than review's guess. Opt-in because Deep-Learn isn't built yet, making the reader a forward dependency.</p></div>
+    </div>
+  </details>
+
+  <details class="decision-block reveal">
+    <summary><span class="dn">10</span><span class="dt">Diagnose and fix as two agents, joined by a written diagnosis</span><span class="chev">›</span></summary>
+    <div class="body">
+      <div class="row"><span class="rl what">What it does</span><p>Since deep-skills 0.3.0 each cluster gets a read-only <b>diagnose agent</b> at the <code>--max</code> level, which writes the confirmed cause, cited chain and fix approach to <code>06-Bug-Fix/round-N/diagnosis-&lt;CL-K&gt;.md</code>, then a <b>fix agent</b> at the bug-fix level that implements exactly that file. A wrong diagnosis → <code>diagnosis-disputed</code>; the 2-attempt cap counts pairs; a crash resumes at the fix agent when the file exists; split/merge gives new clusters new files.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Keeping the fused agent (one model does both jobs, so either diagnosis runs below the best model or every line of the fix is written on the most expensive one); passing the diagnose transcript along (breaks the artifacts-only rule and can't be resumed); one shared diagnosis file per round (parallel agents would collide).</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p><i>The smartest model authors the cause; a strong builder implements it</i> — the same "planners and reviewers ≥ builders" principle as the series' <code>--max</code> table. Continuity moves from "same agent" to "written record", which is also auditable, resumable, and reused by the proof agent and <code>--learn</code>. Not yet benchmarked — a tracked deferred.</p></div>
     </div>
   </details>
 </section>
@@ -290,7 +300,8 @@ proof = <span class="a">regressed</span>  → <span class="a">revert immediately
     <div class="qh">deep-bugfix</div>
     <dl>
       <dt>Input</dt><dd><code>accepted</code> findings (default), a bug report / stack trace, or a failing test</dd>
-      <dt>Output</dt><dd><code>06-Bug-Fix/round-N/</code> → scope.json · fix-summary.md · (<code>--learn</code>) root-causes.json; findings flipped <code>fixed</code></dd>
+      <dt>Agents per cluster</dt><dd>diagnose (your <code>--max</code> level, read-only) → fix (bug-fix level) → adversarial proof (fresh)</dd>
+      <dt>Output</dt><dd><code>06-Bug-Fix/round-N/</code> → scope.json · diagnosis-&lt;CL-K&gt;.md per cluster · fix-summary.md · (<code>--learn</code>) root-causes.json; findings flipped <code>fixed</code></dd>
       <dt>Order</dt><dd>apply → proof → containment → commit (never reordered)</dd>
       <dt>Proof</dt><dd>static chain-trace (default) · red→green (<code>--reproduce</code>); fresh adversarial verdict <code>fixed | unproven | regressed</code></dd>
       <dt>Hard rules</dt><dd>Fix code only; never triage; never edit the plan; prove before commit; never Haiku, never <code>main</code>/<code>develop</code></dd>

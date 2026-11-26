@@ -23,7 +23,7 @@ By the end you can:
 3. Review across the **four lenses** and apply the **last-mile** methodology (chain-tracing
    with per-hop evidence).
 4. Produce a correct **findings.json + report.md + certificate.md**, all findings `open`.
-5. Choose between **default / `--multi-agent` / `--mega`** and understand the finder-fleet,
+5. Choose between **default / `--multi-agent` / `--mega`** (and a `--max` model level) and understand the finder-fleet,
    adversarial-verification, and **model-tier** discipline.
 6. Run the decoupled **`--triage`** step — the only mode that writes to the plan.
 
@@ -144,21 +144,37 @@ which is what makes per-round finding counts meaningful.
 |---|---|---|
 | *(default)* | Most reviews | One fresh agent, four lenses + deterministic pre-pass. |
 | `--multi-agent` / `/multi-agent` | Large/risky diffs | Five-stage pipeline: scripted setup → **8 model-tiered single-lens finders** → dedup/decompose → **severity-gated adversarial verification** → script-assembled synthesis. Token-disciplined. |
-| `--mega` | Release gates, big risky merges | Same pipeline with dials at max — all finders/verifiers on the main tier; ~2× wall clock. **Confirm cost with the user first.** |
+| `--mega` | Release gates, big risky merges | Same pipeline with every dial turned up — every finder and verifier on the review's top model (the level `--max` picks), quality's severity cap lifted; ~2× wall clock. **Confirm cost with the user first.** A bare *"max review"* means this, not `--max`. |
+| `--max=<smartest\|smarter\|smart>` | Choosing the model level — say *"use the smartest models"* | The highest model level for this review (smartest: Fable 5.2 · smarter: Opus 5.5 · smart: Sonnet 5.5). Default: your current model's level. Passed on to the `/deep-bugfix` run under `--triage --fix`. Combines with `--mega`: `--max` picks the top model, `--mega` puts every agent on it. |
 | `--browser` | Live last-mile proof | Exercises promised behaviors against an **already-running** dev server; cites observed request/response. Never starts a server; never reads `.env`. |
 | `--security` | (future) | Inert until `/deep-security` exists — a documented seam. |
 | `--triage` | After a review | Runs only the triage step; the one mode that writes to the plan. |
 | `--triage --auto-accept-min=<sev>` | Unattended triage — say *"accept majors and up"* | Zero-prompt policy: ≥ threshold → `accepted`; below → auto-**deferred** (ledger row; never auto-rejected); Blockers always accepted. HITL unchanged without it. |
 
 ### The model-tier discipline (multi-agent / mega)
-Finders are **model-tiered by what each lens catches**, and the model is **set explicitly on
-every agent launch as a pinned full ID** (`claude-fable-5` / `claude-opus-4-8` / latest
-`claude-sonnet-*`) — never a bare alias, **never Haiku, any tier, any stage.** Blocker/Major
-lenses run on the main tier; `diff-scan`/`conformance`/`coherence` on mid; the combined
-`quality` sweep on cheap, severity-capped ≤4. Adversarial verification is **severity-gated**:
-sev ≥5 candidates get a fresh verifier briefed to **refute** them. *Model routing is
-load-bearing — a run that silently fell to Haiku produced zero findings on a diff with two
-known Criticals.* If any agent ran below its tier, discard and relaunch it.
+Finders are **model-tiered by what each lens catches**, using three fixed model levels —
+smartest (Fable 5.2), smarter (Opus 5.5), smart (Sonnet 5.5). The review's **top model** is the
+level `--max` picks (default: your current model's level), and each agent runs at or below it:
+
+| Agent | With `--max=smartest` | With `--max=smarter` (e.g. an Opus 5.5 session) |
+|---|---|---|
+| `removed-behavior`, `seam-trace`, `last-mile`, `frozen-state-probe` | Fable 5.2 | Opus 5.5 |
+| `diff-scan`, `conformance`, `coherence` | Opus 5.5 | Sonnet 5.5 |
+| `quality` (severity-capped ≤4) | Sonnet 5.5 | Sonnet 5.5 |
+| Verifier, sev-5 candidate | Sonnet 5.5 | Sonnet 5.5 |
+| Verifier, sev ≥6 candidate (and any sev-5 raised to ≥6) | Fable 5.2 | Opus 5.5 |
+| Default single-agent review | Fable 5.2 | Opus 5.5 |
+
+With `--max=smart` every agent runs on Sonnet 5.5 — the floor. `--mega` puts every agent on the
+top model. The model is **set explicitly on every agent launch as a pinned full ID**
+(`claude-fable-5-2` / `claude-opus-5-5` / `claude-sonnet-5-5`) — never a bare alias, **never
+Haiku, any level, any stage.** If a model isn't available to you, the agent falls back to the
+same level's previous generation (Fable 5 / Opus 5 / Sonnet 5), then one level down, never below
+the smart level — and the report header records the models that actually ran. Adversarial
+verification is **severity-gated**: sev ≥5 candidates get a fresh verifier briefed to **refute**
+them. *Model routing is load-bearing — a run whose heavy finders silently fell to Haiku produced
+zero Blockers and zero Majors on a diff with two known Criticals.* If any agent ran on a model
+other than the one chosen for it (beyond a recorded fallback), discard and relaunch it.
 
 ---
 
@@ -198,6 +214,8 @@ itself load cards at runtime the way the first three do.) See the
 - **Relaxing token discipline** mid-run because the diff "feels important" — escalating to
   `--mega` is the user's call, before launch.
 - **A bare model alias** (or Haiku) in the multi-agent pipeline — pin the full ID per launch.
+- **Saying "max" when you mean the model level** — a bare *"max review"* is `--mega` (depth).
+  For the model level, name it: *"use the smartest models"* (`--max=smartest`).
 
 ## Mastery checklist
 
@@ -205,7 +223,7 @@ itself load cards at runtime the way the first three do.) See the
 - [ ] Ran the deterministic pre-pass as tools, not agents; never touched `.env`.
 - [ ] Reviewed all four lenses; traced each promised behavior hop-by-hop with evidence.
 - [ ] Produced report.md + findings.json + certificate.md with **all findings `open`**, nothing written outside `04-Code-Review/`.
-- [ ] Chose the right flag for the diff's risk and respected the model-tier discipline.
+- [ ] Chose the right flag (and `--max` level) for the diff's risk and respected the model-tier discipline.
 - [ ] Ran `--triage` as a separate step and routed accepted fixes into a cold-executable fix-phase.
 
 ## Quick reference
@@ -216,6 +234,7 @@ itself load cards at runtime the way the first three do.) See the
 | Output | `04-Code-Review/` → `report.md` · `findings.json` · `certificate.md` (all `open`) |
 | Lenses | Correctness · Last-Mile · Plan Conformance · Coherence |
 | Pass | No Blockers |
+| Models | Top model = `--max` level (default: your current model's); heavy finders + serious-finding verifiers on it, the rest one or two levels lower, floor Sonnet 5.5 |
 | Hard rules | Review never edits source or the plan; only `--triage` writes to the plan; never Haiku in the pipeline |
 | Loops back to | [`/deep-bugfix`](deep-bugfix.md) (remediates the accepted findings) |
 

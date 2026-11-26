@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Skill 4 · deep-code-review — Deep Skills Training</title>
-<meta name="description" content="Run multi-agent, evidence-gated review that catches the last mile — and learn why review is split from triage, why findings stay open, and why the pipeline bans Haiku.">
+<meta name="description" content="Run multi-agent, evidence-gated review that catches the last mile — and learn why review is split from triage, why findings stay open, and why every agent runs on a pinned model level (Fable 5.2, Opus 5.5, Sonnet 5.5) and never Haiku.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -38,7 +38,7 @@
     <span class="chip"><span class="d"></span> Review ≠ triage</span>
     <span class="chip"><span class="d"></span> Four lenses</span>
     <span class="chip"><span class="d"></span> 8-finder fleet</span>
-    <span class="chip"><span class="d"></span> Model-tier discipline</span>
+    <span class="chip"><span class="d"></span> Model levels: Fable 5.2 · Opus 5.5 · Sonnet 5.5</span>
     <span class="chip"><span class="d"></span> 18 design decisions</span>
   </div>
 </section>
@@ -71,7 +71,7 @@
     <div class="o"><span class="i">2</span><p>Run the <b>deterministic pre-pass</b> (lint/typecheck/tests) as tools, never agents.</p></div>
     <div class="o"><span class="i">3</span><p>Review across the <b>four lenses</b> and apply the <b>last-mile</b> chain-tracing methodology.</p></div>
     <div class="o"><span class="i">4</span><p>Produce a correct <b>findings.json + report.md + certificate.md</b>, all findings <code>open</code>.</p></div>
-    <div class="o"><span class="i">5</span><p>Choose <b>default / <code>--multi-agent</code> / <code>--mega</code></b> and respect the model-tier discipline.</p></div>
+    <div class="o"><span class="i">5</span><p>Choose <b>default / <code>--multi-agent</code> / <code>--mega</code></b> (and a <code>--max</code> model level) and respect the model-tier discipline.</p></div>
     <div class="o"><span class="i">6</span><p>Run the decoupled <b><code>--triage</code></b> step — the only mode that writes to the plan.</p></div>
   </div>
 </section>
@@ -155,7 +155,8 @@
       <tbody>
         <tr><td><i>(default)</i></td><td>Most reviews</td><td>One fresh agent, four lenses + deterministic pre-pass.</td></tr>
         <tr><td><code>--multi-agent</code></td><td>Large/risky diffs</td><td>Five-stage pipeline: scripted setup → <b>8 model-tiered single-lens finders</b> → dedup/decompose → <b>severity-gated adversarial verification</b> → script-assembled synthesis.</td></tr>
-        <tr><td><code>--mega</code></td><td>Release gates</td><td>Same pipeline, dials at max — all finders/verifiers on the main tier; ~2× wall clock. <b>Confirm cost first.</b></td></tr>
+        <tr><td><code>--mega</code></td><td>Release gates</td><td>Same pipeline, every dial turned up — every finder and verifier on the review's top model (the level <code>--max</code> picks), quality's cap lifted; ~2× wall clock. <b>Confirm cost first.</b> A bare <i>“max review”</i> means this, not <code>--max</code>.</td></tr>
+        <tr><td><code>--max=&lt;level&gt;</code></td><td>Choosing the model level — say <i>“use the smartest models”</i></td><td>Highest model level for this review: smartest (Fable 5.2) · smarter (Opus 5.5) · smart (Sonnet 5.5). Default: your current model's level. Passed on to <code>/deep-bugfix</code> under <code>--triage --fix</code>; combines with <code>--mega</code>.</td></tr>
         <tr><td><code>--browser</code></td><td>Live last-mile proof</td><td>Exercises promised behaviors against an already-running dev server; cites observed traffic.</td></tr>
         <tr><td><code>--triage</code></td><td>After a review</td><td>Runs only triage; the one mode that writes to the plan.</td></tr>
         <tr><td><code>--triage --auto-accept-min=&lt;sev&gt;</code></td><td>Unattended triage — say <i>“accept majors and up”</i></td><td>Zero-prompt policy: ≥ threshold → <code>accepted</code>; below → auto-<b>deferred</b> (ledger row; never auto-rejected); Blockers always accepted. HITL unchanged without it.</td></tr>
@@ -164,7 +165,7 @@
   </div>
   <div class="callout warn">
     <span class="t">Model-tier discipline — load-bearing</span>
-    <p>Finders are <b>model-tiered by what each lens catches</b>, and the model is set explicitly on every launch as a <b>pinned full ID</b> (<code>claude-fable-5</code> / <code>claude-opus-4-8</code> / latest <code>claude-sonnet-*</code>) — never a bare alias, <b>never Haiku, any tier, any stage.</b> Blocker/Major lenses run on the main tier; diff-scan/conformance/coherence on mid; the combined quality sweep on cheap, capped ≤4. A run that silently fell to Haiku produced <b>zero findings on a diff with two known Criticals.</b> If any agent ran below its tier — discard and relaunch it.</p>
+    <p>Finders are <b>model-tiered by what each lens catches</b>. The review's top model is the level <code>--max</code> picks (default: your current model's level). With <b>smartest</b>: removed-behavior / seam-trace / last-mile / frozen-state-probe and the sev ≥6 verifiers on <b>Fable 5.2</b>; diff-scan / conformance / coherence on <b>Opus 5.5</b>; the quality sweep (capped ≤4) and sev-5 verifiers on <b>Sonnet 5.5</b>. With <b>smarter</b> (e.g. an Opus 5.5 session): the heavy lenses on Opus 5.5, everything else on Sonnet 5.5. With <b>smart</b>: everything on Sonnet 5.5 — the floor. The model is set explicitly on every launch as a <b>pinned full ID</b> (<code>claude-fable-5-2</code> / <code>claude-opus-5-5</code> / <code>claude-sonnet-5-5</code>) — never a bare alias, <b>never Haiku, any level, any stage.</b> A run whose heavy finders silently fell to Haiku produced <b>zero Blockers and zero Majors on a diff with two known Criticals.</b> If any agent ran on a model other than the one chosen for it (beyond a recorded fallback) — discard and relaunch it.</p>
   </div>
   <div class="callout decision">
     <span class="t">Finders find, verifiers prove</span>
@@ -271,9 +272,9 @@
   <details class="decision-block reveal">
     <summary><span class="dn">9</span><span class="dt">Model-tier resolution and the Haiku ban</span><span class="chev">›</span></summary>
     <div class="body">
-      <div class="row"><span class="rl what">What it does</span><p>Three tiers (main/mid/cheap) resolve from the orchestrator's own model at launch, set explicitly on every launch as a pinned full ID. Blocker/Major lenses on main; diff-scan/conformance/coherence on mid; quality on cheap (capped ≤4). <b>Haiku is never used — any tier, any stage.</b></p></div>
-      <div class="row"><span class="rl rej">Rejected alternative</span><p>Bare aliases (a run with the <code>opus</code> alias got Opus 4.6, silently below tier); implicit/inherited resolution (“exactly how the Haiku mis-route happened”); Haiku anywhere (“worse than no output — it ships false confidence”).</p></div>
-      <div class="row"><span class="rl why">Why this choice</span><p>A run whose main-tier lenses silently fell to Haiku produced 0 Blockers and 0 Majors on a diff with two known Criticals. Tiering is calibrated by what each lens catches. Any agent shown running below tier is invalid — discard and relaunch.</p></div>
+      <div class="row"><span class="rl what">What it does</span><p>Three <b>fixed model levels</b> — smartest (Fable 5.2), smarter (Opus 5.5), smart (Sonnet 5.5) — pinned in one shared <code>model-map.json</code>. The review's top model is the level <code>--max</code> picks; the Blocker/Major lenses run on it, diff-scan/conformance/coherence one level lower, quality two levels lower (capped ≤4), never below Sonnet 5.5. Set explicitly on every launch as a pinned full ID. <b>Haiku is never used — any level, any stage.</b> <i>Superseded relative tiers on 2026-11-25:</i> earlier versions derived three relative levels from the session model through exact per-model rows that broke on every release.</p></div>
+      <div class="row"><span class="rl rej">Rejected alternative</span><p>Bare aliases (a run with the <code>opus</code> alias got Opus 4.6, silently below tier); implicit/inherited resolution (“exactly how the Haiku mis-route happened”); Haiku anywhere (“worse than no output — it ships false confidence”); levels that shift with the session model (replaced in 0.3.0).</p></div>
+      <div class="row"><span class="rl why">Why this choice</span><p>A run whose heavy lenses silently fell to Haiku produced 0 Blockers and 0 Majors on a diff with two known Criticals. Tiering is calibrated by what each lens catches. Any agent shown running on a model other than the one resolved for it is invalid — discard and relaunch.</p></div>
     </div>
   </details>
 
@@ -370,6 +371,7 @@
   <div class="mistake"><p><b>Reading <code>.env</code> for commands/ports</b> — never. Use package.json / angular.json / CLAUDE.md, else ask.</p></div>
   <div class="mistake"><p><b>Relaxing token discipline</b> mid-run because the diff “feels important” — escalating to <code>--mega</code> is the user's call, before launch.</p></div>
   <div class="mistake"><p><b>A bare model alias</b> (or Haiku) in the multi-agent pipeline — pin the full ID per launch.</p></div>
+  <div class="mistake"><p><b>Saying “max” when you mean the model level</b> — a bare <i>“max review”</i> is <code>--mega</code>. For the model level, name it: <i>“use the smartest models”</i>.</p></div>
 </section>
 
 <section class="sec" id="mastery">
@@ -380,7 +382,7 @@
     <li>Ran the deterministic pre-pass as tools, not agents; never touched <code>.env</code>.</li>
     <li>Reviewed all four lenses; traced each promised behavior hop-by-hop with evidence.</li>
     <li>Produced report.md + findings.json + certificate.md with <b>all findings <code>open</code></b>, nothing written outside <code>04-Code-Review/</code>.</li>
-    <li>Chose the right flag for the diff's risk and respected the model-tier discipline.</li>
+    <li>Chose the right flag (and <code>--max</code> level) for the diff's risk and respected the model-tier discipline.</li>
     <li>Ran <code>--triage</code> as a separate step and routed accepted fixes into a cold-executable fix-phase.</li>
   </ul>
 </section>
@@ -395,6 +397,7 @@
       <dt>Output</dt><dd><code>04-Code-Review/</code> → report.md · findings.json · certificate.md (all <code>open</code>)</dd>
       <dt>Lenses</dt><dd>Correctness · Last-Mile · Plan Conformance · Coherence</dd>
       <dt>Pass</dt><dd>No Blockers</dd>
+      <dt>Models</dt><dd>Top model = the <code>--max</code> level (default: your current model's); heavy finders + serious-finding verifiers on it, the rest one or two levels lower, floor Sonnet 5.5</dd>
       <dt>Hard rules</dt><dd>Review never edits source or the plan; only <code>--triage</code> writes to the plan; never Haiku in the pipeline</dd>
       <dt>Loops back to</dt><dd><a href="deep-bugfix.html">/deep-bugfix</a> (remediates the accepted findings)</dd>
     </dl>

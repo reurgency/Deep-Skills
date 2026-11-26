@@ -51,6 +51,9 @@ pipeline. Keep it slim.
   current branch.**
 - `--parallel` — opt-in parallel phase execution, **only** when phases are provably
   independent. Never parallelize without this flag.
+- `--max=<smartest|smarter|smart>` (say *"use the smartest models"*) — the highest model level
+  the phase agents use. Building runs on Opus 5.5 at both smartest and smarter (the plan is
+  already designed and reviewed), on Sonnet 5.5 at smart. Default: your current model's level.
 
 ### Module 2 — Load & assess
 Identify: single- vs multi-phase, which phases are already done (read the Phase Summaries),

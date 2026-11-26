@@ -45,7 +45,7 @@ vocabulary from earlier ones.
 
 > **Optional add-on (free, separate plugin):** [`/deep-goal`](deep-goal.md) — an autonomous,
 > rigor-gated **conductor** that runs the whole six-skill relay from one invocation. It is
-> **not a seventh bundled skill**: it ships as its own plugin, requires deep-skills ≥ 0.2.0,
+> **not a seventh bundled skill**: it ships as its own plugin, requires deep-skills ≥ 0.3.0,
 > and the six core skills never require it. Learn the six by hand first — its page assumes
 > all of them. (HTML edition: [`html/deep-goal.html`](html/deep-goal.html).)
 
@@ -199,6 +199,7 @@ what was reviewed, and what remains deferred.
 | **AI map** | `docs/ai-map/`, deep-docs' standing, machine-owned, tiered documentation of what's built. |
 | **Anchor** | A `path:line (symbol)` reference backing a doc claim; symbol-primary, verified before publish. |
 | **Tier-0** | deep-docs' always-loaded `MAP.md` + `index.json`, held under a hard token ceiling. |
+| **Model level** | One of three fixed levels every skill's agents run on — smartest (Fable 5.2), smarter (Opus 5.5), smart (Sonnet 5.5); `--max` (*"use the smartest models"*) caps how high a run goes, defaulting to your current model's level. |
 | **Rigor** | deep-goal's single quality dial (`yolo`/`poc`/`mvp`/`prod`): selects, as data, the stage list, planning interactivity, triage threshold, and re-review cap. |
 | **Conductor** | deep-goal's role: a thin pipeline walker that sequences and verifies the six skills, never doing their jobs. |
 | **pipeline.md** | `00-Manifest/pipeline.md` — the conductor's state file, updated at every stage boundary; re-invoking deep-goal resumes from it. |

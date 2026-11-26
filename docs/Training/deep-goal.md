@@ -10,7 +10,7 @@ plan → plan-review → implement → code-review → bugfix → docs — with 
 (`yolo` / `poc` / `mvp` / `prod`) selecting, as data, which stages run, how interactive planning
 is, what auto-triage accepts, and how many review→fix rounds the loop may take. It is a
 **thin conductor**: it sequences and verifies; it never writes plans, source, reviews, or docs
-itself. It requires the deep-skills plugin **≥ 0.2.0** (verified at launch); the six core skills
+itself. It requires the deep-skills plugin **≥ 0.3.0** (verified at launch); the six core skills
 never require it back.
 
 ---
@@ -33,6 +33,12 @@ By the end you can:
    does in each case.
 6. **Resume** a killed, paused, or halted run from `pipeline.md`, and read a **run report**
    for everything the pipeline decided alone.
+7. Explain **model allocation**: the three fixed model levels (smartest / smarter / smart),
+   how `--max` picks the model each stage runs on, what your current model still decides
+   (the recommended `--max`, and interactive planning, which runs in your session) — and read
+   the **launch card** before anything runs.
+8. **Hand off a plan you made yourself** — finish an interactive `/deep-plan`, then let
+   deep-goal run the rest with `--from-plan`.
 
 ## Prerequisites
 
@@ -67,6 +73,54 @@ Two rules make it trustworthy:
 State lives in **`00-Manifest/pipeline.md`** — conductor-written, updated at every stage
 boundary. Kill the run at any point; re-invoking deep-goal resumes from it.
 
+**Model allocation is a second axis, orthogonal to rigor.** Rigor picks *which* stages run and
+whether they fan out; **`--max`** picks *what model each stage runs on*. deep-goal uses the same
+model map as every deep-skills skill (`references/model-map.json` for the models,
+`references/model-map.md` for the rules), with three levels pinned to specific models — they
+don't shift with the model you happen to be chatting in:
+
+| Level | Claude | GPT |
+|---|---|---|
+| **smartest** | Fable 5.2 (then Fable 5) | Astra-6 (then GPT-5.6 Sol) |
+| **smarter** | Opus 5.5 (then Opus 5) | GPT-6-Sol (then GPT-5.6 Terra) |
+| **smart** | Sonnet 5.5 (then Sonnet 5) | GPT-6.1-Terra (then GPT-5.6 Luna) |
+
+A run stays in your session's model family. Smart is the floor — small models (Haiku,
+GPT-mini/nano) never run. What each stage runs on, by `--max` (Claude models shown):
+
+| Stage | `--max=smartest` | `--max=smarter` | `--max=smart` |
+|---|---|---|---|
+| plan | Fable 5.2 | Opus 5.5 | Sonnet 5.5 |
+| plan review | Fable 5.2 | Opus 5.5 | Sonnet 5.5 |
+| implement | Opus 5.5 | Opus 5.5 | Sonnet 5.5 |
+| code review (+ triage, re-reviews) | Fable 5.2 | Opus 5.5 | Sonnet 5.5 |
+| bug fix | Opus 5.5 | Opus 5.5 | Sonnet 5.5 |
+| docs | Sonnet 5.5 | Sonnet 5.5 | Sonnet 5.5 |
+
+The principle: **planners and reviewers ≥ builders ≥ documenters.** Every stage is also told
+your `--max`, so its own helper agents pick their models exactly as the skill would standalone
+(e.g. code review's quality checker runs on Sonnet 5.5).
+
+**Your current model** sets two things: the **recommended `--max`** (its own level — omit the
+flag and deep-goal asks, recommending it), and **whatever runs in your session** — the conductor
+itself and **interactive planning at mvp/prod**, which runs inline because you're present. If
+your model is below the planning level you chose, the launch card suggests switching with
+`/model` (or your assistant's model picker) first. A run may put stages *above* your current
+model — that's intended. On hosts that can't run background agents (Codex, Cursor, Copilot
+today), each stage's lead runs in your session too, while its helper agents still use the level
+you chose. **If you can't reach a model** (your plan or org blocks it), the stage tries the same
+level's previous generation, then the next level down — never below smart — and `pipeline.md`
+and the run report record the model that actually ran (e.g. "smartest ran on Fable 5").
+
+**Customizing:** a `.deep-skills/model-map.json` at your repo root repins a model or moves a
+stage's level — for every deep-skills skill and deep-goal. Only the keys you change; it merges
+over the shipped map and is validated at launch. Example — run docs on Opus 5.5 when you choose
+smartest:
+
+```json
+{"stages":{"smartest":{"docs":"smarter"}}}
+```
+
 ---
 
 ## Curriculum
@@ -86,22 +140,50 @@ Below-threshold findings are **auto-deferred** (Deferreds-ledger row, reported l
 **never auto-rejected**. A repo override can add or reshape levels at level granularity;
 it is validated **at launch, never mid-run** (`references/rigor-levels.md`).
 
-### Module 2 — Launch: handshake, resolution, dry-run
-At launch the conductor: checks for a prior `pipeline.md` (re-entry — Module 8) → resolves
-rigor from the merged map (omitted → one structured question, recommending mvp, every option
-self-contained) → runs the **version handshake** (deep-skills ≥ 0.2.0; refuses politely when
-absent/below; a version-less dev install passes with a logged warning) → settles the effort
-slug → writes the initial `pipeline.md`. **`--dry-run` prints the resolved pipeline with cost
-bands and stops** — it dispatches nothing, writes nothing, and skips the handshake entirely.
-Make previewing a habit: it is the cheapest question you can ask the add-on.
+### Module 2 — Launch: handshake, questions, the launch card, dry-run
+At launch the conductor: checks for a prior `pipeline.md` (re-entry — Module 8) → runs the
+**version handshake** (deep-skills ≥ 0.3.0; refuses politely when absent/below; a version-less
+dev install passes with a logged warning) → if rigor and/or `--max` are missing, asks them as
+**one batched question set** (rigor recommends mvp; max recommends your current model's level,
+each choice previewing the model every stage would run on) → shows the **launch card**:
+
+```
+Goal: <one sentence>
+Effort: <slug>
+Rigor: mvp · Max: smarter · Your session: Opus 5.5
+Plan: inline on your session (Opus 5.5)
+Plan review: smarter - Opus 5.5
+Implement: smarter - Opus 5.5
+Code review (+ triage, re-reviews): smarter - Opus 5.5
+Bug fix: smarter - Opus 5.5
+Docs: smart - Sonnet 5.5
+```
+
+…plus at most one warning line (e.g. your model is below the planning level, or the host runs
+every step in your session). **At mvp/prod the card waits for one answer:** Launch (also
+confirms the effort name) · Change rigor or max · Edit goal or name · Cancel — nothing is
+written to disk before Launch, so cancelling is always clean. **At yolo/poc it prints and goes.**
+The card replaces deep-plan's own goal-confirmation question — deep-goal passes `--confirmed`
+so you aren't asked twice. **`--dry-run` prints the resolved pipeline, with the model each stage
+would run on and cost bands, and stops** — it dispatches nothing, writes nothing, and skips the
+handshake entirely. Make previewing a habit: it is the cheapest question you can ask the add-on.
 
 ### Module 3 — The planning window
 Branch on the plan stage's `mode`: **autonomous** (yolo/poc) dispatches
 `deep-plan --autonomous --effort=<slug>` (+ `--columbo` per the map) — zero questions; every
 self-answered decision lands as an **Assumptions** row in the plan, and the run report
 reproduces them verbatim. **Interactive** (mvp/prod) runs `/deep-plan` inline with
-`--rounds=<n>` from the map — normal planning, your answers. Either way the planning record
-completes when `plan.md` exists — the autonomy boundary.
+`--rounds=<n>` from the map — normal planning, your answers, **on your current model** (it runs
+in your session). Either way the planning record completes when `plan.md` exists — the autonomy
+boundary.
+
+**Already planned? Continue from your plan.** Plan interactively with `/deep-plan` on its own;
+when it finishes it offers to *"run the remaining stages autonomously with deep-goal"* (only
+when deep-goal is installed, and only for an interactive, standalone plan). Saying yes — or
+later saying *"continue from my plan"* / `--from-plan[=<path>]` — makes deep-goal **adopt** that
+plan (`.deep-skills/<effort>/01-Plan/plan.md`) instead of planning again: the plan stage is
+recorded `complete (adopted)` and the run starts at **plan review** (mvp/prod) or **implement**
+(yolo/poc). With no path, deep-goal finds the plan, or asks which one if there are several.
 
 ### Module 4 — Dispatch and the advance test
 Each remaining stage: mark `in-flight` → render the stage briefing (the subagent's **entire
@@ -172,14 +254,17 @@ Every flag is **natural-language-first** — the plain-language trigger is the p
 | Flag | Say | What it does |
 |---|---|---|
 | *(goal argument)* | *"run deep-goal on \<feature\>"* | The feature/goal to take through the pipeline. |
-| `--rigor=<level>` | *"at mvp rigor"*, *"yolo it"* | Select the rigor level. Omitted → one structured question (recommends mvp). |
-| `--dry-run` | *"preview the run"*, *"what would a prod run do"* | Print the resolved pipeline + cost bands and stop. Dispatches nothing; exempt from the version handshake. |
+| `--rigor=<level>` | *"at mvp rigor"*, *"yolo it"* | Select the rigor level. Omitted → asked before launch, together with `--max` if that's missing too (recommends mvp). |
+| `--max=<smartest\|smarter\|smart>` | *"use the smartest models"*, *"keep it to smarter models"*, *"max smart"* | The highest model level any stage may use. With smartest: planning, plan review and code review on Fable 5.2, building and bug fixing on Opus 5.5, docs on Sonnet 5.5. Omitted → asked (recommends your current model's level). The phrase must name a level. |
+| `--from-plan[=<path>]` | *"continue from my plan"* | Adopt a plan you already made with `/deep-plan` instead of planning again; starts at plan review (mvp/prod) or implement (yolo/poc). |
+| `--dry-run` | *"preview the run"*, *"what would a prod run do"* | Print the resolved pipeline — each stage with the model it would run on — plus cost bands, and stop. Dispatches nothing; exempt from the version handshake. |
 | `--budget=<band>` | *"cap spend at ~500k tokens"* | Soft token ceiling, checked between stages; crossing pauses + notifies; resume continues. |
 | `--gate=<stage>` (repeatable) | *"pause before implement"* | Inject a human checkpoint before a named stage; persisted, honored on resume; fires once. |
 | `--worktree` | *"build in a worktree"* | One conductor-owned worktree for all post-planning stages; report carries merge instructions. |
 
 The conductor also *dispatches* core flags you already know (`deep-plan --autonomous
---effort=<slug> --columbo --rounds=<n>`, `deep-code-review --triage --auto-accept-min=<sev>`)
+--effort=<slug> --columbo --rounds=<n> --confirmed`, `deep-code-review --triage
+--auto-accept-min=<sev>`, and `--max=<level>` on every stage)
 — those are free-tier deep-skills features, documented on their own skill pages.
 
 ---
@@ -211,6 +296,9 @@ the [Deep-Learn overview](README.md#deep-learn--the-self-improving-directive-loo
    deep-implement's phase summaries).
 6. **Report audit:** take a completed poc run report and list every decision the pipeline made
    alone — Assumptions, auto-deferrals — and decide which ones you'd have made differently.
+7. **Model call:** from a Sonnet 5.5 session, dry-run an mvp effort at `--max=smartest`, then at
+   `--max=smart`. Predict each stage's model before reading the output, and name the one stage
+   whose model the dry-run can't change (interactive planning — it runs in your session).
 
 ---
 
@@ -229,6 +317,16 @@ the [Deep-Learn overview](README.md#deep-learn--the-self-improving-directive-loo
   test (artifact + manifest flip) is the only evidence.
 - **Hand-editing `pipeline.md`** or another skill's manifest line — pipeline state is
   conductor-owned; stage lines are each skill's own.
+- **Assuming your current model decides what every stage runs on** — it only sets the
+  recommended `--max` and what runs in your session (the conductor and interactive planning).
+  Starting in Sonnet 5.5 with `--max=smartest` still builds on Opus 5.5 and reviews on
+  Fable 5.2. To change what runs where, pick a different `--max` (or repin it in
+  `.deep-skills/model-map.json`).
+- **Planning at mvp/prod below the level you chose** — interactive planning runs in your
+  session. If the launch card warns that your model is below the planning level, switch with
+  `/model` (or your assistant's model picker) *before* Launch.
+- **Re-planning work you already planned** — if you ran `/deep-plan` yourself, say *"continue
+  from my plan"* (`--from-plan`) instead of starting deep-goal from scratch.
 - **Ignoring auto-deferred findings** because the run "passed" — deferral is loud by design;
   the run report lists every one with severity. Triage them like you would any Deferreds row.
 - **Running prod rigor on a non-Claude-Code host** and hitting context limits — the inline
@@ -243,6 +341,8 @@ the [Deep-Learn overview](README.md#deep-learn--the-self-improving-directive-loo
 - [ ] Read a run report and accounted for every Assumption and auto-deferred finding.
 - [ ] Correctly predicted HALT vs CONTINUE for a spine and a tail blocker.
 - [ ] Killed and resumed a run with no duplicated stage side effects.
+- [ ] Read a launch card and predicted each stage's model for a `--max` you chose.
+- [ ] Handed an interactive `/deep-plan` to deep-goal with `--from-plan`.
 - [ ] Authored a repo rigor override that survives launch validation.
 
 ## Quick reference
@@ -253,9 +353,12 @@ the [Deep-Learn overview](README.md#deep-learn--the-self-improving-directive-loo
 | Output | The six skills' own artifacts, plus `00-Manifest/pipeline.md` (state) and `00-Manifest/run-report.md` (accountability) |
 | State | `pipeline.md` — every boundary; kill + re-invoke = resume |
 | Interactivity | Planning window only; then gates and budget pauses, nothing else waits |
+| Model allocation | Three fixed levels — smartest (Fable 5.2), smarter (Opus 5.5), smart (Sonnet 5.5); `--max` picks each stage's model (with smartest: plan/plan review/code review Fable 5.2, implement/bug fix Opus 5.5, docs Sonnet 5.5); default = your current model's level; interactive planning runs in your session |
+| Launch card | Goal, effort, rigor, max, the model per stage, ≤ 1 warning; waits for Launch at mvp/prod, prints and goes at yolo/poc |
+| Continue from a plan | `--from-plan` / *"continue from my plan"* — adopts your `/deep-plan` plan, starts at plan review (mvp/prod) or implement (yolo/poc) |
 | Advance test | Artifact at canonical path AND manifest line flipped (round-aware in the loop) |
 | Hard rules | Never writes code/plans/reviews/docs; read-only on stage lines; artifacts are the only inter-stage channel; refuses at launch, never mid-run |
-| Requires | deep-skills ≥ 0.2.0 (verified at launch); the core skills never require deep-goal |
+| Requires | deep-skills ≥ 0.3.0 (verified at launch); the core skills never require deep-goal |
 | Hosts | Claude Code = verified floor; others inline-sequential — [`plugins/deep-goal/HOSTS.md`](../../plugins/deep-goal/HOSTS.md) |
 
 ⬅ Back to the [Training Program](README.md) — or run the six-skill capstone by hand first;
