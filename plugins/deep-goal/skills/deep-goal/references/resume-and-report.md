@@ -64,7 +64,7 @@ Once § 1.3 rule 1's version re-check has passed (it runs first and may refuse b
 
 **Double-dispatch guard, re-entry edition:** within a live session, `conductor.md` § 3's guard *announces* an in-flight stage rather than dispatching beside it. On re-entry the human's re-invocation is the evidence the prior conductor died - so the question announces the in-flight record (and whether its artifacts check out), and choosing Resume either completes it (idempotency row) or re-dispatches it (died mid-flight row). Exactly one re-dispatch per resume per stage; a stage is never dispatched while another record is `in-flight`.
 
-**What resume never does:** re-ask rigor or max · re-derive base or re-resolve models (except the one-time legacy back-fill above) · re-derive the header · archive anything (that is fresh's job) · rewrite a `complete` record · re-fire an approved gate · create a second worktree or effort dir · dispatch past a boundary whose checks fail.
+**What resume never does** (except § 1.3's two re-validation rules: the version re-check and the one-time pre-0.3.0 back-fill)**:** re-ask rigor or max · re-derive base or re-resolve models · re-derive the header · archive anything (that is fresh's job) · rewrite a `complete` record · re-fire an approved gate · create a second worktree or effort dir · dispatch past a boundary whose checks fail.
 
 ## 2. The final run report
 
