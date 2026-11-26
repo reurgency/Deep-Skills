@@ -10,6 +10,7 @@
 
 > **Goal:** <one-line goal as invoked>
 > **Rigor:** `<level>` (source: <shipped templates/rigor-map.json | repo override .deep-skills/rigor-map.json>) · **Outcome:** <complete - N/N dispatches | complete with CONTINUE blockers - N/N dispatches>
+> **Max:** `<tier>` (source: <flag | asked | default>) · **Base:** `<model-id>`< (resumed on `<model-id>` - inline stages after the resume ran there)>
 > **State:** [pipeline.md](pipeline.md) · [manifest.md](manifest.md)
 
 ## Stages run
@@ -18,7 +19,7 @@ One row per dispatch record, in run order (loop rounds included). Commits are re
 
 | # | Stage | Status | Artifact | Commits | Spend (est) |
 |---|---|---|---|---|---|
-| 1 | plan | complete | [plan.md](../01-Plan/plan.md) | - | ~<N>k |
+| 1 | plan | <complete \| complete (adopted)> | [plan.md](../01-Plan/plan.md) | - | ~<N>k \| 0 (adopted) |
 | 2 | <stage> | <status> | [<artifact>](<canonical path>) | <shas \| -> | ~<N>k |
 
 ## Assumptions (from the plan - verbatim)
@@ -26,7 +27,9 @@ One row per dispatch record, in run order (loop rounds included). Commits are re
 Every decision the autonomous planner made **alone**, reproduced verbatim from [`01-Plan/plan.md` § Assumptions](../01-Plan/plan.md) - the unattended run's audit trail (this report is the ledger's canonical reader). Read each row: this is what nobody was asked.
 
 <!-- interactive-planning runs replace the table with: "None - planning was interactive at this
-     rigor; these calls were the user's." -->
+     rigor; these calls were the user's." An adopted plan (--from-plan) with no Assumptions
+     section: "None - the plan was adopted from an existing deep-plan session; its calls were
+     the user's." -->
 
 | # | Question | Chosen answer | Why |
 |---|---|---|---|
@@ -64,12 +67,16 @@ The loop's ledger, from pipeline.md (snapshots stay there - plumbing, not outcom
 
 ## Spend - uncalibrated estimates
 
-Heuristic bands per `rigor-levels.md` § Cost bands, refined by observed usage where the host surfaced it - **estimates, never measurements**.
+Heuristic bands per `rigor-levels.md` § Cost bands, refined by observed usage where the host surfaced it - **estimates, never measurements**. The **Model** column is the model each stage lead **actually ran on** (pipeline.md's Stage list after dispatch - `references/conductor.md` § 3), with its level; helper agents inside a stage are listed in that stage's own report header.
 
-| Stage | Spend (est) |
-|---|---|
-| <stage> | ~<N>k |
-| **Total** | **~<N>k tokens** |
+| Stage | Model (actually ran) | Spend (est) |
+|---|---|---|
+| <stage> | <tier: model-id[ (fallback from model-id)] \| your session: model-id (inline) \| adopted - not run> | ~<N>k |
+| **Total** | | **~<N>k tokens** |
+
+<!-- If any stage ran on a fallback model, say so plainly here, e.g. "smartest ran on Fable 5
+     (claude-fable-5) - no Fable 5.2 access this run." A degraded run is the user's best, but it is
+     never presented as equal to a full-access run (references/model-map.md § Access fallback). -->
 
 <!-- --budget runs append: ceiling ~<band>; Budget events reproduced from pipeline.md. -->
 

@@ -5,8 +5,14 @@
        {skill_path}    - that skill's SKILL.md under the launch-resolved deep-skills install
                          (a Claude-Code-specific location optimization; the NAME is authoritative)
        {effort_name}   - the effort slug (artifacts home: .deep-skills/{effort_name}/)
-       {stage_flags}   - this stage's arguments + flags from the resolved rigor map
+       {stage_flags}   - this stage's arguments + flags from the resolved rigor map, ALWAYS
+                         ending with --max=<x> (the run's max from the pipeline.md header)
                          (conductor.md § Stage → invocation table)
+       {stage_tier}    - the stage's level for this run's max: smartest | smarter | smart
+                         (conductor.md § Model resolution; model-map.json stages.<max>.<stage>)
+       {stage_model}   - the model ID this subagent was actually launched on (after any
+                         try-and-fall-back) - the conductor sets the subagent's model to it
+                         explicitly; echoed here for the stage's own run-report header
        {worktree_path} - two renderings (references/loop-and-budget.md § 5):
                          · no --worktree: "none - work on the current branch per the skill's own
                            defaults"
@@ -28,6 +34,7 @@ You are running **one stage** of an autonomous deep-* pipeline (conducted by dee
 
 - On Claude Code its SKILL.md is at `{skill_path}` - a location shortcut only; the skill is invoked **by name**, and its own SKILL.md (directive cards, workflow, guardrails, artifacts) defines everything you do. Read and follow it completely.
 - **Effort:** `{effort_name}` - all artifacts for this run live under `.deep-skills/{effort_name}/`. If your skill asks which effort/plan/findings to use, it is this one; never propose a different effort name.
+- **Model:** you run at **`{stage_tier}`** (`{stage_model}`); helper agents resolve from `--max` via your skill's model map - follow your skill's own agent table and `references/model-map.md`, setting each helper's model explicitly.
 - **Working tree:** {worktree_path}
 
 Pipeline rules - these bind you on top of the skill's own guardrails, never instead of them:

@@ -18,17 +18,21 @@
 
 > **Goal:** <one-line goal as invoked>
 > **Rigor:** `<level>` (source: <shipped templates/rigor-map.json | repo override .deep-skills/rigor-map.json>)
+> **Max:** `<smartest | smarter | smart>` (source: <flag | asked | default>) · models from <shipped references/model-map.json | shipped + repo override .deep-skills/model-map.json>
+> **Base:** `<model-id>` (the session deep-goal was launched in; tier <smartest | smarter | smart | below floor - warned>)<; host runs stage leads inline on base>
 > **deep-skills:** `<resolved plugin.json path>` · version <x.y.z - handshake pass | unverified (no semver version field - warning logged, capabilities assumed)>
 > **Gates:** <none | before <stage>[, …]> · **Budget:** <none | ~<band> tokens> · **Worktree:** <none | pending (created after planning) | <path> (branch deep-goal/<effort>)>
 
 ## Stage list (resolved at launch)
 
-The resolved level's stages in dispatch order, with the invocation each renders to (`references/conductor.md` § Stage → invocation table). A `code-review` stage with a `triage` option expands to two dispatches.
+The resolved level's stages in dispatch order, with the invocation each renders to (`references/conductor.md` § Stage → invocation table - every invocation ends with `--max=<x>`) and the **model** each stage lead runs on (`references/conductor.md` § Model resolution). A `code-review` stage with a `triage` option expands to two dispatches (triage and re-review rounds use the code-review tier).
 
-| # | Stage | Dispatch | Invocation |
-|---|---|---|---|
-| 1 | plan | <inline (interactive) *or* subagent (autonomous)> | `deep-plan <…flags per the map>` |
-| 2 | <stage> | subagent | `<skill> <…flags>` |
+**Model column - written twice** (contract row 4): at launch it holds the **planned** `<tier>: <model-id>`; when the stage's record leaves `in-flight` (inline stages: on completion, or on resume) the conductor **overwrites** it with the model that actually ran - `<tier>: <id>`, plus ` (fallback from <planned id>)` when the host rejected the planned one. Other renderings: `your session: <id> (inline)` for interactive planning; `your session: <id> (inline-led)` for every stage lead on a host without background agents; `adopted - not run` for a `--from-plan` plan. A later dispatch of the same stage that ran on a different model notes `model: <id>` in its own record's Notes. Re-read on resume, never re-resolved.
+
+| # | Stage | Dispatch | Model | Invocation |
+|---|---|---|---|---|
+| 1 | plan | <inline (interactive) \| subagent (autonomous) \| adopted> | <your session: model-id (inline) \| tier: model-id (autonomous) \| adopted - not run> | `deep-plan <goal> --confirmed <…flags> --max=<x>` (inline) \| `deep-plan <goal> --autonomous <…flags> --max=<x>` \| - (adopted) |
+| 2 | <stage> | subagent | <tier: model-id[ (fallback from model-id)]> | `<skill> <…flags> --max=<x>` |
 
 ## Artifact baseline (recorded at launch)
 
@@ -50,7 +54,7 @@ One record per dispatch, in order. **Status:** `pending` → `in-flight` → `co
 
 | # | Stage | Status | Started | Finished | Advance test | Spend (est) | Notes |
 |---|---|---|---|---|---|---|---|
-| 1 | plan | pending | - | - | - | - | - |
+| 1 | plan | <pending \| complete (adopted: Started = Finished = launch; Advance test `adopted - <path> @ <mtime>`; Spend 0; Notes `adopted (--from-plan)`)> | - | - | - | - | - |
 | 2 | <stage> | pending | - | - | - | - | - |
 
 - **Advance test** - the conductor's own verification result, e.g. `pass - 01-Plan/plan.md exists`, `pass - summary.md + manifest "03 Implementation: complete"`, `fail - findings.json has open statuses`, `skipped - zero accepted-and-unfixed findings, nothing to fix` (empty-set short-circuit, `references/loop-and-budget.md` § 1.5). Per-stage checks: `references/conductor.md` § 4.

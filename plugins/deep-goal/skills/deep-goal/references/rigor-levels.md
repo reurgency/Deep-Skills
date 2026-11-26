@@ -12,7 +12,7 @@ Each level in `rigor-map.json` carries:
 |---|---|
 | `stages[]` | Ordered stage list. Each entry names a stage from the `known_stages` roster plus its per-stage options. |
 | `stages[].mode` | On `plan`: `autonomous` (dispatched, zero questions, self-answered decisions recorded as Assumptions) or `interactive` (run inline - the user is present by definition). On `plan-review` / `code-review`: `single-agent` or `multi-agent` (dispatched with `--multi-agent`). |
-| `stages[].rounds` | On `plan`, interactive mode: front-loaded question rounds (`deep-plan --rounds=<n>`); interactive planning also offers optional gap rounds beyond the front-loaded count. `0` under autonomous. |
+| `stages[].rounds` | On `plan`, interactive mode: front-loaded question rounds (passed as `--rounds=<n>` on the inline deep-plan invocation, `conductor.md` § Stage → invocation table); interactive planning also offers optional gap rounds beyond the front-loaded count. `0` under autonomous. |
 | `stages[].columbo` | On `plan`: whether the plan ends with a self-run columbo pass (`--columbo`). An option of the plan stage, **not** a dispatch stage. |
 | `stages[].triage` | On `code-review`: `{"auto_accept_min": N}` → the conductor invokes `deep-code-review --triage --auto-accept-min=N`. Findings at/above severity `N` are auto-accepted; everything below is **auto-deferred** into the plan's Deferreds ledger and reported loudly in the run report - never auto-rejected. Blockers (9-10) auto-accept regardless. An option of the code-review stage, **not** a dispatch stage. |
 | `re_review_cap` | Max re-review rounds in the code-review → triage → bugfix loop. Absent when the level runs no code review. The loop's exit semantics per level live in `references/conductor.md` / `loop-and-budget.md`; the cap number lives only here in the map. |
@@ -89,7 +89,7 @@ The conductor validates the override **at launch, before any dispatch**, and ref
 
 1. **JSON must parse.** A parse error names the file and the parser's error.
 2. **Stage names** - every `stages[].stage` must exist in the merged `known_stages` roster. Unknown → refuse, naming the level, the bad stage name, and the roster. A roster entry with `available: false` (e.g. the reserved `security` slot for the future `/deep-security` skill) → refuse as "reserved, not yet shipped", naming the stage.
-3. **Stage list shape** - `stages` must be a non-empty array; the **first stage must be `plan`** (the pipeline builds on a plan; the interactivity boundary is defined by it).
+3. **Stage list shape** - `stages` must be a non-empty array; the **first stage must be `plan`** (the pipeline builds on a plan; the interactivity boundary is defined by it). This holds under `--from-plan` too: the plan stage stays in the list and is recorded `complete` as adopted at launch (its `mode`/`rounds`/`columbo` are ignored), and dispatch starts at the next stage in the list (`conductor.md` § 1c).
 4. **Options belong to their owner** - `mode`/`rounds`/`columbo` only on `plan` (`mode` ∈ `autonomous`|`interactive`; `rounds` integer ≥ 0; `columbo` boolean); `mode` on `plan-review`/`code-review` ∈ `single-agent`|`multi-agent`; `triage` only on `code-review` with `auto_accept_min` an integer 1-10. An option on the wrong stage, an unknown option key, or an out-of-range value → refuse, naming the key.
 5. **Caps** - `re_review_cap` integer ≥ 0; required when the level's list contains `code-review`, meaningless (refused) when it doesn't.
 6. **Level names** - non-empty strings; a level must be an object with a valid `stages` array.
