@@ -2,7 +2,9 @@
      Written by the cluster's DIAGNOSE agent (read-only otherwise); read by the FIX agent (its only
      cause input), the proof agent (the confirmed-cause statement), and - when the cluster closes -
      copied into the cluster's fix-summary.md "Confirmed cause" line (and root-causes.json under --learn).
-     A retry, a redirect, or a diagnosis-disputed re-run REWRITES this file (fresh diagnose agent).
+     A retry, a redirect, or a diagnosis-disputed re-run REWRITES this file (fresh diagnose agent);
+     whenever an attempt fails (attempt 1 or 2 - before any revert, retry or cap handling), the orchestrator appends a "> **Refuted:** <unproven | regressed | diagnosis-disputed> - <reason>"
+     line here so a crash-resume knows this attempt failed (the rewrite removes it).
      Split: each new cluster id gets its own file; the original file's first line becomes
      "Superseded by <CL-Ka>, <CL-Kb>". See references/clustering-and-diagnosis.md. -->
 

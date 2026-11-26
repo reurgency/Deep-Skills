@@ -53,4 +53,4 @@ At round start (after the re-entry check in `references/commit-and-handoff.md`),
 }
 ```
 
-`defects` is the selection; `clusters` is the **provisional** cluster plan (clusters are hypotheses - splits/merges during diagnosis are appended as updated entries, never rewritten over). This file is what makes a crashed run recoverable: statuses alone cannot reconstruct scoped-in `open` findings or synthesized `BF-*` defects. Resume = `scope.json` minus defects already `fixed`.
+`defects` is the selection; `clusters` is the **provisional** cluster plan (clusters are hypotheses - splits/merges during diagnosis are appended as updated entries, never rewritten over). This file is what makes a crashed run recoverable: statuses alone cannot reconstruct scoped-in `open` findings or synthesized `BF-*` defects. Resume = `scope.json` minus defects already `fixed` and minus clusters already closed in `fix-summary.md`.
