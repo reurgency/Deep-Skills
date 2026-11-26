@@ -2,7 +2,7 @@
 
 > **Series-shared reference.** Copied **byte-identically** into every deep-* skill's and deep-goal's `references/` directory (the series standalone rule forbids cross-skill references). All copies must stay byte-identical. The series consistency sweep (`scripts/check-shared.sh`, maintainers only) verifies this.
 
-> **Required launch input, not an optional pointer.** Before launching any agent, a skill reads this file and its sibling **`references/model-map.json`**, merges the optional repo override (§ Repo override), and sets every agent's model **explicitly** to a full model ID. This is the model-tier routing correctness guarantee (`references/host-affordances.md`), not a tunable affordance. It is host-agnostic: the same files resolve on Claude Code, Codex, Cursor, and Copilot.
+> **Required launch input, not an optional pointer.** Before launching any agent, a skill reads this file and its sibling **`references/model-map.json`**, merges the optional repo override (§ Repo override), resolves every agent's model to a full model ID, and sets it **explicitly** on every launch with the host's launch value (§ Host binding). This is the model-tier routing correctness guarantee (`references/host-affordances.md`), not a tunable affordance. It is host-agnostic: the same files resolve on Claude Code, Codex, Cursor, and Copilot.
 
 **Data vs rules.** `model-map.json` is the **only** place model IDs and stage tiers live: the ladder (per tier, per model family, current then previous generation), the unused utility equivalents, and the `--max` stage table. This file holds the **rules** for reading it and never restates an ID. When this file seems to disagree with the JSON about a model or a tier assignment, the (merged) JSON wins.
 
@@ -24,11 +24,13 @@ Three tiers, named by intelligence only, from strongest down:
 
 `ladder.<tier>.<family>` in `model-map.json` is a list of model IDs for that tier in that model family (`claude`, `gpt`). The **first** entry is the current generation, the next is the previous generation - the list is also the access-fallback order for that tier (§ Access fallback).
 
+GPT entries are display names until the host IDs are confirmed (RE-VERIFY); Claude entries are host model IDs. Matching against the ladder uses the normalization in § Base-tier lookup.
+
 ## Column = base's family
 
 Resolve every agent from the **same family as base** (the session model, § Base): a Claude base reads the `claude` lists, a GPT base reads the `gpt` lists. A run never mixes families - hosts cannot dispatch the other family's models.
 
-If base is not on the ladder (unknown ID), use the host's native family (Claude on Claude Code; GPT on Codex and on Copilot running a GPT model) and warn as for a below-floor model (§ Base).
+If base is not on the ladder (unknown ID), use the host's native family (GPT on Codex and on Copilot running a GPT model; Claude everywhere else - Claude Code, Cursor, Copilot on any other model, any other host) and warn as for a below-floor model (§ Base). If the host cannot launch that family, § Access fallback step 5 applies.
 
 ## Reasoning effort
 
@@ -49,7 +51,7 @@ The tier is the model; effort is never used to make up for a lower tier.
 
 ### Base-tier lookup
 
-Find base's tier by matching the session model's ID against **every list in the merged ladder** (both families, current and previous generation; ignore case and any host-added suffix such as a date or context-size tag). Exact match only - never guess a tier from a family name.
+Find base's tier by matching the session model's ID against **every list in the merged ladder** (both families, current and previous generation; ignore case, treat spaces, hyphens and underscores as equal, and ignore any host-added suffix such as a date or context-size tag). Exact match only - never guess a tier from a family name. The same normalization applies to the one-tier-only uniqueness check (§ Repo override, rule 6) and to matching a reported model ID (§ Binding rules, rule 5).
 
 | Session model | Base tier |
 |---|---|
@@ -103,18 +105,32 @@ The user's **access** (their plan or org may block a model) is the only thing th
 2. Then the **same tier's** previous-generation ID.
 3. Then step down one tier and repeat (current, then previous) - down to the floor `smart`.
 4. If nothing at or below the tier is accessible, collapse **up** to the nearest accessible tier.
+5. If no ladder model in base's family is accessible at any tier: a small/utility base (rule 4) → refuse, with the below-floor warning wording plus "no supported model is available to launch helper agents". Any other base → launch on base (explicitly; on an alias host, base's family word, or inherit where the host only allows that), record `<base id> (fallback: no ladder model accessible)`, and present the run as degraded. On an alias host, step 5 is **exempt** from the no-same-alias and discard rules (§ Host binding; rule 5). If an earlier alias attempt returned a reported model that is off-ladder but not small, that output is **kept, not discarded**, and it is the step-5 result, with no relaunch. Otherwise launch once with base's family word, or inherit the session model where the host allows only that (the one sanctioned exception to rule 2), and accept the reported model unless it is small (small → refuse, rule 4). Either way, record `<reported id> (fallback: no ladder model accessible)` and mark the run degraded.
 
-**Detection is try-and-fall-back:** launch with the candidate; a launch the host rejects as unavailable or unauthorized moves to the next candidate. Never pre-guess what the user can access.
+**Detection is try-and-fall-back:** launch with the candidate; a launch the host rejects as unavailable or unauthorized moves to the next candidate (a schema or validation rejection is a binding error - § Host binding - not unavailability). Never pre-guess what the user can access.
 
 **Record the model actually used.** Every run records, in its report header, `Base: <id> · Max: <tier> · Models: <role> <id>, …`, with any fallback noted (`<id> (fallback from <id>)`). deep-goal writes the same into `pipeline.md` and its run report. A degraded run is allowed - it is the user's best - but it is never presented as equal to a full-access run.
 
+## Host binding
+
+The ladder ID is the model's **identity**: what is resolved, recorded and verified. The **launch value** is what the host's per-agent model setting accepts. Each host:
+
+- **Claude Code:** the Agent tool's `model` accepts family aliases only (`fable`, `opus`, `sonnet`; RE-VERIFY per release). The launch value is the family word of the resolved ID (the token after `claude-`). It is never `haiku`, whatever the tier. Pass it explicitly on every launch, built-in types included (rule 3). Because the host resolves the alias, verification is mandatory: every launch carries the model report (below), then rule 5 applies. The plugins ship no `.claude/agents/*.md` files, so full-ID pinning is not available on this host today.
+- **Codex, Cursor, Copilot:** the launch value is the resolved ID itself, in the host's per-agent `model` field (RE-VERIFY per host, especially GPT display names, § The ladder).
+
+**Model report.** Every brief the orchestrator gives a launched agent (finder, verifier, diagnose/fix/proof agent, explorer, deep-goal stage lead) ends with this line, appended verbatim after the brief's own output contract: *'After everything else in your final response, add one last line: `MODEL: <your exact model ID>` - the ID from your own system context, not any ID this brief names.'* The line sits **outside** any fixed output format the brief requires. The orchestrator reads it and strips it before parsing or assembling that format (verdict blocks, card verdicts, proof verdicts). The **reported ID** is the model that ran: compare it with the resolved ID (normalization: § Base-tier lookup) and apply rule 5 and the alias paragraph below. Where host transcript metadata names the model, that metadata substitutes for the line. Neither present → record `<resolved id> (unverified - launched as <launch value>)` and continue. This convention applies on every host and is mandatory where the launch value is an alias.
+
+**Binding errors are not access errors.** A launch the host rejects because the value fails its schema or validation (not an allowed value, malformed) is a binding error. Correct the launch value per this section and relaunch, **at most once per candidate.** If this section defines no other launch value for that candidate, or the corrected value is also rejected, the candidate counts as **not accessible on this host** and § Access fallback advances, recorded as `<id> (binding error: <rejected value>)`. If every candidate, step 5 included, ends this way, refuse, naming the host and the rejected values (a host-binding defect, reported for the HOSTS matrix). Short of that exit, a binding error never counts as unavailable and never advances § Access fallback. Only an access, authorization or model-not-available rejection advances it.
+
+**Alias hosts and the previous generation.** One alias stands for a whole tier, so step 2 (same tier, previous generation) cannot be selected. The alias's own resolution is that tier's single candidate. The verified ID decides the result: on the merged ladder in base's family and not small → valid; record it, with `(fallback from <resolved id>)` if it differs. Small → that tier counts as not accessible on this host: discard the output. Off the ladder (not small) → that tier counts as not accessible on this host: **set the output aside** (step 5 may use it). Either way, continue § Access fallback at the next tier's alias (no relaunch with the same alias, step 5 excepted). No model report and no metadata → record `<resolved id> (unverified - launched as <alias>)`.
+
 ## Binding rules
 
-1. **Pin the FULL model ID, never an alias.** Pass the exact ID from the ladder on every launch. A bare alias like `opus` is resolved by the host, not by this map: a calibration run that launched its finders with the `opus` alias silently got Opus 4.6, below the tier it was meant to run at.
+1. **Resolve to the FULL model ID, never to an alias.** The resolved ID is what every run records and verifies; the value passed at launch follows § Host binding. Where any skill says "pass/bind the full model ID, never an alias", read it this way. A bare alias like `opus` is resolved by the host, not by this map: a calibration run that launched its finders with the `opus` alias silently got Opus 4.6, below the tier it was meant to run at - which is why an alias launch is always verified (rule 5, § Host binding).
 2. **Set the model explicitly on every agent launch** (the host's per-agent model parameter). Never rely on inheritance from the session or on a host default.
 3. **Built-in agent types need the explicit model too.** Some hosts' built-in agent types carry their own default model - for example Claude Code's `Explore` type defaults to a small model (RE-VERIFY per host release). Every launch of such a type (exploration in deep-plan, plan-review dimensions, a single-agent review) passes the tier's model explicitly.
 4. **Small models never appear - any tier, any stage, any agent, any host.** The `_utility_unused` entries and the host's other small models (Haiku, GPT-mini, GPT-nano and the like) are never assigned. A calibration run whose finders silently routed to Haiku reported 0 Blockers and 0 Majors on a diff with two known Criticals - worse than no review, because it ships false confidence.
-5. **Detection → discard + relaunch.** If an agent's transcript or first response shows it running on a different model than the one this map resolved for it (other than a recorded access fallback), its output is invalid: discard it and relaunch with the model set explicitly.
+5. **Detection → discard + relaunch.** If an agent's model report (§ Host binding) or transcript shows it running on a different model than the one this map resolved for it (other than a recorded access fallback), its output is invalid: discard it and relaunch with the model set explicitly. On an alias-binding host, what an alias-resolved model counts as is defined in § Host binding; never relaunch with the same alias; § Access fallback step 5 is exempt.
 
 ## Repo override
 
@@ -136,7 +152,7 @@ A repository can repin a model or move a stage's tier without touching plugin fi
 
 1. The file must parse as JSON.
 2. Top-level keys: only `map_version`, `ladder`, `stages` (plus `_` keys). **Per-agent fleet tables are not overridable** - they live in each skill.
-3. Tiers (`ladder.<tier>`) and max levels (`stages.<max>`) are one of `smartest`, `smarter`, `smart`. No new tiers.
+3. Tiers (`ladder.<tier>`) and max levels (`stages.<max>`) are one of `smartest`, `smarter`, `smart`. No new tiers. Family keys under `ladder.<tier>` are `claude` and `gpt` only (`map_version` 2); any other key → refuse.
 4. The stage roster is fixed: `plan`, `plan-review`, `implement`, `code-review`, `bugfix`, `docs`. A stage's value is one of the three tiers.
 5. A stage's tier may not exceed its max (`stages.smart.docs = "smartest"` → refuse).
 6. Each ladder list is a non-empty list of non-empty model IDs; none may be a small/utility model; and an ID may appear in only one tier (so base-tier lookup stays unambiguous).

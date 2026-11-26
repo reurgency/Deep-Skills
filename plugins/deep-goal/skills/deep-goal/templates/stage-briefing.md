@@ -10,9 +10,10 @@
                          (conductor.md § Stage → invocation table)
        {stage_tier}    - the stage's level for this run's max: smartest | smarter | smart
                          (conductor.md § Model resolution; model-map.json stages.<max>.<stage>)
-       {stage_model}   - the model ID this subagent was actually launched on (after any
-                         try-and-fall-back) - the conductor sets the subagent's model to it
-                         explicitly; echoed here for the stage's own run-report header
+       {stage_model}   - the model ID this launch attempt is set to (the planned or
+                         fallback-candidate ID, not an observation) - the conductor sets the
+                         subagent's model to it explicitly, and re-renders the briefing for
+                         every try-and-fall-back relaunch (conductor.md § 3 step 3)
        {worktree_path} - two renderings (references/loop-and-budget.md § 5):
                          · no --worktree: "none - work on the current branch per the skill's own
                            defaults"
@@ -34,7 +35,7 @@ You are running **one stage** of an autonomous deep-* pipeline (conducted by dee
 
 - On Claude Code its SKILL.md is at `{skill_path}` - a location shortcut only; the skill is invoked **by name**, and its own SKILL.md (directive cards, workflow, guardrails, artifacts) defines everything you do. Read and follow it completely.
 - **Effort:** `{effort_name}` - all artifacts for this run live under `.deep-skills/{effort_name}/`. If your skill asks which effort/plan/findings to use, it is this one; never propose a different effort name.
-- **Model:** you run at **`{stage_tier}`** (`{stage_model}`); helper agents resolve from `--max` via your skill's model map - follow your skill's own agent table and `references/model-map.md`, setting each helper's model explicitly.
+- **Model:** you were launched for **`{stage_tier}`** (planned model `{stage_model}`). Your skill's run-report header records your own model as your system context gives it, never this planned ID; helper agents resolve from `--max` via your skill's model map - follow your skill's own agent table and `references/model-map.md`, setting each helper's model explicitly.
 - **Working tree:** {worktree_path}
 
 Pipeline rules - these bind you on top of the skill's own guardrails, never instead of them:
@@ -42,3 +43,4 @@ Pipeline rules - these bind you on top of the skill's own guardrails, never inst
 1. **Artifacts are the only channel.** Everything you need from earlier stages is already in `.deep-skills/{effort_name}/` (plan, manifest, review artifacts - read what your skill directs); everything you produce must land in your skill's canonical artifacts. You receive no transcripts and pass none forward.
 2. **Your final message is not the channel - write the artifacts.** The conductor advances only on artifact evidence: your skill's expected output files at their canonical paths, and your skill's own manifest stage line updated exactly as it prescribes. A closing summary that isn't backed by artifacts counts as not done.
 3. **Stay in your stage.** Run `{skill_name}` with the arguments above and stop - do not invoke other deep-* skills (unless your skill's own workflow explicitly does), do not edit `00-Manifest/pipeline.md` or another stage's artifacts, and ask the user nothing: this pipeline is autonomous. If you hit a blocker, do what your skill prescribes (its blocker report / notification), then stop.
+4. **Model report.** After everything else in your final message, add one last line: `MODEL: <your exact model ID>`, the ID from your own system context. This line is the one thing your final message carries (rule 2 still holds for everything else).

@@ -14,7 +14,7 @@ The Deep-Learn directive loader (`skills/deep-goal/scripts/load-active-cards.sh`
 |---|---|---|---|---|
 | `SKILL.md` skills (this skill loads) | ✓ | ✓ gate | ✓ gate | ✓ gate |
 | **Per-stage fresh-subagent dispatch** | ✓ | ⚠ inline sequential | ⚠ inline sequential | ⚠ inline sequential |
-| **Per-stage model selection** (`--max` + the shared model map, `references/model-map.json` / `model-map.md`) | ✓ Agent `model` param | ⚠ stage leads run on your current model; helper agents inside a stage still get their models | ⚠ same | ⚠ same (a stage's helpers may fall back to one agent) |
+| **Per-stage model selection** (`--max` + the shared model map, `references/model-map.json` / `model-map.md`) | ✓ Agent `model` param (family alias; model verified - RE-VERIFY) | ⚠ stage leads run on your current model; helper agents inside a stage still get their models | ⚠ same | ⚠ same (a stage's helpers may fall back to one agent) |
 | Structured questions (rigor selection, gates, resume/fresh) | ✓ `AskUserQuestion` | ⚠ numbered-list chat fallback | ⚠ numbered-list chat fallback | ⚠ numbered-list chat fallback |
 | Notifications (halts, gates, budget pauses, completion) | ✓ `PushNotification` | ⚠ `osascript` → bold `ATTENTION:` line | ⚠ same fallback chain | ⚠ same fallback chain |
 | deep-skills discovery for the version handshake | ✓ `~/.claude/plugins/installed_plugins.json` | ⚠ sibling-install check (RE-VERIFY) | ⚠ sibling-install check (RE-VERIFY) | ⚠ checkout-relative (CLI: same as Claude Code) |
