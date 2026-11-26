@@ -110,7 +110,12 @@ Offer `/columbo` as the final completeness check. Fix anything it surfaces. This
 ### 9. Hand-off (optional deep-goal offer)
 **Interactive, standalone runs only.** Skip this step entirely - offer nothing - when any of `--autonomous`, `--confirmed`, `--rounds`, or `--effort` was given (these are orchestrator-style flags, so this also covers being called from inside a deep-goal run, including older deep-goal versions that don't pass `--confirmed`).
 
-Otherwise, **only if a `deep-goal` skill is available in this session** (it is listed among the session's available skills - do not probe install files; deep-goal is a separate, optional plugin and this skill never requires it), ask one structured question:
+Otherwise, make the offer only when all of these hold (deep-goal is a separate, optional plugin and this skill never requires it):
+- **A `deep-goal` skill is available in this session** - it is listed among the session's available skills. Do not probe install files.
+- **That deep-goal can continue from a plan** - its description or argument-hint, as shown in the session's skill listing, advertises `--from-plan` or a deep-skills requirement of ≥ 0.3.0. Decide from the listing text only, never by reading install files; if you can't tell, treat it as not advertised.
+- **The plan is at the default location** - it was written to `.deep-skills/<effort-name>/01-Plan/plan.md`, not to an explicit path override.
+
+When all hold, ask one structured question:
 > *Run the remaining stages autonomously with deep-goal? It continues from this plan; the rigor you pick decides which stages run.*
 
 Options, each with a preview listing the stages that rigor would run after this plan:
@@ -119,9 +124,9 @@ Options, each with a preview listing the stages that rigor would run after this 
 - **mvp** / **prod** - plan-review, implement, code-review, bugfix, docs.
 - **No, I'll continue myself** - close with the usual `/deep-plan-review` / `/deep-implement` pointers.
 
-On a rigor choice: invoke `/deep-goal --from-plan=<plan path> --rigor=<chosen level>` (on hosts without slash commands, ask for it in natural language: *"run deep-goal at <level> rigor and continue from my plan at <plan path>"*). deep-goal then asks whatever is still missing (rigor, model level) and shows its launch card. This skill's job ends at the invocation.
+On a rigor choice: invoke `/deep-goal --from-plan=.deep-skills/<effort-name>/01-Plan/plan.md --rigor=<chosen level>`, appending ` --max=<x>` when this session was given a model level (flag or phrase). Always pass the plan path repo-relative, never absolute. On hosts without slash commands, ask for it in natural language: *"run deep-goal at <level> rigor and continue from my plan at .deep-skills/<effort-name>/01-Plan/plan.md"*, adding *", using the <x> models"* when a model level was given. deep-goal then asks for the model level if it wasn't passed, and shows its launch card. This skill's job ends at the invocation.
 
-If no `deep-goal` skill is available, say nothing about deep-goal - just close with the usual `/deep-plan-review` / `/deep-implement` pointers.
+If no `deep-goal` skill is available, or the plan was written to an explicit path override, say nothing about deep-goal - just close with the usual `/deep-plan-review` / `/deep-implement` pointers. If deep-goal is available but its listing doesn't advertise continuing from a plan, make no offer; close with the usual pointers plus one plain line: *"Your deep-goal version can't continue from a plan yet - update the deep-goal plugin to use this hand-off."*
 
 ## Deferreds - nothing gets forgotten by phase 4
 

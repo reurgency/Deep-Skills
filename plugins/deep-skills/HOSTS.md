@@ -89,25 +89,27 @@ The VS Code editor has **no skills marketplace** - point it at this repo's skill
 
 ## Updating
 
-Third-party marketplace plugins are **not** auto-updated - pull new versions explicitly. **deep-goal** is a separate (free) plugin bundled in the same marketplace; it requires **deep-skills ≥ 0.3.0**, so update deep-skills first, then add deep-goal.
+Third-party marketplace plugins are **not** auto-updated - pull new versions explicitly. **deep-goal** is a separate (free) plugin bundled in the same marketplace; it requires **deep-skills ≥ 0.3.0**, so update deep-skills first, then update (or add) deep-goal.
 
 ### Claude Code
 ```
 /plugin marketplace update reurgency
 /plugin update deep-skills@reurgency
+/plugin update deep-goal@reurgency         # if you already have the conductor
 /plugin install deep-goal@reurgency        # if you don't have the conductor yet
 ```
 
 ### GitHub Copilot - CLI
 ```
 copilot plugin update deep-skills@reurgency     # or: copilot plugin update --all
-copilot plugin install deep-goal@reurgency
+copilot plugin update deep-goal@reurgency       # if already installed
+copilot plugin install deep-goal@reurgency      # if not yet installed
 copilot plugin list                             # verify
 ```
 Copilot auto-updates only **first-party** plugins on session start; third-party marketplaces (this one) need the manual `copilot plugin update`. There is **no** `copilot plugin marketplace update` subcommand today (an open feature request) - `plugin update` fetches the latest from the registry directly, so no separate catalog refresh is needed.
 
 ### Codex / Cursor (gate pending - RE-VERIFY)
-Codex: `codex plugin marketplace update reurgency` (RE-VERIFY the subcommand), then reinstall/update via `/plugins`. Cursor: update from Customize → Marketplace. Install the deep-goal plugin the same way on either.
+Codex: `codex plugin marketplace update reurgency` (RE-VERIFY the subcommand), then reinstall/update via `/plugins`. Cursor: update from Customize → Marketplace. Install or update the deep-goal plugin the same way on either.
 
 ### GitHub Copilot - VS Code editor (file-based)
 `git pull` your checkout of this repo - the `chat.agentSkillsLocations` path already points at it. To add the conductor, include `plugins/deep-goal/skills` alongside `plugins/deep-skills/skills`.

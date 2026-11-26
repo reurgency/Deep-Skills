@@ -79,6 +79,7 @@ It is a warning, not a refusal: the skill can't change the session's model.
 
 - `deep-code-review --triage --fix` forwards `--max=<x>` to the chained deep-bugfix run.
 - deep-goal passes `--max=<x>` in every dispatched stage's flags, so each stage's fleet resolves exactly as it would standalone. deep-goal's triage dispatch and re-review rounds 2+ use the `code-review` stage tier.
+- deep-plan's deep-goal hand-off (step 9) forwards `--max=<x>` when deep-plan was given one.
 
 ### Hosts without background subagents
 
