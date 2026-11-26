@@ -55,11 +55,11 @@ deep-skills/
 
 ## Model-tier routing
 
-The fleet skills (`deep-code-review`, `deep-plan-review`, `deep-bugfix`) bind each agent's model from that skill's `references/model-map.md` before fan-out - keyed by the orchestrator's own model, so one host-agnostic map resolves everywhere. All tiers are reasoning tiers, and the ceiling is your selected model. Details in [`HOSTS.md`](./HOSTS.md) § *Model-tier routing*.
+Every helper agent a skill launches gets its model set explicitly, from one shared model map with three fixed levels: **smartest** (Fable 5.2), **smarter** (Opus 5.5) and **smart** (Sonnet 5.5) - or their GPT equivalents when your session runs a GPT model. Small models never run. Add `--max=<smartest|smarter|smart>` (or say *"use the smartest models"*) to set the highest level a run may use; it defaults to your current model's level. Each skill then puts some helpers lower - for example, deep-code-review's quality checker runs on Sonnet 5.5 - and anything done in your own session (like the planning conversation) runs on your current model. A repo can repin models with an optional `.deep-skills/model-map.json`. Details in [`HOSTS.md`](./HOSTS.md) § *Model-tier routing*.
 
 ## Optional companion
 
-**deep-goal** is a separately-installed, free pipeline conductor that runs these six skills end-to-end from a single invocation. It **works with** deep-skills but is never required by it, and nothing here depends on it. If you don't have it, everything above works exactly the same.
+**deep-goal** is a separately-installed, free pipeline conductor that runs these six skills end-to-end from a single invocation. It **works with** deep-skills but is never required by it, and nothing here depends on it. If deep-goal is installed, an interactive `/deep-plan` offers at the end to hand the remaining stages to deep-goal, which continues from your plan instead of planning again. If you don't have it, there's no offer and everything above works exactly the same. deep-goal 0.3.0 requires deep-skills ≥ 0.3.0.
 
 ## License
 

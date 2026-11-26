@@ -42,16 +42,20 @@ What each skill does with no argument, plus the flags it accepts at invocation.
 | | `--columbo` | *"Include a columbo pass"* — self-run the `/columbo` completeness check at the end and fix what it surfaces (meaningful primarily with `--autonomous`). |
 | | `--effort=<slug>` | *"Call the effort X"* — name the effort dir up front, skipping propose-and-confirm. Absent, an autonomous run derives the slug itself and states it, never asks. |
 | | `--rounds=<n>` | *"Three rounds of questions"* — interactive sessions only: skip the cadence question and run exactly n front-loaded question rounds (ignored under `--autonomous`). |
+| | `--max=<level>` | *"Use the smartest models"* — the highest model level (smartest / smarter / smart) the planning helpers may use (exploration, `/breakout`, columbo). Default: your current model's level. The planning conversation itself always runs on your current model. |
 | `/deep-plan-review` |  | Reviews the most recent plan (`.deep-skills/*/01-Plan/plan.md`); or pass an explicit plan path. |
 | | `--multi-agent` | Parallel review — one fresh agent per dimension, then a synthesis pass. |
+| | `--max=<level>` | Highest model level the review agents may use: the single reviewer (and, under `--multi-agent`, the user-alignment reviewer) runs at it; the other dimensions run one level lower (never below Sonnet 5.5). Default: your current model's level. |
 | `/deep-implement` |  | Implements the most recent plan; or pass an explicit plan path. |
 | | `--autonomous` / `--collaborative` | Run unattended end-to-end, or pause for approval at each phase. (Asks if omitted on a multi-phase plan.) |
 | | `--worktree` | Do the work in an isolated git worktree (default: the current branch). |
 | | `--parallel` | Run provably-independent phases concurrently (falls back to sequential otherwise). |
+| | `--max=<level>` | Highest model level the phase agents may use (with smartest, building runs on Opus 5.5 — the plan is already designed and reviewed). Default: your current model's level. |
 | `/deep-code-review` |  | Reviews the current feature branch against the base it was cut from. |
 | | *PR / file or folder paths* | Pass `PR65`, `#65`, or a PR URL to review a PR; pass file or folder paths to scope the review. |
-| | `--multi-agent` | Full fleet review — eight model-tiered single-lens finders, adversarial verification of survivors, scripted synthesis into one report. |
-| | `--mega` | Maximum review — every finder/verifier on the top model, quality caps lifted (~2× cost; for release gates). |
+| | `--multi-agent` | Full fleet review — eight single-lens finders, each on a model matched to its lens (the heaviest lenses on the review's top model, the quality checker on Sonnet 5.5), adversarial verification of survivors, scripted synthesis into one report. |
+| | `--mega` | Deepest review — every finder and verifier on the review's top model (the level `--max` picks), quality caps lifted (~2× cost; for release gates). A bare *"max review"* means this, not `--max`. |
+| | `--max=<level>` | *"Use the smartest models"* — the highest model level for this review (with smartest: Fable 5.2). Default: your current model's level. Passed on to the `/deep-bugfix` run under `--triage --fix`. |
 | | `--triage` | Opt-in pass over an existing review's findings (fix / defer / reject); routes accepted findings to `/deep-bugfix` (plan fix-phase as the fallback). The only mode that edits the plan. |
 | | `--auto-accept-min=<sev>` | With `--triage`: *"accept majors and up"* — zero-prompt triage: findings at/above the numeric severity are accepted, everything below is auto-deferred (Deferreds-ledger row; never auto-rejected); Blockers (9–10) always accepted. HITL triage unchanged without it. |
 | | `--fix` | With `--triage`: chain straight into an autonomous `/deep-bugfix` run on the accepted findings (no-op with a pointer when `/deep-bugfix` isn't installed). |
@@ -63,9 +67,11 @@ What each skill does with no argument, plus the flags it accepts at invocation.
 | | `--reproduce` | Upgrade proof from static chain-trace to a red→green reproduction test, committed with the fix. |
 | | `--worktree` | Isolate fix work in a git worktree (default: the current branch). |
 | | `--learn` | Emit a per-round root-cause record (`round-N/root-causes.json`) for the future Deep-Learn Pattern Ledger. |
+| | `--max=<level>` | Highest model level: the diagnose agent and the proof for serious findings run at it; the fix agent runs at the bug-fix level (with smartest: diagnose on Fable 5.2, fix on Opus 5.5). Default: your current model's level. |
 | `/deep-docs` |  | Documents the whole repo — the full tiered, anchor-verified pipeline. |
 | | *\<path>* | Scope to a subsystem, or *"put the map under \<path>"* to relocate output from the default `docs/ai-map/`. |
 | | `--refresh` | Re-resolve anchors + diff the file-set, then regenerate only the stale/new subsystems (no git required). |
+| | `--max=<level>` | Accepted for consistency; mapping and anchor-checking run on Sonnet 5.5 at every level unless a repo override (`.deep-skills/model-map.json`) moves them. |
 
 ### In-session commands
 
@@ -107,13 +113,17 @@ A single `--rigor=<yolo|poc|mvp|prod>` dial selects — from data, repo-overrida
 | Flag | Say | What it does |
 |---|---|---|
 | *(goal argument)* | *"run deep-goal on \<feature\>"* | The feature/goal to take through the pipeline. |
-| `--rigor=<level>` | *"at mvp rigor"*, *"yolo it"* | Pick the rigor level; omitted → one structured question (recommends mvp). |
-| `--dry-run` | *"preview the run"* | Print the resolved pipeline + cost bands and stop — dispatches nothing, needs no deep-skills install. |
+| `--rigor=<level>` | *"at mvp rigor"*, *"yolo it"* | Pick the rigor level; omitted → asked before launch, together with `--max` if that's missing too (recommends mvp). |
+| `--max=<smartest\|smarter\|smart>` | *"use the smartest models"*, *"keep it to smarter models"* | Highest model level any stage may use. With smartest: planning, plan review and code review on Fable 5.2, building and bug fixing on Opus 5.5, docs on Sonnet 5.5. Omitted → asked (recommends your current model's level). |
+| `--from-plan[=<path>]` | *"continue from my plan"* | Adopt a plan you already made with `/deep-plan` instead of planning again; the run starts at plan review (mvp/prod) or implement (yolo/poc). An interactive `/deep-plan` offers this hand-off when deep-goal is installed. |
+| `--dry-run` | *"preview the run"* | Print the resolved pipeline, the model each stage would run on, and cost bands, then stop — dispatches nothing, needs no deep-skills install. |
 | `--budget=<band>` | *"cap spend at ~500k tokens"* | Soft token ceiling checked between stages; crossing pauses + notifies; re-invoke to resume. |
 | `--gate=<stage>` | *"pause before implement"* | Human checkpoint before a named stage, even in an autonomous run (repeatable; survives resume). |
 | `--worktree` | *"build in a worktree"* | One conductor-owned worktree for all post-planning stages; the run report ends with merge instructions. |
 
-Requires **deep-skills ≥ 0.2.0** installed alongside (verified at launch). deep-goal ships free in the same marketplace — install it with `/plugin install deep-goal@reurgency` (after `/plugin marketplace add reurgency/marketplace`). Training page: [`docs/Training/deep-goal.md`](docs/Training/deep-goal.md).
+Before anything runs, deep-goal shows a **launch card** — goal, effort name, rigor, model level, the model for each stage — and at mvp/prod waits for *Launch* (nothing is written if you cancel). Model details: [`plugins/deep-goal/README.md`](plugins/deep-goal/README.md).
+
+Requires **deep-skills ≥ 0.3.0** installed alongside (verified at launch). deep-goal ships free in the same marketplace — install it with `/plugin install deep-goal@reurgency` (after `/plugin marketplace add reurgency/marketplace`). Training page: [`docs/Training/deep-goal.md`](docs/Training/deep-goal.md).
 
 ## Learn the skills
 
@@ -146,7 +156,7 @@ The same skills install natively on each host. Full commands, the capability mat
 Update later with `/plugin marketplace update reurgency`.
 
 ¹ Manifest authored; the empirical capability gate (install + run a full cycle, confirm fan-out + model binding) is **pending** — see `HOSTS.md`. Fast-moving schema/command details are marked **RE-VERIFY** there.
-² VS Code Copilot's docs show only **sequential** handoffs. If the gate confirms no parallel fan-out, the single-agent skills (`deep-plan`, `deep-implement`, `deep-docs`) run fully and the fleet skills (`deep-code-review`, `deep-plan-review`, `deep-bugfix` — the latter fans out per-cluster diagnose+fix agents plus fresh proof agents) route to a single-agent fallback on that host only.
+² VS Code Copilot's docs show only **sequential** handoffs. If the gate confirms no parallel fan-out, `deep-plan` and `deep-implement` run fully and the fleet skills (`deep-code-review`, `deep-plan-review`, `deep-bugfix` — per-cluster diagnose and fix agents plus fresh proof agents — and `deep-docs` — per-boundary survey and per-card anchor-verify agents) route to a single-agent fallback on that host only.
 
 ## Repo layout
 
@@ -171,7 +181,7 @@ Deep-Skills/
 │   │                               #   self-locating loader resolves it on every host
 │   └── deep-goal/                  # OPTIONAL ADD-ON — the pipeline conductor
 │       ├── HOSTS.md                #   (own plugin, own manifests, own HOSTS.md;
-│       └── skills/deep-goal/       #    requires deep-skills ≥ 0.2.0, never vice versa)
+│       └── skills/deep-goal/       #    requires deep-skills ≥ 0.3.0, never vice versa)
 ├── docs/
 │   └── roadmap/                    # self-learning directive-loop design notes
 └── README.md

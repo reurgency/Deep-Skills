@@ -1,6 +1,6 @@
 # Hosts & distribution - deep-goal (add-on plugin)
 
-deep-goal is an **add-on plugin** to the deep-skills plugin: one skill body (`skills/deep-goal/SKILL.md` + `references/` + `scripts/` + `templates/`), thin per-host manifests (`.claude-plugin/`, `.codex-plugin/`, `.cursor-plugin/`), never forked per host - the same packaging rules as its sibling (`plugins/deep-skills/HOSTS.md`). It **requires the deep-skills plugin ≥ 0.2.0 installed alongside** on every host; the launch version handshake (`skills/deep-goal/SKILL.md` § Launch) verifies this and refuses politely when it's absent or below minimum. Core never requires deep-goal back - coupling is strictly one-directional.
+deep-goal is an **add-on plugin** to the deep-skills plugin: one skill body (`skills/deep-goal/SKILL.md` + `references/` + `scripts/` + `templates/`), thin per-host manifests (`.claude-plugin/`, `.codex-plugin/`, `.cursor-plugin/`), never forked per host - the same packaging rules as its sibling (`plugins/deep-skills/HOSTS.md`). It **requires the deep-skills plugin ≥ 0.3.0 installed alongside** on every host; the launch version handshake (`skills/deep-goal/SKILL.md` § Launch) verifies this and refuses politely when it's absent or below minimum. Core never requires deep-goal back - coupling is strictly one-directional.
 
 > **The host floor, stated plainly: Claude Code is the designed-and-verified floor.** The conductor's dispatch model - one fresh background subagent per autonomous stage, briefed with a rendered `stage-briefing.md` as its entire prompt - assumes Claude Code's subagent affordances. On **Codex, Cursor, and Copilot** deep-goal degrades to **inline sequential execution** (below): functional, honestly caveated, not yet gate-verified. If your pipeline matters, run it on Claude Code.
 
@@ -14,6 +14,7 @@ The Deep-Learn directive loader (`skills/deep-goal/scripts/load-active-cards.sh`
 |---|---|---|---|---|
 | `SKILL.md` skills (this skill loads) | ✓ | ✓ gate | ✓ gate | ✓ gate |
 | **Per-stage fresh-subagent dispatch** | ✓ | ⚠ inline sequential | ⚠ inline sequential | ⚠ inline sequential |
+| **Per-stage model selection** (`--max` + the shared model map, `references/model-map.json` / `model-map.md`) | ✓ Agent `model` param | ⚠ stage leads run on your current model; helper agents inside a stage still get their models | ⚠ same | ⚠ same (a stage's helpers may fall back to one agent) |
 | Structured questions (rigor selection, gates, resume/fresh) | ✓ `AskUserQuestion` | ⚠ numbered-list chat fallback | ⚠ numbered-list chat fallback | ⚠ numbered-list chat fallback |
 | Notifications (halts, gates, budget pauses, completion) | ✓ `PushNotification` | ⚠ `osascript` → bold `ATTENTION:` line | ⚠ same fallback chain | ⚠ same fallback chain |
 | deep-skills discovery for the version handshake | ✓ `~/.claude/plugins/installed_plugins.json` | ⚠ sibling-install check (RE-VERIFY) | ⚠ sibling-install check (RE-VERIFY) | ⚠ checkout-relative (CLI: same as Claude Code) |
@@ -28,6 +29,7 @@ On hosts without Claude Code's fresh-subagent dispatch, only the dispatch **mech
 - **Same stage order, same briefings, same advance tests, same `pipeline.md` records.** Each stage's rendered briefing is executed **inline in the main session, one stage at a time**, and the conductor still verifies artifacts + manifest flips before advancing. Resume, gates, budget checks, and the run report all work unchanged - they read `pipeline.md` and artifacts, not session state.
 - **Honest caveat #1 - context.** Everything shares one context window. yolo/poc runs are comfortably inside it; **mvp and especially prod-rigor runs (multi-agent reviews × re-review rounds) may hit context limits** before the pipeline completes.
 - **Honest caveat #2 - independence.** The series' fresh-eyes guarantee is weakened inline: a reviewer running in the same session has the upstream stages' history in context. The core skills' own sub-agent fan-out (where the host supports it) restores part of this, but the stage-level isolation Claude Code provides is not replicated.
+- **Honest caveat #3 - model allocation.** Choosing a model per stage needs per-stage dispatch. On these hosts each stage's **lead** runs inline in your session, on your current model - the conductor can't switch the session's model between stages. **Helper agents inside a stage still get the models your `--max` choice gives them**, because every stage is still told `--max=<level>` and all four hosts can set a model per agent (on VS Code Copilot a stage's helpers may fall back to one agent). The launch card says so in plain words: *"This assistant runs each step in your current session (<your model>). Helper agents inside a step still use the model level you chose."* `pipeline.md` and the run report record `your session: <model> (inline-led)` for each such stage. To run a stage's lead on a specific model, end the session at a stage boundary and re-invoke in a fresh session set to that model (the mitigation below) - the run report records the model each stage actually ran on either way.
 - **The workable mitigation today:** `pipeline.md` makes every stage boundary a clean re-entry point - you can **end the session at a boundary and re-invoke deep-goal in a fresh session**; it resumes at the first incomplete stage with gates/budget/worktree intact. That manual per-stage restart recovers both fresh context and fresh eyes.
 - **The documented deferred:** formal per-stage session-restart guidance (and full four-host parity for the fallback) is a tracked deferred - the conductor isolates dispatch behind one protocol section precisely so the fallback can replace only that section per host. None of these hosts has passed an empirical gate for deep-goal yet; treat all three as **functional, unverified**.
 
@@ -38,7 +40,7 @@ Every install needs **both** plugins from the same store: deep-skills first (or 
 ### Claude Code (reference host - shipped)
 ```
 /plugin marketplace add reurgency/marketplace
-/plugin install deep-skills@reurgency      # if not already installed (≥ 0.2.0)
+/plugin install deep-skills@reurgency      # if not already installed (≥ 0.3.0)
 /plugin install deep-goal@reurgency
 ```
 
@@ -65,4 +67,4 @@ Point `chat.agentSkillsLocations` at **both** `plugins/deep-skills/skills` and `
 
 The core maintainer rules apply verbatim (`plugins/deep-skills/HOSTS.md` § Maintainer rules): one source of truth per skill body, byte-identical shared files, no Claude-only affordance at a call site, frontmatter discipline, M3 gate before committing a host. deep-goal adds one:
 
-6. **`references/artifact-structure.md` is the seventh copy.** Any canonical edit to the series artifact contract is swept across **all six core copies + deep-goal's copy**, `cmp`-verified pairwise. Same for `references/host-affordances.md` and `scripts/load-active-cards.sh` (deep-goal's is the seventh byte-identical copy of each).
+6. **deep-goal carries the seventh copy of every series-shared file.** `references/model-map.json`, `references/model-map.md`, `references/host-affordances.md`, `references/artifact-structure.md`, and `scripts/load-active-cards.sh` are each byte-identical to the six core copies. Any canonical edit (made under `plugins/deep-skills/skills/deep-code-review/`) is swept across **all six core copies + deep-goal's copy** and verified with `scripts/check-shared.sh --shared` (repo root; not shipped, maintainers only). deep-goal reads the same model map as the core skills - it has no model data of its own.
