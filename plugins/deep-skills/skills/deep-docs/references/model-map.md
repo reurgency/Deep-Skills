@@ -137,6 +137,8 @@ The ladder ID is the model's **identity**: what is resolved, recorded and verifi
 
 A repository can repin a model or move a stage's tier without touching plugin files, by adding **`.deep-skills/model-map.json`** at the repo root (beside the effort directories). It is optional; when absent, the shipped JSON is used as is. Every skill - and deep-goal - reads it **at launch, before any agent is launched**. A future Deep Dashboard edits only this file.
 
+**Exception - a stage launched with a resolved-map snapshot.** An orchestrator that resolves the map once for a whole run may freeze it as **`.deep-skills/<effort>/00-Manifest/model-map.resolved.json`** (the merged `ladder` and `stages`, same schema, plus a `_source` key) and name that file in the stage's briefing. A stage launched that way uses the snapshot as its merged map, in place of the shipped `model-map.json` and this override: the snapshot was validated when it was written, so the stage does not re-read, re-merge or re-validate either file, and never refuses over them. Everything else in this file (tiers, `--max`, fleet notation, binding rules, host binding) applies unchanged.
+
 **Same schema, sparse.** Only the keys you want to change. Example - run docs on the smarter tier when `--max=smartest`:
 
 ```json

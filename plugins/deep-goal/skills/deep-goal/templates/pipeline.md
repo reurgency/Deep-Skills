@@ -21,7 +21,7 @@
 
 > **Goal:** <one-line goal as invoked>
 > **Rigor:** `<level>` (source: <shipped templates/rigor-map.json | repo override .deep-skills/rigor-map.json>)
-> **Max:** `<smartest | smarter | smart>` (source: <flag | asked | default>) · models from <shipped references/model-map.json | shipped + repo override .deep-skills/model-map.json>
+> **Max:** `<smartest | smarter | smart>` (source: <flag | asked | default>) · models from `00-Manifest/model-map.resolved.json` (frozen at launch from <`<shipped model-map.json path>` (deep-skills install | deep-goal fallback) | `<shipped model-map.json path>` + repo override .deep-skills/model-map.json>)
 > **Base:** `<model-id>` (the session deep-goal was launched in; tier <smartest | smarter | smart | below floor - warned>)<; host runs stage leads inline on base>
 > **deep-skills:** `<resolved plugin.json path>` · version <x.y.z - handshake pass | unverified (no semver version field - warning logged, capabilities assumed)>
 > **Gates:** <none | before <stage>[, …]> · **Budget:** <none | ~<band> tokens> · **Worktree:** <none | pending (created after planning) | <path> (branch deep-goal/<effort>)>

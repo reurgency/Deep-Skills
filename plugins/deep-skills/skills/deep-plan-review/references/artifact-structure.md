@@ -31,7 +31,7 @@ Canonical file names per stage:
 
 ## Repo-level core file: `.deep-skills/model-map.json`
 
-`.deep-skills/model-map.json` (**repo level**, sibling of the effort dirs, not per-effort) is an optional, user-edited override of the shipped model map (`references/model-map.json`). It is a **core** file: **every** deep-* skill - and any orchestrator - reads it at launch, before launching any agent, merges it over the shipped map, and validates it (rules: `references/model-map.md` § Repo override). Skills only read it; the repo owner (or a future dashboard) writes it. It is distinct from the orchestrator-owned `rigor-map.json` below, which core skills never read.
+`.deep-skills/model-map.json` (**repo level**, sibling of the effort dirs, not per-effort) is an optional, user-edited override of the shipped model map (`references/model-map.json`). It is a **core** file: **every** deep-* skill - and any orchestrator - reads it at launch, before launching any agent, merges it over the shipped map, and validates it (rules: `references/model-map.md` § Repo override). Sole exception: a stage whose orchestrator briefing names a resolved-map snapshot (`00-Manifest/model-map.resolved.json`, below) uses that snapshot instead and does not re-read this file (`references/model-map.md` § Repo override). Skills only read it; the repo owner (or a future dashboard) writes it. It is distinct from the orchestrator-owned `rigor-map.json` below, which core skills never read.
 
 ## `00-Manifest/manifest.md` format
 
@@ -71,9 +71,10 @@ Orchestrator add-ons that drive the deep-* series (dispatching the core skills o
 
 - `00-Manifest/pipeline.md` - orchestrator-owned pipeline state (rigor level, resolved stage list, dispatch records, gates, blockers, spend). Written only by the orchestrator.
 - `00-Manifest/run-report.md` - orchestrator-owned final run report.
+- `00-Manifest/model-map.resolved.json` - orchestrator-owned resolved-map snapshot: the merged, validated model map frozen at the run's launch. Written only by the orchestrator; a core skill reads it only when its stage briefing names it (`references/model-map.md` § Repo override).
 - `.deep-skills/rigor-map.json` (**repo level**, sibling of the effort dirs, not per-effort) - an optional user-edited override of an orchestrator's shipped rigor defaults.
 
-Ownership rule: core skills never read or write these files, and treat unknown files in `00-Manifest/` as opaque - each skill updates its own stage line in `manifest.md` and leaves everything else untouched. Likewise, an orchestrator never writes a core skill's stage line (it reads statuses; the summary paragraph is its only manifest write).
+Ownership rule: core skills never write these files and never read them (sole exception: the resolved-map snapshot, read when a stage briefing names it), and treat unknown files in `00-Manifest/` as opaque - each skill updates its own stage line in `manifest.md` and leaves everything else untouched. Likewise, an orchestrator never writes a core skill's stage line (it reads statuses; the summary paragraph is its only manifest write).
 
 ## Legacy note
 
