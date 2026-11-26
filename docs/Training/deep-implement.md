@@ -47,7 +47,7 @@ pipeline. Keep it slim.
   including the **Phase Summaries** appendix and **Deferreds** ledger.
 - `--autonomous` / `--collaborative` — execution mode. If omitted on a multi-phase plan,
   **ask**. (`references/execution-modes.md`)
-- `--worktree` — isolate work in a git worktree via `/create_worktree`. Default: **work in the
+- `--worktree` — isolate work in a git worktree (host worktree command if any, else plain `git worktree`). Default: **work in the
   current branch.**
 - `--parallel` — opt-in parallel phase execution, **only** when phases are provably
   independent. Never parallelize without this flag.
@@ -73,9 +73,11 @@ Per `references/phase-execution.md`:
 For each phase, run the loop: **implement → validate → fix → (commit) → summarize → hand-off.**
 
 ### Module 5 — Validate each phase
-Per `references/validation.md`: typecheck (e.g. `bunx tsc` **from the app dir — never `npx`
-from root**), run relevant tests via the `test-runner` skill, and run the prompt-assembly
-snapshot test if the phase touched the relevant pipeline stages. **Block only on *new*
+Per `references/validation.md`: first **discover your project's check commands** (manifest
+scripts → CLAUDE.md guidance → tool configs; never `.env`) — the skill ships no hardcoded
+commands. Then typecheck changed apps, run relevant tests both targeted and as a combined
+suite run, and run any conditional checks your CLAUDE.md requires for the paths the phase
+touched (e.g. "run snapshot test X after editing Y"). **Block only on *new*
 failures in changed files / their imports** — pre-existing unrelated failures don't gate you.
 
 ### Module 6 — The bounded fix loop

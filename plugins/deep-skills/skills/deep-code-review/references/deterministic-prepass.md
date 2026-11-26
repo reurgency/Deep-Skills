@@ -24,13 +24,13 @@ The skill ships with **no hardcoded commands**. Discover what the host project r
 
 **Hard rule: NEVER read `.env` or any secrets file during discovery** - not for commands, ports, or anything else. If a needed value can't be found in package.json / angular.json / CLAUDE.md (or equivalents), **ask the user**. No exceptions.
 
-### Example - what discovery finds in *this* repo
+### Example - discovery output for one host project
 
-The following are **examples of discovery output for this host project, explicitly not skill behavior** - a different project yields different commands:
+The following are **examples of discovery output for one Angular + Bun monorepo, explicitly not skill behavior** - a different project yields different commands:
 
 - `cd apps/ui && bunx tsc --noEmit -p tsconfig.app.json` - UI typecheck (from per-app guidance; angular.json confirms the tsconfig).
 - `cd apps/api && bunx tsc --noEmit` - API typecheck.
-- `cd apps/api && bun test src/tests/prompt-assembly-evaluation.test.ts` - the prompt-assembly snapshot test, run **only when the diff touches files under `.maudel/pipeline_stages/**`** (a conditional documented in this repo's CLAUDE.md - a textbook case of rule 2 above).
+- `cd apps/api && bun test src/tests/prompt-assembly-evaluation.test.ts` - the prompt-assembly snapshot test, run **only when the diff touches files under `.maudel/pipeline_stages/**`** (a conditional documented in that project's CLAUDE.md - a textbook case of rule 2 above).
 
 ## Run the suite together, not only per-file
 
@@ -41,7 +41,7 @@ The following are **examples of discovery output for this host project, explicit
 The pre-pass exists to judge **this change**, not the whole repo:
 
 - Run checks that cover the **changed files and their import graph**. Whole-project typechecks are fine when that's the only granularity the project offers - but read the results through the diff.
-- **Pre-existing failures** in untouched code are *noted in the report* (one line, "pre-existing, not introduced by this diff") - they are **not findings** against the change. In this repo, for example, pre-existing test type errors in the API are known noise.
+- **Pre-existing failures** in untouched code are *noted in the report* (one line, "pre-existing, not introduced by this diff") - they are **not findings** against the change. For example, a project may carry known pre-existing type errors in its test files - noise, not findings.
 - A failure is attributable to the diff when it's in a changed file, in a file importing a changed file, or demonstrably triggered by the change (e.g. a contract the diff altered).
 
 ## Feeding results into the report

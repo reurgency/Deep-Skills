@@ -10,7 +10,7 @@
 
 **Creating the worktree** - two paths, both fully supported:
 
-- **Native (preferred when the host has one):** the host's worktree command - on Claude Code, `/create_worktree fix/<effort-slug>` (it handles ports, install, and `.env`). Use it whenever it exists.
+- **Native (preferred when the host has one):** a project- or host-provided worktree command (e.g. `/create_worktree fix/<effort-slug>`, which may also handle ports, install, and `.env`). Use it whenever it exists.
 - **Plain-git fallback (any host):** `git worktree add ../<repo>-fix-<effort-slug> -b fix/<effort-slug>` from the repo root, then run the project's discovered install step in the new tree so containment tests and typechecks can run there.
 
 Either way the worktree's branch is `fix/<effort-slug>` - the same branch the branch policy would have created in place. A missing native command never blocks the mode; degrade to plain git (see `references/host-affordances.md`).

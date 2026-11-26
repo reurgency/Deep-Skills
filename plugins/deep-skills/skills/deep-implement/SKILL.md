@@ -37,17 +37,17 @@ Every flag is **natural-language-first** - the plain-language trigger is the pri
 
 - **plan** - explicit path argument → plan in context → most recent `.deep-skills/*/01-Plan/plan.md` (see `references/artifact-structure.md`; pre-retrofit plans remain reachable via explicit path). Read it fully, including the **Phase Summaries** appendix and **Deferreds** ledger.
 - **Run autonomously / unattended** (`--autonomous`) or **check in with me at each phase** (`--collaborative`) - execution mode. If omitted on a multi-phase plan, **ask** (see `references/execution-modes.md`).
-- **Work in an isolated worktree** (`--worktree`) - isolate work in a git worktree via `/create_worktree`. Default: **work in the current branch** (see `references/commit-and-handoff.md`).
+- **Work in an isolated worktree** (`--worktree`) - isolate work in a git worktree (the host's worktree command if it has one, else plain `git worktree add`). Default: **work in the current branch** (see `references/commit-and-handoff.md`).
 - **Run independent phases in parallel** (`--parallel`) - opt-in parallel phase execution, **only** when phases are provably independent (see `references/phase-execution.md`). Never parallelize unless this is explicitly requested.
 
 ## Reuse, don't reinvent
 
-- Tests → the **`test-runner`** skill's `execSync` capture pattern.
-- Worktrees → `/create_worktree` · `/remove_worktree`.
-- Hand-off/resume → `/handoff` · `/resume_handoff` machinery + the plan's Phase Summaries appendix.
+- Tests → the host project's own runner and scripts, discovered per `references/validation.md` (no hardcoded commands).
+- Worktrees → the host's worktree command where one exists, else plain `git worktree` (see `references/commit-and-handoff.md`).
+- Hand-off/resume → the plan's Phase Summaries appendix + `templates/phase-handoff.md`.
 - Build/validate commands & git conventions → `references/validation.md`, `references/commit-and-handoff.md`.
 
-`deep-implement` is a lightweight, plan-driven orchestrator - deliberately *not* the DB-backed story pipeline (`story-implementer`, `.maudel/pipeline_stages/**`). Don't duplicate that machinery.
+`deep-implement` is a lightweight, plan-driven orchestrator - the plan and its Phase Summaries are its only state. Don't build tracking machinery around it (databases, ticket queues, external hand-off stores).
 
 ## Workflow
 
@@ -55,7 +55,7 @@ Every flag is **natural-language-first** - the plain-language trigger is the pri
 Read the plan. Identify: single- vs multi-phase, which phases are already done (Phase Summaries appendix), the Deferreds ledger, and each phase's acceptance/validation criteria. Resolve mode and flags. If resuming, start at the first unfinished phase. If the target phase is a **fix-phase** appended by `/deep-code-review --triage`, note that executing it here is the **fallback route** - `/deep-bugfix` is the primary remediation executor when installed.
 
 ### 2. Set up the worktree (if `--worktree`)
-Create the isolated worktree via `/create_worktree`. Otherwise branch-first if on `main`/`develop` (see `references/commit-and-handoff.md`). Code changes go in the worktree; **plan/summary updates go to the source branch root** (reuse the story-implementer rule).
+Create the isolated worktree (native command or plain-git fallback - see `references/commit-and-handoff.md`). Otherwise branch-first if on `main`/`develop` (see `references/commit-and-handoff.md`). Code changes go in the worktree; **plan/summary updates go to the source branch root** (the worktree documentation rule in `references/commit-and-handoff.md`).
 
 ### 3. Execute phases
 Per `references/phase-execution.md`:
@@ -65,7 +65,7 @@ Per `references/phase-execution.md`:
 For each phase run the loop: **implement → validate → fix → (commit) → summarize → hand-off.**
 
 ### 4. Validate each phase
-Per `references/validation.md`: typecheck (`bunx tsc` from the app dir - never `npx` from root), run relevant tests via `test-runner`, and auto-run the prompt-assembly snapshot test if the phase touched `.maudel/pipeline_stages/**`. Block only on **new** failures in changed files/their imports.
+Per `references/validation.md`: discover the host project's check commands (manifest scripts → CLAUDE.md guidance → tool configs; never `.env`), then typecheck changed apps, run relevant tests both targeted and as a combined suite run, and run any conditional extra checks the project's guidance requires for the paths touched. Block only on **new** failures in changed files/their imports.
 
 ### 5. Fix loop (bounded)
 If validation fails, the phase agent fixes and re-validates. **Cap: 2 attempts.** If still failing → **stop**, write a blocker report (`templates/blocker-report.md`), **notify** (see `references/notifications.md`), and in autonomous mode do **not** commit broken code.

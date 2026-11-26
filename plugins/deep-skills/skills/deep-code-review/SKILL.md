@@ -134,5 +134,4 @@ Per the cross-assistant **Portability** rule, every flag is **natural-language-f
 - **Model routing is load-bearing: set the model explicitly on every agent launch, resolved from `references/model-map.md` (a required launch input); all three tiers are reasoning tiers, so a host's small/utility models (Claude: Haiku) never appear anywhere in this pipeline.** A run whose main-tier lenses silently fell to Haiku produced zero Blockers/Majors on a diff with two known Criticals - if any agent turns out to have run below its assigned (ceiling-relative) tier, its output is invalid; discard and relaunch it.
 
 <!-- Authoring note: this SKILL.md stays under 500 lines with detail in references/, per the
-     skill-creator skill's authoring rules (the source of the <500-line limit - distinct from
-     the .maudel skill guidelines, which govern Maudel-runtime skills and state a different rule). -->
+     skill-creator skill's authoring rules (the source of the <500-line limit). -->

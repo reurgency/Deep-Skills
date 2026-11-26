@@ -33,7 +33,7 @@ Notify sparingly regardless of mechanism: blockers, user-requested checkpoints (
 
 ## Browser / worktree / bypass-permissions
 
-- Use the host's equivalent where exposed (Claude Code `/create_worktree`, browser tooling, bypass-permissions mode); **else omit** the optional affordance and proceed with the portable path. None of these gate a skill's core output.
+- Use the host's equivalent where exposed (a project/host worktree command such as `/create_worktree` - else plain `git worktree`; browser tooling; bypass-permissions mode); **else omit** the optional affordance and proceed with the portable path. None of these gate a skill's core output.
 
 ## Attribution trailer
 

@@ -1,4 +1,4 @@
-<!-- Slim next-phase hand-off. Appended to the plan (and optionally .maudel/handoffs/active/). Keep it short - the plan holds the detail. -->
+<!-- Slim next-phase hand-off. Appended to the plan (and optionally to the host project's own hand-off location, if its CLAUDE.md names one). Keep it short - the plan holds the detail. -->
 
 ### Hand-off → Phase <N+1>: <next phase title>
 
