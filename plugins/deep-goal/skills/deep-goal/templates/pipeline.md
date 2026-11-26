@@ -4,10 +4,8 @@
      re-invocation reads prior state from here (references/resume-and-report.md § 1), the
      one-stage-in-flight guard reads the
      Dispatch records, and the final run report is assembled from it.
-     Header fields are resolved ONCE at launch and never re-derived mid-run (resume exceptions,
-     references/resume-and-report.md § 1.3: the deep-skills version outcome is re-checked every
-     resume; a header written by deep-goal < 0.3.0 gets its missing Max/Base/Model column
-     back-filled once); the Artifact baseline
+     Header fields are resolved ONCE at launch and never re-derived mid-run (except for the exceptions in
+     references/resume-and-report.md § 1.3); the Artifact baseline
      is likewise recorded once at launch and re-read on resume, never re-snapshot (sole exception:
      on --worktree runs the docs/ai-map row is re-recorded from the fresh worktree when the
      worktree is created - references/loop-and-budget.md § 5). Dates in absolute
