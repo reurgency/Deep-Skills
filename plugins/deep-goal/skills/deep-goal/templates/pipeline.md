@@ -4,7 +4,10 @@
      re-invocation reads prior state from here (references/resume-and-report.md § 1), the
      one-stage-in-flight guard reads the
      Dispatch records, and the final run report is assembled from it.
-     Header fields are resolved ONCE at launch and never re-derived mid-run; the Artifact baseline
+     Header fields are resolved ONCE at launch and never re-derived mid-run (resume exceptions,
+     references/resume-and-report.md § 1.3: the deep-skills version outcome is re-checked every
+     resume; a header written by deep-goal < 0.3.0 gets its missing Max/Base/Model column
+     back-filled once); the Artifact baseline
      is likewise recorded once at launch and re-read on resume, never re-snapshot (sole exception:
      on --worktree runs the docs/ai-map row is re-recorded from the fresh worktree when the
      worktree is created - references/loop-and-budget.md § 5). Dates in absolute
@@ -27,7 +30,7 @@
 
 The resolved level's stages in dispatch order, with the invocation each renders to (`references/conductor.md` § Stage → invocation table - every invocation ends with `--max=<x>`) and the **model** each stage lead runs on (`references/conductor.md` § Model resolution). A `code-review` stage with a `triage` option expands to two dispatches (triage and re-review rounds use the code-review tier).
 
-**Model column - written twice** (contract row 4): at launch it holds the **planned** `<tier>: <model-id>`; when the stage's record leaves `in-flight` (inline stages: on completion, or on resume) the conductor **overwrites** it with the model that actually ran - `<tier>: <id>`, plus ` (fallback from <planned id>)` when the host rejected the planned one. Other renderings: `your session: <id> (inline)` for interactive planning; `your session: <id> (inline-led)` for every stage lead on a host without background agents; `adopted - not run` for a `--from-plan` plan. A later dispatch of the same stage that ran on a different model notes `model: <id>` in its own record's Notes. Re-read on resume, never re-resolved.
+**Model column - written twice** (contract row 4): at launch it holds the **planned** `<tier>: <model-id>`; when the stage's record leaves `in-flight` (inline stages: on completion, or on resume) the conductor **overwrites** it with the model that actually ran - `<tier>: <id>`, plus ` (fallback from <planned id>)` when the host rejected the planned one. Other renderings: `your session: <id> (inline)` for interactive planning; `your session: <id> (inline-led)` for every stage lead on a host without background agents; `adopted - not run` for a `--from-plan` plan. A later dispatch of the same stage that ran on a different model notes `model: <id>` in its own record's Notes. Re-read on resume, never re-resolved - except a run launched by deep-goal < 0.3.0, whose column is added and resolved once on resume (references/resume-and-report.md § 1.3).
 
 | # | Stage | Dispatch | Model | Invocation |
 |---|---|---|---|---|
