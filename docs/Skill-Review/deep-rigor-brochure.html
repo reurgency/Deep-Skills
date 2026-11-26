@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Rigor — Ship AI-built changes you can actually trust</title>
+<style>
+  :root {
+    --bg: #0a0e14;
+    --bg-alt: #0f141d;
+    --surface: #151b26;
+    --surface-2: #1a2231;
+    --border: #263041;
+    --border-hi: #35425a;
+    --text: #e6ebf4;
+    --text-dim: #9aa7bd;
+    --text-faint: #6b7890;
+    --accent: #4f9cff;
+    --accent-2: #34d399;
+    --accent2: #34d399;
+    --accent3: #a78bfa;
+    --warn: #fbbf24;
+    --mono: "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- Nav ---------- */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(10,14,20,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 24px; max-width: 1080px; margin: 0 auto;
+  }
+  .logo { font-weight: 800; font-size: 1.1rem; letter-spacing: -0.02em; }
+  .logo .mark {
+    display: inline-block; width: 10px; height: 10px; border-radius: 3px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    margin-right: 9px; transform: rotate(45deg);
+  }
+  .nav-links { display: flex; gap: 26px; font-size: 0.9rem; }
+  .nav-links a { color: var(--text-dim); text-decoration: none; transition: color .15s; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    background: var(--accent); color: #06101f !important; font-weight: 600;
+    padding: 7px 16px; border-radius: 8px;
+  }
+  .nav-cta:hover { filter: brightness(1.1); }
+  @media (max-width: 720px) { .nav-links a:not(.nav-cta) { display: none; } }
+
+  /* ---------- Hero ---------- */
+  header { position: relative; overflow: hidden; }
+  header::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 45% at 50% -8%, rgba(79,156,255,0.16), transparent 65%),
+      radial-gradient(ellipse 40% 35% at 85% 15%, rgba(52,211,153,0.07), transparent 60%);
+    pointer-events: none;
+  }
+  .hero { position: relative; text-align: center; padding: 96px 24px 72px; }
+  .eyebrow {
+    display: inline-block; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--accent);
+    border: 1px solid rgba(79,156,255,0.35); background: rgba(79,156,255,0.08);
+    padding: 5px 14px; border-radius: 999px; margin-bottom: 26px;
+  }
+  h1 {
+    font-size: clamp(2.2rem, 5.5vw, 3.6rem); font-weight: 800;
+    letter-spacing: -0.03em; line-height: 1.12; max-width: 820px; margin: 0 auto 22px;
+  }
+  h1 .grad {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .tagline {
+    font-size: clamp(1.05rem, 2.4vw, 1.35rem); font-weight: 650; letter-spacing: -0.015em;
+    color: var(--text); max-width: 720px; margin: 0 auto 18px;
+  }
+  .tagline em { font-style: normal; color: var(--accent); }
+  .sub {
+    font-size: 1.08rem; color: var(--text-dim); max-width: 680px; margin: 0 auto 36px;
+  }
+  .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 42px; }
+  .btn {
+    display: inline-block; padding: 12px 26px; border-radius: 10px; font-weight: 600;
+    font-size: 0.98rem; text-decoration: none; transition: all .15s;
+  }
+  .btn-primary { background: var(--accent); color: #06101f; }
+  .btn-primary:hover { filter: brightness(1.12); transform: translateY(-1px); }
+  .btn-ghost { border: 1px solid var(--border-hi); color: var(--text); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .hero-term {
+    max-width: 640px; margin: 0 auto; text-align: left;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+    font-family: var(--mono); font-size: 0.86rem; overflow: hidden;
+  }
+  .term-bar {
+    display: flex; align-items: center; gap: 7px;
+    background: var(--surface-2); padding: 10px 14px; border-bottom: 1px solid var(--border);
+  }
+  .dot { width: 11px; height: 11px; border-radius: 50%; }
+  .dot:nth-child(1){ background:#ff5f57; } .dot:nth-child(2){ background:#febc2e; } .dot:nth-child(3){ background:#28c840; }
+  .term-body { padding: 18px 20px; line-height: 1.75; overflow-x: auto; }
+  .term-body .p { color: var(--accent2); }
+  .term-body .c { color: var(--text-faint); }
+  .term-body .k { color: var(--accent3); }
+  .term-body .ok { color: var(--accent2); }
+  .term-body .dim { color: var(--text-dim); }
+
+  .stat-row {
+    display: flex; justify-content: center; gap: 48px; flex-wrap: wrap;
+    padding: 40px 24px 8px; position: relative;
+  }
+  .stat { text-align: center; }
+  .stat b { display: block; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.02em; }
+  .stat span { font-size: 0.85rem; color: var(--text-faint); }
+
+  /* ---------- Sections ---------- */
+  section { padding: 84px 0; }
+  section.alt { background: var(--bg-alt); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .kicker {
+    font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 12px;
+  }
+  h2 { font-size: clamp(1.6rem, 3.4vw, 2.3rem); font-weight: 800; letter-spacing: -0.025em; line-height: 1.2; margin-bottom: 16px; }
+  .lede { color: var(--text-dim); font-size: 1.05rem; max-width: 720px; margin-bottom: 44px; }
+  .lede strong { color: var(--text); }
+
+  /* ---------- Problem ---------- */
+  .problem-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+  .problem-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px;
+  }
+  .problem-card h3 { font-size: 1.02rem; margin-bottom: 8px; }
+  .problem-card p { font-size: 0.92rem; color: var(--text-dim); }
+  .problem-card .x { color: var(--warn); font-family: var(--mono); font-size: 0.85rem; display: block; margin-bottom: 10px; }
+
+  /* ---------- Pipeline ---------- */
+  .pipeline {
+    display: flex; align-items: stretch; gap: 0; overflow-x: auto; padding: 8px 4px 20px;
+  }
+  .stage {
+    flex: 1; min-width: 128px; position: relative;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 14px; margin-right: 34px; transition: border-color .15s, transform .15s;
+  }
+  .stage:last-child { margin-right: 0; }
+  .stage:hover { border-color: var(--accent); transform: translateY(-3px); }
+  .stage::after {
+    content: "→"; position: absolute; right: -27px; top: 50%; transform: translateY(-50%);
+    color: var(--text-faint); font-size: 1.1rem;
+  }
+  .stage:last-child::after { content: none; }
+  .stage .num { font-family: var(--mono); font-size: 0.72rem; color: var(--accent); margin-bottom: 6px; display: block; }
+  .stage h4 { font-size: 0.95rem; margin-bottom: 5px; }
+  .stage p { font-size: 0.78rem; color: var(--text-dim); line-height: 1.45; }
+  .loop-note {
+    margin-top: 6px; font-size: 0.85rem; color: var(--text-faint); font-family: var(--mono);
+  }
+  .loop-note b { color: var(--accent3); font-weight: 600; }
+
+  /* ---------- Rigor levels ---------- */
+  .levels { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+  .level {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 26px 24px; display: flex; flex-direction: column; transition: border-color .15s, transform .15s;
+  }
+  .level:hover { transform: translateY(-3px); }
+  .level .name { font-family: var(--mono); font-size: 1.05rem; font-weight: 700; margin-bottom: 4px; }
+  .level .tag { font-size: 0.78rem; margin-bottom: 14px; }
+  .level ul { list-style: none; font-size: 0.86rem; color: var(--text-dim); flex: 1; }
+  .level li { padding: 5px 0 5px 22px; position: relative; }
+  .level li::before { content: "•"; position: absolute; left: 6px; color: var(--border-hi); }
+  .level li.on::before { content: "✓"; color: var(--accent2); }
+  .lv-yolo:hover { border-color: var(--text-faint); }
+  .lv-poc:hover { border-color: var(--warn); }
+  .lv-mvp { border-color: rgba(79,156,255,0.5); position: relative; }
+  .lv-mvp:hover { border-color: var(--accent); }
+  .lv-mvp .rec {
+    position: absolute; top: -11px; right: 16px; background: var(--accent); color: #06101f;
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 999px;
+  }
+  .lv-prod:hover { border-color: var(--accent3); }
+  .lv-yolo .tag { color: var(--text-faint); } .lv-poc .tag { color: var(--warn); }
+  .lv-mvp .tag { color: var(--accent); } .lv-prod .tag { color: var(--accent3); }
+
+  /* ---------- Features ---------- */
+  .feat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+  .feat {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 26px;
+    transition: border-color .15s;
+  }
+  .feat:hover { border-color: var(--border-hi); }
+  .feat .icon {
+    width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-size: 1.15rem; margin-bottom: 16px;
+    background: rgba(79,156,255,0.12); border: 1px solid rgba(79,156,255,0.25);
+  }
+  .feat h3 { font-size: 1.05rem; margin-bottom: 8px; letter-spacing: -0.01em; }
+  .feat p { font-size: 0.92rem; color: var(--text-dim); }
+  .feat p code, .lede code, .problem-card code {
+    font-family: var(--mono); font-size: 0.84em; background: var(--surface-2);
+    border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; color: var(--text);
+  }
+
+  /* ---------- Split rows ---------- */
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+  @media (max-width: 860px) { .split { grid-template-columns: 1fr; gap: 32px; } }
+  .split h2 { margin-bottom: 14px; }
+  .split .lede { margin-bottom: 22px; }
+  .checklist { list-style: none; }
+  .checklist li {
+    padding: 9px 0 9px 32px; position: relative; color: var(--text-dim); font-size: 0.95rem;
+  }
+  .checklist li::before {
+    content: "✓"; position: absolute; left: 0; top: 9px;
+    width: 20px; height: 20px; border-radius: 6px; font-size: 0.75rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(52,211,153,0.12); color: var(--accent2); border: 1px solid rgba(52,211,153,0.3);
+  }
+  .checklist b { color: var(--text); }
+  .panel {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    font-family: var(--mono); font-size: 0.82rem; padding: 24px; line-height: 1.9;
+    overflow-x: auto; box-shadow: 0 18px 44px rgba(0,0,0,0.35);
+  }
+  .panel .h { color: var(--text-faint); }
+  .panel .g { color: var(--accent2); } .panel .b { color: var(--accent); }
+  .panel .y { color: var(--warn); } .panel .v { color: var(--accent3); }
+  .panel .r { color: #f87171; }
+
+  /* ---------- Quote band ---------- */
+  .band {
+    text-align: center; padding: 72px 24px;
+    background: linear-gradient(180deg, rgba(79,156,255,0.06), transparent);
+    border-top: 1px solid var(--border);
+  }
+  .band blockquote {
+    font-size: clamp(1.25rem, 2.8vw, 1.7rem); font-weight: 650; letter-spacing: -0.02em;
+    max-width: 760px; margin: 0 auto; line-height: 1.4;
+  }
+  .band blockquote .grad {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .band .attr { margin-top: 16px; color: var(--text-faint); font-size: 0.9rem; }
+
+  /* ---------- Install ---------- */
+  .install-box {
+    max-width: 680px; margin: 0 auto;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+  }
+  .install-box .term-body { font-size: 0.9rem; }
+  .hosts { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+  .host {
+    font-size: 0.82rem; font-family: var(--mono); color: var(--text-dim);
+    border: 1px solid var(--border); border-radius: 999px; padding: 6px 16px; background: var(--surface);
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    border-top: 1px solid var(--border); padding: 36px 24px; text-align: center;
+    color: var(--text-faint); font-size: 0.85rem;
+  }
+  footer a { color: var(--text-dim); text-decoration: none; }
+  footer a:hover { color: var(--text); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo"><span class="mark"></span>Deep&nbsp;Rigor</div>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#rigor">Rigor levels</a>
+      <a href="#evidence">Evidence</a>
+      <a href="#autonomy">Autonomy</a>
+      <a href="#install" class="nav-cta">Install</a>
+    </div>
+  </div>
+</nav>
+
+<header>
+  <div class="hero">
+    <span class="eyebrow">Autonomous engineering, held to a standard</span>
+    <h1>Ship AI-built changes you can <span class="grad">actually trust.</span></h1>
+    <p class="tagline"><em>20 years</em> of engineering judgment, baked into <em>one slash command</em>.</p>
+    <p class="sub">
+      Deep Rigor runs your feature through a complete engineering pipeline — plan, adversarial review,
+      isolated build, empirical verification, independent code review, fix, docs — end to end, hands-free.
+      You pick how much rigor the change deserves. It proves the rest.
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#install">Get started</a>
+      <a class="btn btn-ghost" href="#how">See the pipeline</a>
+    </div>
+    <div class="hero-term">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+      <div class="term-body">
+<span class="p">❯</span> /deep-goal "rate-limit the public API" --rigor=mvp<br>
+<span class="c"># or just say it: "run deep-goal on API rate limiting, mvp rigor"</span><br>
+<br>
+<span class="k">plan</span>        <span class="ok">✓</span> <span class="dim">interactive — you shape it, it writes it</span><br>
+<span class="k">plan-review</span> <span class="ok">✓</span> <span class="dim">independent agent, fresh eyes, cited findings</span><br>
+<span class="k">implement</span>   <span class="ok">✓</span> <span class="dim">isolated worktree, per-phase commits</span><br>
+<span class="k">code-review</span> <span class="ok">✓</span> <span class="dim">4 findings — 3 fixed &amp; re-verified, 1 deferred on the record</span><br>
+<span class="k">docs</span>        <span class="ok">✓</span> <span class="dim">machine-readable map, every claim anchored</span><br>
+<br>
+<span class="ok">done</span> <span class="dim">— full run report in .deep-skills/rate-limit/00-Manifest/</span>
+      </div>
+    </div>
+  </div>
+  <div class="stat-row">
+    <div class="stat"><b>1</b><span>command end-to-end</span></div>
+    <div class="stat"><b>6</b><span>pipeline stages</span></div>
+    <div class="stat"><b>4</b><span>rigor levels (+ your own)</span></div>
+    <div class="stat"><b>0</b><span>unverified claims shipped</span></div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">The problem</div>
+    <h2>AI agents are confident.<br>Confidence is not evidence.</h2>
+    <p class="lede">
+      Any agent can generate a plausible diff. The hard part is everything around it — and it's exactly
+      where unattended AI work quietly falls apart:
+    </p>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <span class="x">// nobody asked "should we?"</span>
+        <h3>It builds things that shouldn't exist</h3>
+        <p>Agents execute whatever they're told. A misdiagnosed cause or an unsound premise gets faithfully — and expensively — implemented.</p>
+      </div>
+      <div class="problem-card">
+        <span class="x">// reviewer == author</span>
+        <h3>It marks its own homework</h3>
+        <p>An agent reviewing its own output shares its own blind spots. "Looks good to me" from the same context that wrote the code is theater, not review.</p>
+      </div>
+      <div class="problem-card">
+        <span class="x">// tests pass ≠ it works</span>
+        <h3>"Tests green" gets confused with "done"</h3>
+        <p>Typecheck and unit tests can't tell you the change behaves on real data, survives the last mile to the user, or is even live after merge.</p>
+      </div>
+      <div class="problem-card">
+        <span class="x">// what happened here?</span>
+        <h3>There's no paper trail</h3>
+        <p>When a run ends, all you have is a diff and a chat transcript. No record of what was reviewed, what was deferred, what was rejected — or why.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="how">
+  <div class="wrap">
+    <div class="kicker">How it works</div>
+    <h2>A real engineering pipeline, not a longer prompt.</h2>
+    <p class="lede">
+      One invocation walks your change through six specialized stages. Every stage runs as a
+      <strong>fresh, independent agent</strong> that communicates only through durable artifacts —
+      reviewers never see the author's reasoning, so they can't inherit its blind spots.
+      Progress is verified by checking the artifacts themselves, never by trusting an agent's summary.
+    </p>
+    <div class="pipeline">
+      <div class="stage"><span class="num">01</span><h4>Plan</h4><p>Scoped, evidence-based plan — with a gate that can kill unsound work before a line is written.</p></div>
+      <div class="stage"><span class="num">02</span><h4>Plan review</h4><p>Independent agents critique the plan against your codebase and cite every finding.</p></div>
+      <div class="stage"><span class="num">03</span><h4>Implement</h4><p>Phase-by-phase build in an isolated worktree. Never commits failing code. Never touches main.</p></div>
+      <div class="stage"><span class="num">04</span><h4>Code review</h4><p>Adversarial multi-lens review of the diff. Findings are severity-scored and verified before they count.</p></div>
+      <div class="stage"><span class="num">05</span><h4>Fix</h4><p>Diagnosis-first repairs at the root cause. A separate agent proves each fix — or it's reverted.</p></div>
+      <div class="stage"><span class="num">06</span><h4>Docs</h4><p>A machine-readable map of what was built. Every claim anchored to <code>file:line</code> or it doesn't publish.</p></div>
+    </div>
+    <p class="loop-note">└─ stages 04–05 <b>loop until they converge</b>: fewer findings every round, capped by your rigor level — never an infinite review spiral.</p>
+  </div>
+</section>
+
+<section id="rigor">
+  <div class="wrap">
+    <div class="kicker">The rigor dial</div>
+    <h2>Pay for exactly as much certainty as the change deserves.</h2>
+    <p class="lede">
+      Full ceremony on a throwaway spike is waste. A light touch on a data migration is reckless.
+      One dial — <code>--rigor</code> — selects the stages, the review depth, and the convergence bar.
+      Levels are <strong>data, not prose</strong>: drop a <code>rigor-map.json</code> in your repo to
+      reshape them or add your own.
+    </p>
+    <div class="levels">
+      <div class="level lv-yolo">
+        <div class="name">yolo</div>
+        <div class="tag">Spikes &amp; throwaways</div>
+        <ul>
+          <li class="on">Autonomous plan</li>
+          <li class="on">Build</li>
+          <li>No review</li>
+          <li>No docs</li>
+        </ul>
+      </div>
+      <div class="level lv-poc">
+        <div class="name">poc</div>
+        <div class="tag">Prototypes you might keep</div>
+        <ul>
+          <li class="on">Autonomous plan + self-audit</li>
+          <li class="on">Build</li>
+          <li class="on">One review — only breakage blocks</li>
+          <li>Everything else deferred, on the record</li>
+        </ul>
+      </div>
+      <div class="level lv-mvp">
+        <span class="rec">Recommended</span>
+        <div class="name">mvp</div>
+        <div class="tag">Real features</div>
+        <ul>
+          <li class="on">Interactive planning — you stay in the loop</li>
+          <li class="on">Independent plan + code review</li>
+          <li class="on">Majors fixed, fixes re-verified</li>
+          <li class="on">Docs shipped</li>
+        </ul>
+      </div>
+      <div class="level lv-prod">
+        <div class="name">prod</div>
+        <div class="tag">When being wrong is expensive</div>
+        <ul>
+          <li class="on">Deep planning, multi-agent reviews</li>
+          <li class="on">Triage accepts down to Minors</li>
+          <li class="on">Loop must provably converge</li>
+          <li class="on">Halts loudly if it can't</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="evidence">
+  <div class="wrap">
+    <div class="kicker">The philosophy</div>
+    <h2>Evidence over vibes, at every stage.</h2>
+    <p class="lede">
+      Deep Rigor is a powerful combination of <strong>empirical verification</strong> and
+      <strong>structured orchestration</strong> — every claim in the pipeline is backed by something
+      that ran, measured, or resolved, not by an agent's say-so.
+    </p>
+    <div class="feat-grid">
+      <div class="feat">
+        <div class="icon">⚖️</div>
+        <h3>It can tell you "no"</h3>
+        <p>Before planning, the pipeline evaluates whether the change is sound and worth building. If the premise fails on real evidence, you get the finding and the receipts — not a beautifully executed mistake.</p>
+      </div>
+      <div class="feat">
+        <div class="icon">📏</div>
+        <h3>Measure before reasoning</h3>
+        <p>When a plan hinges on an empirical question — is it actually slow? will this over-match? — the pipeline runs the five-minute probe on real data first, and plans from the measurement.</p>
+      </div>
+      <div class="feat">
+        <div class="icon">🥊</div>
+        <h3>Adversarial by design</h3>
+        <p>Review agents are briefed to <em>refute</em>, not to approve. Findings above the severity bar face a fresh verifier trying to knock them down; every survivor cites <code>file:line</code>. Refuted claims are kept on record, never silently dropped.</p>
+      </div>
+      <div class="feat">
+        <div class="icon">🔌</div>
+        <h3>Verified against reality</h3>
+        <p>Beyond typecheck and tests: run it on real data, print the actual rows, probe the latency, watch the real traffic. "Green" without an empirical proof of the core claim doesn't clear the bar at higher rigor.</p>
+      </div>
+      <div class="feat">
+        <div class="icon">🚀</div>
+        <h3>Live means <em>proven</em> live</h3>
+        <p>Every plan states its activation path — restart, reload, reconnect, migration — up front. After merge, the pipeline confirms the change is actually running and shows the before/after. No more stale-build victory laps.</p>
+      </div>
+      <div class="feat">
+        <div class="icon">🛟</div>
+        <h3>Risky mutations ship dark</h3>
+        <p>Changes that touch live data go out behind an off-by-default flag with a logging dry-run. Reading the dry-run's real output <em>is</em> the go/no-go gate — before a single row changes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="autonomy">
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <div class="kicker">Autonomy with guardrails</div>
+        <h2>Walk away. It knows when to interrupt you.</h2>
+        <p class="lede">
+          All human interaction happens up front, in the planning window. After that the run is
+          autonomous — and disciplined about your attention. It pings you for exactly four things:
+          a blocker, a checkpoint you asked for, a budget ceiling, or completion. Everything else
+          is a decision it makes and records.
+        </p>
+        <ul class="checklist">
+          <li><b>Gates you place:</b> "pause before implement" injects a human checkpoint into an otherwise hands-free run.</li>
+          <li><b>Budget ceilings:</b> cap the spend; the run pauses cleanly between stages when it's crossed — resume, raise, or stop.</li>
+          <li><b>Crash-safe resume:</b> pipeline state persists from launch. Re-invoke after any interruption and it picks up at the exact stage it left — never re-running finished work.</li>
+          <li><b>A full paper trail:</b> plans, review findings, severity ledgers, deferred items, per-stage spend, and a final run report — durable artifacts your whole team can audit.</li>
+        </ul>
+      </div>
+      <div class="panel">
+<span class="h"># .deep-skills/rate-limit/00-Manifest/pipeline.md</span><br>
+<span class="h">rigor:</span> <span class="b">mvp</span>&nbsp;&nbsp;<span class="h">budget:</span> <span class="y">~500k</span>&nbsp;&nbsp;<span class="h">gate:</span> <span class="v">implement</span><br>
+<br>
+<span class="g">✓</span> plan          <span class="h">complete · plan.md</span><br>
+<span class="g">✓</span> plan-review   <span class="h">complete · 2 findings folded in</span><br>
+<span class="v">◉</span> gate          <span class="h">approved 14:02 — proceed</span><br>
+<span class="g">✓</span> implement     <span class="h">complete · 3 phases · worktree</span><br>
+<span class="g">✓</span> code-review   <span class="h">complete · 4 findings</span><br>
+<span class="g">✓</span> bugfix        <span class="h">complete · 3 fixed, proven</span><br>
+<span class="g">✓</span> re-review     <span class="h">certificate: PASS</span><br>
+<span class="b">▸</span> docs          <span class="h">in-flight</span><br>
+<br>
+<span class="h">residuals: 1 deferred (Minor) — in run report</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <div class="split">
+      <div class="panel">
+<span class="h"># scales past a single change</span><br>
+<span class="b">campaign:</span> checkout-redesign<br>
+&nbsp;&nbsp;<span class="g">✓</span> slice 1  <span class="h">payment seam · shipped a41f2c9</span><br>
+&nbsp;&nbsp;<span class="g">✓</span> slice 2  <span class="h">cart migration · dark, dry-run clean</span><br>
+&nbsp;&nbsp;<span class="b">▸</span> slice 3  <span class="h">new checkout UI · in pipeline</span><br>
+&nbsp;&nbsp;<span class="y">◌</span> slice 4  <span class="h">re-sequenced — probe changed the premise</span><br>
+<br>
+<span class="h">rejected: client-side totals (drift risk,</span><br>
+<span class="h">&nbsp;&nbsp;measured 2.3% mismatch) — do not retry</span>
+      </div>
+      <div>
+        <div class="kicker">Built for the long haul</div>
+        <h2>Big efforts. Many sessions. Zero amnesia.</h2>
+        <p class="lede">
+          Large work decomposes into dependency-ordered, independently-shippable slices — each one a
+          full pipeline run, merged with your approval before the next begins. And because everything
+          lives in artifacts, a fresh session inherits the whole state:
+        </p>
+        <ul class="checklist">
+          <li><b>Plans are self-contained.</b> No stage depends on chat history; any agent, any day, can pick up where the last one stopped.</li>
+          <li><b>The plan is a hypothesis.</b> When a measurement breaks a slice's premise, the sequence changes — the pipeline never executes a now-wrong plan because it was the plan.</li>
+          <li><b>Rejected approaches stay rejected.</b> What was tried, killed, and why is on the record — so no future session burns a day rediscovering it.</li>
+          <li><b>It gets better as you use it.</b> Learned, human-approved improvements ship as data the pipeline loads at runtime — your process compounds without anyone rewriting it.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="band">
+  <blockquote>
+    "Done" doesn't mean the agent said so.<br>
+    It means <span class="grad">reviewed by fresh eyes, proven on real data, live in production</span> — with the receipts filed.
+  </blockquote>
+  <div class="attr">— the standard every Deep Rigor run is held to</div>
+</div>
+
+<section id="install">
+  <div class="wrap" style="text-align:center;">
+    <div class="kicker">Get started</div>
+    <h2>Two commands. Then just describe the feature.</h2>
+    <p class="lede" style="margin-left:auto; margin-right:auto;">
+      Install once, then invoke with a slash command or plain English —
+      <code>"run deep-goal on dark mode, prod rigor"</code> works exactly like the flags do.
+    </p>
+    <div class="install-box">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+      <div class="term-body">
+<span class="p">❯</span> /plugin marketplace add reurgency/marketplace<br>
+<span class="p">❯</span> /plugin install deep-skills@reurgency<br>
+<br>
+<span class="p">❯</span> /deep-goal "add dark mode" --rigor=mvp<br>
+<span class="c"># preview any run first, free: --dry-run</span>
+      </div>
+    </div>
+    <div class="hosts">
+      <span class="host">Claude Code</span>
+      <span class="host">GitHub Copilot CLI</span>
+      <span class="host">Codex</span>
+      <span class="host">Cursor</span>
+    </div>
+    <div class="cta-row" style="margin-top:36px; margin-bottom:0;">
+      <a class="btn btn-primary" href="#">Install Deep Rigor</a>
+      <a class="btn btn-ghost" href="#how">Read the docs</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span class="logo" style="font-size:0.95rem;"><span class="mark"></span>Deep&nbsp;Rigor</span>
+    &nbsp;·&nbsp; part of the Deep-Skills series by reUrgency &nbsp;·&nbsp;
+    <a href="#how">Pipeline</a> &nbsp;·&nbsp; <a href="#rigor">Rigor levels</a> &nbsp;·&nbsp; <a href="#install">Install</a>
+  </div>
+</footer>
+
+</body>
+</html>

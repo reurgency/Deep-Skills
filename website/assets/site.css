@@ -523,3 +523,8 @@ html.js .reveal.in{opacity:1;transform:none}
 
 /* deep-goal separator in the Skills dropdown (conductor sits apart from the six) */
 .dropdown .dropdown-sep{height:1px;margin:6px 12px;background:var(--line);padding:0;list-style:none}
+
+/* GitHub icon link in the header (right of Install) */
+.nav-gh{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;margin-left:2px;color:var(--muted);border-radius:10px;transition:color .16s ease,background .16s ease}
+.nav-gh:hover,.nav-gh:focus-visible{color:var(--text);background:var(--bg-raise);outline:none}
+.nav-gh svg{display:block}
