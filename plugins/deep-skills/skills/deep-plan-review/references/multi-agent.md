@@ -6,7 +6,7 @@ Parallel review: one fresh agent per dimension, then a synthesis pass. Trades to
 
 Before fan-out, read `references/model-map.md` (rules) and `references/model-map.json` (data, merged with any `.deep-skills/model-map.json` repo override) and bind each agent's tier (the **Tier** column below) to a concrete full model ID, set explicitly at launch with the host's launch value (`references/model-map.md` § Host binding; never a host default or a guessed alias) - the model-routing correctness guarantee in `references/host-affordances.md` applies to every fleet. Tiers use the map's fleet notation: **`stage`** = this review's stage tier (`stages.<max>.plan-review`, where `--max` defaults to base's tier - SKILL.md § Flags); **`one down`** = one tier below it, floor `smart`. These tiers are judgment calls, not yet benchmarked the way deep-code-review's finder tiers are.
 
-Launch the dimension agents **in parallel** - one message, multiple `Agent` tool calls - each with the plan text, its single dimension brief, codebase read access, and the user-preference pointers. None of them gets the planning transcript.
+Launch the dimension agents **in parallel** - one message, multiple `Agent` tool calls - each with the plan text, its single dimension brief, codebase read access, and the user-preference pointers, ending with the model-report line (`references/model-map.md` § Host binding). None of them gets the planning transcript.
 
 | Agent | Dimension brief | Tier |
 |---|---|---|
@@ -24,12 +24,14 @@ Scale sensibly: a small plan may only warrant two agents (codebase-duplication +
 
 ## Synthesis
 
-After the agents return, run one synthesis pass (the main session - which runs on base, the session model - or a final `general-purpose` agent on the `stage` tier, model set explicitly) that:
+After the agents return, run one synthesis pass (the main session - which runs on base, the session model - or a final `general-purpose` agent on the `stage` tier, model set explicitly, brief ending with the model-report line) that:
 
 1. **Dedupes** - collapse findings multiple agents raised into one, keeping the strongest evidence.
 2. **Resolves conflicts** - if two agents disagree (e.g. "reuse X" vs "X doesn't fit"), surface both sides and take a position.
 3. **Ranks** - order by severity, then by lens.
 4. **Produces one clean list** - the only thing the user sees; the per-agent raw output stays behind the curtain.
+
+Strip each agent's trailing `MODEL:` line before deduping (it goes in the report header's Models line, never in the findings list).
 
 ## Caution
 

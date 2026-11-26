@@ -6,7 +6,8 @@ The orchestrator (main session) spawns **one fresh sub-agent per phase**, in ord
 - the full plan (so it has Context, Constraints, Approach),
 - **its phase only** (goal, prerequisites, files, steps, acceptance),
 - the **Phase Summaries** appendix so far (what prior phases produced),
-- the latest next-phase hand-off.
+- the latest next-phase hand-off,
+- **the model-report line** - end the brief with it (`references/model-map.md` § Host binding).
 
 **Model: every phase agent runs on the `stage` tier** (`stages.<max>.implement` in `references/model-map.json`, merged with any `.deep-skills/model-map.json` repo override; `--max` defaults to base's tier), resolved per `references/model-map.md` to its full model ID and **set explicitly on every launch** with the host's launch value (`references/model-map.md` § Host binding) - never a host default or a guessed alias, never a small model, including when the host's built-in agent type has its own default model. The same tier applies to phases launched in parallel under `--parallel`. The orchestrator itself runs on base, the session model.
 
@@ -28,7 +29,9 @@ Concurrency is bounded (a small handful, never a swarm) per the user's standing 
 
 ## Briefing a phase agent (prompt shape)
 
-> You are implementing **one phase** of an approved plan. Plan: <path/inline>. Your phase: <phase block>. Already done: <Phase Summaries>. Implement only this phase, following the plan's Approach and Constraints. Reuse the named existing functions/utilities. Do not exceed this phase's scope. Return: files created/modified + a 3-5 line summary + any blocker. Do not commit.
+> You are implementing **one phase** of an approved plan. Plan: <path/inline>. Your phase: <phase block>. Already done: <Phase Summaries>. Implement only this phase, following the plan's Approach and Constraints. Reuse the named existing functions/utilities. Do not exceed this phase's scope. Return: files created/modified + a 3-5 line summary + any blocker. Do not commit. Then append the model-report line verbatim (`references/model-map.md` § Host binding).
+
+The orchestrator strips that trailing `MODEL:` line from the Return before writing Phase Summaries.
 
 The orchestrator handles validation, commits, summaries, and hand-offs - not the phase agent.
 

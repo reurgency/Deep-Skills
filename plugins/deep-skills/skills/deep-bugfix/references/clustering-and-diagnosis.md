@@ -52,6 +52,7 @@ Each diagnose agent receives - and only receives:
 - **The plan** (when the effort has one) - for conformance *context* only: what the behavior was supposed to be.
 - **The recommendation, flagged**: every `recommendation_hypothesis` is passed under the header **"hypothesis - do not trust"**. The review (or reporter) guessed at the cause; the agent must confirm or reject that guess with its own trace.
 - **On a retry or redirect only:** the failed proof's rationale (attempt 2 after `unproven`), the fix agent's `diagnosis-disputed` reason, or the user's redirect note (collaborative) - and the previous diagnosis file, which it rewrites.
+- **The model-report line** - end the brief with it (`references/model-map.md` § Host binding).
 
 It never receives the implementer's transcript, the reviewer's transcript or reasoning, or any prior attempt's chat history - evidence only, fresh eyes.
 
@@ -70,6 +71,7 @@ Each fix agent receives - and only receives:
 - **The cluster's defects** (ids + evidence blocks) - so it knows what the fix must resolve.
 - **Repo access** (write) - inside the worktree under `--worktree`.
 - **Under `--reproduce`:** the red→green protocol (`references/proof-of-fix.md`) - it writes the reproducing test first and records the pre-fix red before applying the fix.
+- **The model-report line** - end the brief with it (`references/model-map.md` § Host binding).
 
 It never receives transcripts, the recommendation (the diagnosis already weighed it), or prior attempts' chat history.
 

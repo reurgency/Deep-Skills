@@ -40,7 +40,7 @@ The planner and the user are too close to the plan to see its blind spots. So th
 | Command | Behavior |
 |---|---|
 | `/multi-agent` | Escalate the current review to **parallel** mode - fan out one fresh agent per dimension, then synthesize. Same effect as the `--multi-agent` flag. See `references/multi-agent.md`. |
-| `/columbo` | Optional fresh-agent completeness gut check (the existing repo command) - complements alignment review with "could a fresh agent execute this?". Its agent (and any other helper agent this skill launches) runs on the review's `stage` tier, model set explicitly (`references/model-map.md`). |
+| `/columbo` | Optional fresh-agent completeness gut check (the existing repo command) - complements alignment review with "could a fresh agent execute this?". Its agent (and any other helper agent this skill launches) runs on the review's `stage` tier, model set explicitly and the model-report line on its brief (`references/model-map.md` § Host binding). |
 
 ## Flags
 
@@ -58,7 +58,7 @@ Resolve the plan to review, in order: an explicit path argument → the plan ref
 If `--multi-agent` (or `/multi-agent`, or its natural-language form - see Flags) was given, use parallel mode. Otherwise default to single-agent - but **recommend** `--multi-agent` when the plan is large or multi-phase.
 
 ### 3. Dispatch the review
-Brief each fresh agent with: the plan text, the two review lenses (`references/review-dimensions.md`), read access to the codebase, and pointers to the user's preference sources (the memory directory's `MEMORY.md` + `feedback_*` memories, root `CLAUDE.md`, and per-app `apps/*/CLAUDE.md` / `Claude.md`). **Do not** pass the planning transcript.
+Brief each fresh agent with: the plan text, the two review lenses (`references/review-dimensions.md`), read access to the codebase, and pointers to the user's preference sources (the memory directory's `MEMORY.md` + `feedback_*` memories, root `CLAUDE.md`, and per-app `apps/*/CLAUDE.md` / `Claude.md`). End each brief with the model-report line (`references/model-map.md` § Host binding). **Do not** pass the planning transcript.
 
 - **Single-agent:** one `Agent` (type `Explore` for read-only sweeps; `general-purpose` if it must reason across both lenses) covers both lenses and returns findings in the format from `references/findings-format.md`. It runs on the review's `stage` tier (`stages.<max>.plan-review`, resolved per `references/model-map.md` + `references/model-map.json`); **pass that model explicitly even for `Explore`**, whose host default is a small model.
 - **Multi-agent:** follow `references/multi-agent.md` - launch the dimension agents **in parallel (one message, multiple Agent calls)**, then run a synthesis pass to dedupe and rank.

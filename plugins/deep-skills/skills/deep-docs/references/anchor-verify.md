@@ -6,7 +6,7 @@ Anchor-verify is the **stale-map defense** and it is **always on** - never sampl
 
 - **Fan-out per card:** launch **one fresh adversarial verifier per subsystem card** (tier-1) and per tier-2 ref, **≤8 concurrent** (the same concurrency cap as the survey fleet; cards beyond 8 run in successive batches).
 - **Model: the `stage` tier** (`stages.<max>.docs` in `references/model-map.json` - `smart` under the shipped table; a repo override may move it), resolved per `references/model-map.md` to its full model ID and **set explicitly on every launch** with the host's launch value (`references/model-map.md` § Host binding) - never a host default or a guessed alias, never a small model.
-- **Fresh and read-only:** each verifier is briefed only with its card/ref + codebase access - never the survey agent's reasoning, never another verifier's output, never an implementation transcript. Its job is to **refute** the anchors, not to trust them.
+- **Fresh and read-only:** each verifier is briefed only with its card/ref + codebase access (the brief ending with the model-report line, `references/model-map.md` § Host binding) - never the survey agent's reasoning, never another verifier's output, never an implementation transcript. Its job is to **refute** the anchors, not to trust them.
 - **Exhaustive:** the verifier re-resolves **every** anchor in its card - no sampling, no budget. Symbol grep is cheap, so exhaustiveness is affordable, and the anchoring guarantee ("every claim is anchored or it's fiction") forbids leaving any anchor unchecked.
 
 ## Per-anchor re-resolution (the procedure)
@@ -33,6 +33,8 @@ ANCHORS:
 RESNAPPED:
 - src/auth/token.ts:12 (signToken): 12 -> 19
 ```
+
+The brief's model-report line (`MODEL: ...`, `references/model-map.md` § Host binding) trails outside this format; read and strip it before parsing.
 
 - **`accurate`** - every anchor re-resolved (some possibly re-snapped); the card is publishable.
 - **`drifted`** - at least one anchor's symbol is gone; the card is stale.

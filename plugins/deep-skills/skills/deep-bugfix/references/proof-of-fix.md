@@ -4,7 +4,7 @@ The skill never ships a "claimed fix." Containment (`references/containment.md`)
 
 ## The proof agent - fresh, adversarial, severity-gated
 
-After the fix agent applies its fix, launch a **fresh agent** whose burden of proof is inverted: it is briefed to **refute "fixed."** It receives the cluster's defects (evidence blocks), the confirmed-cause statement (the cluster's `round-N/diagnosis-<CL-K>.md`), and the diff - never the diagnose or fix agent's transcript or reasoning. It re-derives everything itself.
+After the fix agent applies its fix, launch a **fresh agent** whose burden of proof is inverted: it is briefed to **refute "fixed."** It receives the cluster's defects (evidence blocks), the confirmed-cause statement (the cluster's `round-N/diagnosis-<CL-K>.md`), and the diff - its brief ending with the model-report line (`references/model-map.md` § Host binding) - never the diagnose or fix agent's transcript or reasoning. It re-derives everything itself.
 
 - **Model tier** (fleet notation per `references/model-map.md`, set explicitly at launch): clusters containing any defect at **severity ≥5** get the **`max` tier** (the `--max` tier itself); when every defect is below 5, the **`stage` tier** (`stages.<max>.bugfix`). An unset severity (synthesized `BF-*` defects without a judgment) gates to `max` - when in doubt, prove hard.
 - The proof agent may **raise its hand on the cluster itself**: if the fix resolves some members but its trace cannot connect others to the confirmed cause, that is a false merge - verdict `unproven` with the unexplained members named, and the cluster splits.
@@ -56,6 +56,8 @@ verdict: fixed | unproven | regressed
 defects: [ { id, chain: "<hop-by-hop with citations - or, under --reproduce, test path + the prover's own red/green observations>", holds: true|false } ]
 rationale: <one paragraph - for unproven/regressed, exactly what could not be established or what broke>
 ```
+
+The brief's model-report line (`MODEL: ...`, `references/model-map.md` § Host binding) trails outside this format; read and strip it before parsing.
 
 - **`fixed`** - every defect in the cluster has a complete, cited chain showing the corrected behavior (under `--reproduce`: a committed test the proof agent itself observed red without the fix and green with it - or, for a reported-unreproducible defect, its fallback chain).
 - **`unproven`** - at least one chain has an unevidenced hop, an unexplained cluster member, or a happy-path-only trace; under `--reproduce`, also a missing pre-fix red, a direction the prover could not re-run, or a test green in both directions. Not an accusation - an absence of proof.

@@ -77,7 +77,7 @@ Everything below describes the default **interactive** session. Under `--autonom
 State scope, explicit **non-goals**, and the assumptions you're making. Get a quick confirmation.
 
 ### 3. Explore (read-only)
-Launch up to 3 `Explore` agents in parallel - each on the plan's `stage` tier (`stages.<max>.plan`, resolved per `references/model-map.md` + `references/model-map.json`), **model passed explicitly** because `Explore`'s host default is a small model - to find: reusable patterns/utilities, integration points, data models, and the files that will be touched. **Reuse before inventing** - prefer existing functions over new code, and name them with paths. Do not edit anything in this phase.
+Launch up to 3 `Explore` agents in parallel - each on the plan's `stage` tier (`stages.<max>.plan`, resolved per `references/model-map.md` + `references/model-map.json`), **model passed explicitly** because `Explore`'s host default is a small model - each brief ending with the model-report line (`references/model-map.md` § Host binding) - to find: reusable patterns/utilities, integration points, data models, and the files that will be touched. **Reuse before inventing** - prefer existing functions over new code, and name them with paths. Do not edit anything in this phase.
 
 ### 4. Question rounds
 Emit questions per the chosen cadence. Build each question from a `templates/questions/*.json` format and render via the host's structured-question tool (see `references/host-affordances.md`). Keep questions decision-relevant - skip anything you can answer yourself from exploration. Honor `/drill` and `/breakout` mid-round without losing your place.
