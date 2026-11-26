@@ -2,7 +2,7 @@
 
 The full-treatment review, in five stages: a **scripted setup stage** that does everything deterministic before (and alongside) the agents, a **finder fleet** of independent single-lens passes that deliberately overgenerates candidates, a dedup/decomposition pass, an **adversarial verification** stage that restores precision on the findings that matter, and a **script-assembled synthesis** into **one** report. Trades tokens for both recall (many narrow, independent passes out-find one broad pass) and precision (every surviving Minor+ finding has been attacked by a fresh skeptic). Use for large diffs, multi-phase implementations, pre-merge gates, or whenever the user asks (flag or in-session `/multi-agent` escalation).
 
-**Token discipline is part of the contract.** Two measured baseline runs calibrated this mode. The first (80-file PR, 10 finders, verify-everything) spent ~57% of its tokens on finders re-reading their own large contexts and ~26% verifying nit-tier candidates that no verification ever changed - that bought the finder budgets and the sev ≥5 verification floor. The second (7 finders, floor in place) cut real cost ~37% and showed where the remainder goes: every finder independently ingested the full 15k-line diff (finders ≈ 58% of all spend), the pre-pass ran serially before finders that never consume its output (~13 min), synthesis hand-wrote ~103k output tokens that were mostly transcription of structured verdicts it already had, and the main-model verifier fleet spent itself mostly demoting marginal sev-5 candidates. The scripted stages, model tiers, and budgets below exist to keep the mode's cost proportional to its value - do not drop them when a run "feels important"; every one is calibrated from where the spend demonstrably did and didn't buy findings.
+**Token discipline is part of the contract.** Two measured baseline runs calibrated this mode. The first (80-file PR, 10 finders, verify-everything) spent ~57% of its tokens on finders re-reading their own large contexts and ~26% verifying nit-tier candidates that no verification ever changed - that bought the finder budgets and the sev ≥5 verification floor. The second (7 finders, floor in place) cut real cost ~37% and showed where the remainder goes: every finder independently ingested the full 15k-line diff (finders ≈ 58% of all spend), the pre-pass ran serially before finders that never consume its output (~13 min), synthesis hand-wrote ~103k output tokens that were mostly transcription of structured verdicts it already had, and the top-tier verifier fleet spent itself mostly demoting marginal sev-5 candidates. The scripted stages, model tiers, and budgets below exist to keep the mode's cost proportional to its value - do not drop them when a run "feels important"; every one is calibrated from where the spend demonstrably did and didn't buy findings.
 
 **Two configurations, one pipeline.** The stages below describe the **default** `--multi-agent` configuration. `--mega` (documented at the end) runs the same pipeline with the cost/accuracy dials at maximum - for release gates worth the spend. There is one skill with dials, not two divergent modes.
 
@@ -21,29 +21,31 @@ Three pieces of this mode are deterministic and MUST be scripted, never delegate
 
 ### Model tier resolution - read this before launching anything
 
-The three tiers (**main**, **mid**, **cheap**) are abstract - they bind to concrete host model IDs through the model map. **Before launching anything, read `references/model-map.md` and bind each tier (main/mid/cheap) to its concrete host model ID; set the model explicitly on every agent launch - never an alias, never a host default. The map is a required input.**
+Every agent's model comes from the series-shared model map. **Before launching anything, read `references/model-map.md` (the rules) and `references/model-map.json` (the data), merged with the optional repo override `.deep-skills/model-map.json`, and bind every agent below to a concrete full model ID; set the model explicitly on every agent launch - never an alias, never a host default. The map is a required input.**
+
+Each agent's tier in the tables below uses the map's internal fleet notation: **`stage`** = this review's stage tier (`stages.<max>.code-review`, where `--max` defaults to base's tier - SKILL.md § Flags), **`one down`** / **`two down`** = one / two tiers below it, floor `smart`. Resolve the tier to a model ID from base's family column, then apply the map's access fallback.
 
 Two binding rules:
 
-1. **The main tier IS the orchestrator's (ceiling) model - never anything smaller.** The ceiling is the orchestrator's own model - the strongest the user can access. Tiers resolve **downward from the ceiling, never upward**, and **collapse up to it** when no cheaper reasoning model exists (a restricted Sonnet-4.6 ceiling binds main = mid = cheap = Sonnet 4.6 - see `references/model-map.md`).
-2. **All three tiers are reasoning tiers - the host's small/utility models (on Claude Code, Haiku) never appear here, any tier, any stage, any agent.** Not because a model name is banned, but because every task in this pipeline - finding, verifying, synthesizing - is reasoning work, so a small model is never the right tool. A calibration run whose finders silently routed to Haiku produced 0 Blockers and 0 Majors on a diff with two known Criticals - output worse than none, because it ships false confidence.
+1. **Tiers are fixed; `stage` is the top of this review.** No agent here runs above the stage tier, and the relative tiers floor at `smart` - under `--max=smart` (or a smart-tier session with no `--max`) every agent resolves to `smart`. The access fallback (`references/model-map.md` § Access fallback) is the only thing that moves an agent off its resolved model, and the run records it.
+2. **Every tier is a reasoning tier - the host's small/utility models (on Claude Code, Haiku) never appear here, any tier, any stage, any agent.** Not because a model name is banned, but because every task in this pipeline - finding, verifying, synthesizing - is reasoning work, so a small model is never the right tool. A calibration run whose finders silently routed to Haiku produced 0 Blockers and 0 Majors on a diff with two known Criticals - output worse than none, because it ships false confidence.
 
-**Set the model explicitly on every agent launch** (the Agent tool's `model` parameter / per-agent model setting) - never rely on inheritance or a default. That is exactly how the Haiku mis-route happened: tier labels like "main model" were left to implicit resolution. Before launching the fleet, resolve each tier to its concrete **full model ID** via `references/model-map.md` and use those IDs in every launch. If any agent's transcript or first response shows it running on a model below its assigned (ceiling-relative) tier, its output is invalid: discard it and relaunch that agent with the model set explicitly.
+**Set the model explicitly on every agent launch** (the Agent tool's `model` parameter / per-agent model setting) - never rely on inheritance or a default. That is exactly how the Haiku mis-route happened: tier labels like "main model" were left to implicit resolution. Before launching the fleet, resolve each tier to its concrete **full model ID** via `references/model-map.md` and use those IDs in every launch. If any agent's transcript or first response shows it running on a different model than the one resolved for it (other than a recorded access fallback), its output is invalid: discard it and relaunch that agent with the model set explicitly.
 
 Eight independent finder passes, each a **fresh, read-only agent with exactly one lens**, model-tiered by what calibration showed each lens actually catches:
 
 | # | Pass id | Lens brief | Nearest default lens | Model tier |
 |---|---|---|---|---|
-| 1 | `diff-scan` | Line-by-line correctness read of the diff - `references/review-lenses.md` § Correctness | `correctness` | mid |
-| 2 | `removed-behavior` | Audit every deletion: where did the behavior go? - `references/dimensions.md` | `correctness` | main |
-| 3 | `seam-trace` | Write-path → read-path tracing across files/layers - `references/dimensions.md` | `last-mile` | main |
-| 4 | `last-mile` | Promised-behavior enumeration + hop-by-hop chain walk - `references/last-mile.md` | `last-mile` | main |
-| 5 | `frozen-state-probe` | What does surviving code do at values frozen by deleted writers? - `references/dimensions.md` | `correctness` | main |
-| 6 | `conformance` | Plan / PR-description conformance - `references/review-lenses.md` § Plan Conformance (incl. no-plan degradation) | `plan-conformance` | mid |
-| 7 | `coherence` | One-mind's-work check - `references/review-lenses.md` § Coherence | `coherence` | mid |
-| 8 | `quality` | Combined duplication / simplification / performance / conventions sweep - `references/dimensions.md`. **Severity-capped at ≤4.** | `coherence` | cheap |
+| 1 | `diff-scan` | Line-by-line correctness read of the diff - `references/review-lenses.md` § Correctness | `correctness` | one down |
+| 2 | `removed-behavior` | Audit every deletion: where did the behavior go? - `references/dimensions.md` | `correctness` | stage |
+| 3 | `seam-trace` | Write-path → read-path tracing across files/layers - `references/dimensions.md` | `last-mile` | stage |
+| 4 | `last-mile` | Promised-behavior enumeration + hop-by-hop chain walk - `references/last-mile.md` | `last-mile` | stage |
+| 5 | `frozen-state-probe` | What does surviving code do at values frozen by deleted writers? - `references/dimensions.md` | `correctness` | stage |
+| 6 | `conformance` | Plan / PR-description conformance - `references/review-lenses.md` § Plan Conformance (incl. no-plan degradation) | `plan-conformance` | one down |
+| 7 | `coherence` | One-mind's-work check - `references/review-lenses.md` § Coherence | `coherence` | one down |
+| 8 | `quality` | Combined duplication / simplification / performance / conventions sweep - `references/dimensions.md`. **Severity-capped at ≤4.** | `coherence` | two down |
 
-**Tiering rationale (calibrated across both benchmark runs):** `seam-trace`, `last-mile`, and `removed-behavior` found every Blocker and Major in both runs - they stay on the main tier, as does `frozen-state-probe` (it hunts the same defect class). `diff-scan`, `conformance`, and `coherence` produced solid Minors and no Blockers in either run - the mid tier covers them. `quality` produces nit-tier output by design and is **capped at proposed severity ≤4** (a candidate it believes rates higher is filed at 4 with a believed-higher note - see `references/dimensions.md`); the cap means quality candidates never trigger verifiers - in the second baseline the quality pass was the cheapest finder, but every sev-5 it proposed died in verification, making refutation its main downstream cost.
+**Tiering rationale (calibrated across both benchmark runs):** `seam-trace`, `last-mile`, and `removed-behavior` found every Blocker and Major in both runs - they stay on the stage tier, as does `frozen-state-probe` (it hunts the same defect class). `diff-scan`, `conformance`, and `coherence` produced solid Minors and no Blockers in either run - one tier down covers them. `quality` produces nit-tier output by design, runs two tiers down, and is **capped at proposed severity ≤4** (a candidate it believes rates higher is filed at 4 with a believed-higher note - see `references/dimensions.md`); the cap means quality candidates never trigger verifiers - in the second baseline the quality pass was the cheapest finder, but every sev-5 it proposed died in verification, making refutation its main downstream cost.
 
 Launch rules:
 
@@ -72,10 +74,10 @@ The test for both directions is the same question: *how many independent fixes d
 
 **The verification floor: candidates with proposed severity ≥5 (Minor and up) get verified; sev ≤4 ships unverified.** In the first calibration run every verification outcome that changed anything happened at sev ≥4, and verifying the nit tail consumed ~a quarter of the run for zero changed verdicts. Below-floor findings carry `verification: unverified` into the report and findings.json, with their finder evidence intact; the report states the floor so readers know what "unverified" means. Two adjustments are allowed, both upward: a Stage B merge that raises a candidate's severity to ≥5 puts it above the floor, and synthesis may explicitly send a sev-4 candidate to verification when it looks load-bearing (state why - this is also the promotion path for the quality pass's believed-higher notes). Never lower the floor mid-run to "be thorough" - that decision was made when the mode was invoked.
 
-**Verifiers are model-tiered by what their verdict gates.** In the second baseline, every sev-5 verification ended in a demotion or refutation - knocking down floor-gaming marginal findings is pattern-checking work a cheap model does well; the expensive skeptic is reserved for candidates whose confirmation would gate the merge:
+**Verifiers are model-tiered by what their verdict gates.** In the second baseline, every sev-5 verification ended in a demotion or refutation - knocking down floor-gaming marginal findings is pattern-checking work a lower-tier reasoning model does well; the top-tier skeptic is reserved for candidates whose confirmation would gate the merge:
 
-- **Sev 5 candidates → `cheap`-tier verifier** (the cheapest *reasoning* model, e.g. Sonnet at an Opus/Fable ceiling - never a small model; resolve via `references/model-map.md`). If a cheap verifier *confirms* a sev-5 **and raises** its severity to ≥6, the raise doesn't stand on its own - a main-tier verifier re-checks before synthesis accepts it.
-- **Sev ≥6 candidates → main-tier verifier** (the orchestrator's model, per `references/model-map.md` - set explicitly at launch).
+- **Sev 5 candidates - and a sev-4 candidate synthesis promotes to verification - → `two down` verifier** (two tiers below the stage tier, floor `smart`: e.g. `smart` when the stage tier is `smartest` - still a *reasoning* model, never a small one; resolve via `references/model-map.md`). If a `two down` verifier *confirms* such a candidate **and raises** its severity to ≥6, the raise doesn't stand on its own - a `stage`-tier verifier re-checks before synthesis accepts it.
+- **Sev ≥6 candidates → `stage`-tier verifier** (resolved per `references/model-map.md` - set explicitly at launch).
 
 **One streamed wave, not batched waves.** Verifiers launch as candidates clear Stage B, as a rolling window under the ≤8 concurrency cap - never accumulated into discrete waves with barriers between them (the second baseline's two-wave barrier idled the fleet between waves). Each verifier's prompt carries its Stage 0 fact pre-harvest.
 
@@ -112,7 +114,7 @@ Synthesis is split in two: **mechanical assembly is scripted; the model writes o
 - the Refuted-candidates appendix skeleton (pass id, claim, refutation rationale from RATIONALE lines);
 - the `certificate.md` scaffold (verdict = fail iff unresolved Blockers exist).
 
-**By the model** (the orchestrator itself, in-session - one pass over the verified set plus the pre-pass results; never delegated to a smaller model):
+**By the model** (the orchestrator itself, in-session, so it runs on base, the session model - one pass over the verified set plus the pre-pass results; never delegated to a smaller model):
 
 1. **Enforce the evidence rules.** Findings without evidence (path:line, named symbol, or observed behavior) are rejected here, and the **last-mile no-chain-no-finding rule** is enforced on anything last-mile-shaped: no cited hop-by-hop chain, no finding (`references/last-mile.md`). The probe lens's equivalent rule (no probed chain, no finding) is enforced the same way.
 2. **Reconcile severities.** Where the finder's proposal and the verifier's calibration (or two merged passes) disagree, synthesis picks one severity **with a stated rationale** recorded in the finding (e.g. "finder said 7, verifier raised to 9 - three independent UI paths reach the broken read"). Never silently average.
@@ -122,15 +124,16 @@ Synthesis is split in two: **mechanical assembly is scripted; the model writes o
 
 The multi-agent run ends at the assembled report, exactly like the default flow - all findings `open`, nothing written to the plan. Triage and fix routing are the separate `--triage` step (SKILL.md § 7); verified findings get no special handling there.
 
-## `--mega` - the thorough tier
+## `--mega` - the thorough configuration
 
 `--mega` runs the **same pipeline** with the cost/accuracy dials at the measured-baseline maximum. For release gates and pre-merge reviews of large, risky work where the user explicitly accepts roughly double the default's wall clock and rate-limit footprint:
 
-- **All eight finder passes on the main tier** - the orchestrator's model, resolved per `references/model-map.md` and set explicitly per launch (`quality` may stay on the cheap tier, but its sev ≤4 cap is lifted - it proposes severities normally). Small models stay out here too - every pass still reasons.
-- **All verification on the main tier**, floor still sev ≥5; the sev-5 cheap-tier routing does not apply.
-- **Stage 0 stays fully scripted** (chunking, parallel pre-pass, fact harvest), and Stage D stays script-assembled - determinism trades no accuracy, so the thorough tier keeps it.
+- **All eight finder passes on the `stage` tier, `quality` included** - resolved per `references/model-map.md` and set explicitly per launch; `quality`'s sev ≤4 cap is lifted - it proposes severities normally. (Intentional change from the earlier tiering, which let `quality` stay on the lowest tier under `--mega`.) Small models stay out here too - every pass still reasons.
+- **All verification on the `stage` tier**, floor still sev ≥5; the sev-5 `two down` routing does not apply.
+- **`--mega` × `--max`.** They are independent dials and combine: `--max` picks the stage tier (the highest model level), `--mega` puts every agent on it. `--mega --max=smart` is therefore a full-depth review entirely on the `smart` tier; `--mega` alone uses the default `--max` (base's tier).
+- **Stage 0 stays fully scripted** (chunking, parallel pre-pass, fact harvest), and Stage D stays script-assembled - determinism trades no accuracy, so the thorough configuration keeps it.
 
-Everything else - budgets, floors, evidence rules, one report - is identical. If the user asks for "mega", "thorough", or "the full treatment", this is the tier they mean; confirm the cost before launching.
+Everything else - budgets, floors, evidence rules, one report - is identical. If the user asks for "mega", "thorough", "the full treatment", or a bare "max"/"maximum" review, this is the configuration they mean; confirm the cost before launching. Only a phrase that names a level word ("use the smartest models", "keep it to smarter models") sets `--max` instead.
 
 ## The `--security` seam (documented, INERT)
 

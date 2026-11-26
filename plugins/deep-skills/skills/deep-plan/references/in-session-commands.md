@@ -30,6 +30,7 @@ Split off an **isolated fresh subagent** so the investigation does **not** bloat
    - the user's `<instructions>` / commentary / angle.
 2. **Launch one `Agent`** with that briefing as its entire context:
    - use the `Explore` agent type for read-only investigation; `general-purpose` if it must reason or prototype.
+   - **Model: the `stage` tier** (`stages.<max>.plan` in `references/model-map.json`), resolved per `references/model-map.md` and **passed explicitly on the launch - including for `Explore`**, whose host default is a small model. Never an alias, never a host default.
    - **Foreground (default):** wait for it and return its distilled answer.
    - **Background:** if the user says so (or the investigation is slow and other questions can proceed), pass `run_in_background: true` and keep the session moving; surface the answer when it lands.
 3. **Return only the pearl** - the subagent's distilled answer/recommendation - into the main session. The user accepts or refines; the question resolves; continue.
@@ -76,4 +77,4 @@ Fold every accepted constraint into the plan (Context or a Constraints section) 
 
 ## `/columbo`
 
-On Claude Code this reuses the existing repo command (`.claude/commands/columbo.md`); on other hosts, invoke it by saying *'run a columbo pass'* / *'do a fresh-agent completeness audit.'* Re-read the written plan as a fresh agent with zero prior context and audit for unstated assumptions, undefined terms, missing paths/commands, ambiguous steps, and implicit ordering. If a fresh agent couldn't succeed, list what's missing and fix it in the plan. Offer this as the final step before hand-off.
+On Claude Code this reuses the existing repo command (`.claude/commands/columbo.md`); on other hosts, invoke it by saying *'run a columbo pass'* / *'do a fresh-agent completeness audit.'* Re-read the written plan as a fresh agent with zero prior context and audit for unstated assumptions, undefined terms, missing paths/commands, ambiguous steps, and implicit ordering. If a fresh agent couldn't succeed, list what's missing and fix it in the plan. Offer this as the final step before hand-off. When the pass runs as a launched agent (the usual case - it must have zero prior context), that agent runs on the `stage` tier (`stages.<max>.plan`), model set explicitly per `references/model-map.md`.

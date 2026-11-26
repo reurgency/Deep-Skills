@@ -10,6 +10,7 @@
 > **Verdict: <PASS | FAIL>** - <no Blockers found | all Blockers resolved | N Blocker(s) unresolved>
 > **Scope:** `<verbatim stated-scope line>`
 > **Reviewed:** <YYYY-MM-DD> · **Mode:** <single-agent | multi-agent (N dimensions)><; no-plan mode, if applicable>
+> **Base:** <session model id> · **Max:** <smartest | smarter | smart> · **Models:** <role> <model id>, … <same line as report.md; fallbacks noted as `<id> (fallback from <id>)`>
 
 ## Severity rollup
 

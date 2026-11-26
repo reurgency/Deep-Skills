@@ -42,6 +42,7 @@ After each phase, append to the plan's **Phase Summaries** appendix:
 ## Implementation summary (`03-Implementation/summary.md`)
 
 At run completion (and incrementally if useful), write a work summary to `.deep-skills/<effort>/03-Implementation/summary.md` (see `references/artifact-structure.md`):
+- a header line `Base: <session model id> · Max: <smartest | smarter | smart> · Models: phase agents <model id>` (note any access fallback as `<id> (fallback from <id>)`, naming the phase it happened in),
 - what was built, at the effort level (the per-phase detail stays in the plan's Phase Summaries - this does not replace them),
 - the plan's acceptance/validation criteria **checked off** (or your own checklist if the plan lacks them),
 - open deferreds / known gaps.

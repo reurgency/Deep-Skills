@@ -1,7 +1,7 @@
 ---
 name: deep-docs
 description: Generate context-window-aware, machine-readable documentation of what a codebase has built - a standing, queryable orientation map structured for progressive disclosure, with every claim anchored to file:line (symbol) and adversarially verified by fresh agents. Three independently-loadable tiers (tier-0 MAP.md + index.json always-loaded; tier-1 subsystem cards on touch; tier-2 deep references on demand) so a crawling agent loads only the slice its task needs. Use after /deep-implement, after /deep-code-review, or standalone on any repo to orient an agent. Triggers on /deep-docs and on requests to map, document, or generate an AI-readable map of a codebase. Documents only - it never edits application source.
-argument-hint: Enter to doc the repo · path to scope · --refresh
+argument-hint: Enter to doc the repo · path to scope · --refresh · --max=<smartest|smarter|smart>
 ---
 
 # DeepDocs
@@ -73,6 +73,7 @@ Per the cross-assistant **Portability** rule, every flag is **natural-language-f
 - **Generate / map the codebase** (default; no flag) - say *"map this codebase," "document what's built," "generate the AI map."* Runs the full default-mode pipeline above.
 - **Put the map under \<path>** - say *"put the map under docs/foo," "write the map to \<path>."* Overrides the default `docs/ai-map/` output location (`references/place-and-report.md`).
 - **Refresh the docs** (`--refresh`) - say *"refresh the docs," "regenerate the map."* Re-resolves every recorded anchor against current code (reporting drift) **and** diffs the current source file-set against the stored fingerprint (catching undocumented additions/deletions), then **regenerates only the stale + new subsystems and leaves the rest untouched.** It uses a **dual git-free signal** (anchor re-resolution + file-set diff) that needs no git; a **git-index alignment check** takes a cheap `git diff` fast path *only when* git is proven reliable for this map, and falls back to the git-free signal on any dirty/non-git/shallow/brownfield tree. Every run rewrites the `alignment_fingerprint` the next refresh reads. **Convergence:** on a brownfield repo with unreliable git, early rounds use the git-free signal; once anchors stop drifting and the file-set matches the fingerprint across consecutive rounds, refresh promotes to the fast git-diff path (and drops back automatically if git stops aligning). See `references/refresh.md`.
+- **Choose the model level** (`--max=<smartest|smarter|smart>`) - say *"use the smartest models"* or *"keep it to smarter models"*. Sets the highest model level this skill's helper agents may use. If you don't choose, it uses your current model's level. Which model each helper gets is listed in references/model-map.md and this skill's agent tiers (`references/survey.md`, `references/anchor-verify.md`). (Documentation runs on the smart level at every choice by default - mapping and anchor-checking don't need more - so this only changes anything when your repo's `.deep-skills/model-map.json` moves documentation to a higher level.)
 
 ## Guardrails
 
@@ -81,6 +82,7 @@ Per the cross-assistant **Portability** rule, every flag is **natural-language-f
 - **Existing-docs quarantine.** Pre-existing human docs are indexed as `external-unverified` pointers only - their prose is never absorbed into a trusted tier. `coverage.md` lists referenced-vs-ingested.
 - **Never read `.env` or secrets** during host-convention discovery (source dirs, language, tests, anything). Use `package.json` / `angular.json` / `CLAUDE.md` (or equivalents); ask the user if a needed value isn't there. Degrade gracefully when an optional host helper is absent - no Maûdel-specific or host-specific commands hardcoded.
 - **Fresh eyes only.** Survey and verifier agents are fresh and read-only; never pass them the implementation transcript or each other's output.
+- **Model routing is load-bearing.** Survey, anchor-verify and refresh agents all run on the `docs` stage tier from `references/model-map.md` + `references/model-map.json`, set explicitly per launch - never an alias, never a host default, never a small model. `coverage.md` records the models used.
 - **Generated artifacts are machine-owned.** Every emitted file carries the `GENERATED - do not hand-edit; regenerate overwrites` header. Regen is wholesale overwrite, no merge. Humans annotate elsewhere.
 - **Never half-write the map.** All generation goes through `docs/.ai-map.staging/` + `.in-progress` marker; `docs/ai-map/` is replaced only by atomic `mv` after verify passes. A second run while a marker exists refuses rather than interleaving.
 - **Report progress, don't go silent.** Survey/verify fan-out is long-running; surface boundaries discovered, cards verified, and drift count as it goes.

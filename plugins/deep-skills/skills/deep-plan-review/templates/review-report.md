@@ -5,6 +5,7 @@
 # Review Report - <effort-name>
 
 > **Plan:** [plan.md](../01-Plan/plan.md) · **Reviewed:** <YYYY-MM-DD> · **Mode:** <single-agent | multi-agent (N agents)> · **Verdict:** <Blockers: N · Major: N · Minor: N · Nit: N>
+> **Base:** <session model id> · **Max:** <smartest | smarter | smart> · **Models:** <role> <model id>, … <e.g. `review agent <id>` (single-agent) or `user-alignment <id>, other dimensions <id>, synthesis <session | id>` (multi-agent); note any access fallback as `<id> (fallback from <id>)`>
 
 **Per-lens verdict**
 - User alignment: <clean | N findings>

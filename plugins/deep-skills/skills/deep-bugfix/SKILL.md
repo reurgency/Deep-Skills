@@ -1,7 +1,7 @@
 ---
 name: deep-bugfix
 description: Diagnosis-first remediation of triaged findings (or any bug report / failing test) under regression risk - cluster defects by shared root cause, re-diagnose independently of the review's hypothesis, fix minimally at the confirmed cause, prove the fix with a fresh adversarial agent, and contain the blast radius before committing. Use after /deep-code-review --triage, or standalone on a bug report / stack trace / failing test. Triggers on /deep-bugfix and on requests to fix triaged findings, remediate review findings, or fix a reported bug. Fixes code only - it never makes triage decisions and never edits the plan.
-argument-hint: findings.json / bug report / failing test, or Enter for latest review findings · --autonomous · --reproduce · --worktree · --learn
+argument-hint: findings.json / bug report / failing test, or Enter for latest review findings · --autonomous · --reproduce · --worktree · --learn · --max=<smartest|smarter|smart>
 ---
 
 # DeepBugFix
@@ -43,6 +43,7 @@ scripts/load-active-cards.sh deep-bugfix
 Artifacts live in `.deep-skills/<effort>/06-Bug-Fix/round-N/` (rounds are append-only; next round = max existing round + 1), per the shared `references/artifact-structure.md` `06-Bug-Fix` row. Concretely:
 
 - `round-N/scope.json` - written at round start, before any cluster work: the selected defect ids + provisional cluster plan (the resume record).
+- `round-N/diagnosis-<CL-K>.md` - one per cluster (`templates/diagnosis.md`), written by the cluster's diagnose agent; the fix agent's only cause input (`references/clustering-and-diagnosis.md`).
 - `round-N/fix-summary.md` - one record per cluster (`templates/fix-summary.md`), **appended incrementally as each cluster closes**, never batched to the end.
 - `04-Code-Review/findings.json` - statuses flipped **in place**, `accepted → fixed`, only on a `fixed` verdict. deep-bugfix owns that transition and no other field.
 - `00-Manifest/manifest.md` - created if absent (any deep-* skill owns manifest creation on first write); the `06 Bug Fix` row's artifact link is the literal `[06-Bug-Fix/](../06-Bug-Fix/)` (a static manifest cannot point at "latest round").
@@ -55,6 +56,7 @@ Every flag is **natural-language-first** - the plain-language trigger is the pri
 - **Just fix them all / run unattended** (`--autonomous`) or **check in with me per cluster** (`--collaborative`) - execution mode. If omitted on a multi-cluster run, **ask** (see `references/execution-modes.md`).
 - **Fix it with a reproducing test** (`--reproduce`) - upgrade proof from static chain-trace to a dynamic red→green test: written **before** the fix, observed failing pre-fix and passing post-fix (the proof agent re-runs both directions itself), committed into the host suite riding the cluster's fix commit. Genuinely unreproducible ⇒ reported + chain-trace fallback, never a silent skip. Protocol: `references/proof-of-fix.md`.
 - **Fix in a worktree** (`--worktree`) - isolate fix work in a git worktree: prefer the host's worktree command when present, else plain `git worktree add`. Code + reproduction tests stay in the worktree branch; effort artifacts (fix-summary, manifest, findings statuses) go to the source branch root; at completion the branch is offered for merge/PR. Default stays current-branch. Rules: `references/commit-and-handoff.md`.
+- **Choose the model level** (`--max=<smartest|smarter|smart>`) - say *"use the smartest models"* or *"keep it to smarter models"*. Sets the highest model level this skill's helper agents may use. If you don't choose, it uses your current model's level. Which model each helper gets is listed in references/model-map.md and this skill's agent table (`references/clustering-and-diagnosis.md`). A `/deep-code-review --triage --fix` chain passes its level on to this run.
 - **Record the root cause** (`--learn`) - emit `round-N/root-causes.json` (`templates/root-causes.json`): one proof-truthed record per proven cluster, `taxonomy_class` drawn from the shared `directives/taxonomy.md`, accumulated for the future Deep-Learn Pattern Ledger (Display-only today - no machine reader exists yet; humans read the same causes in `fix-summary.md`). Rules: `references/learn-record.md`.
 
 ## In-session commands
@@ -76,11 +78,11 @@ Series mode loads the `accepted` set - triage already decided; don't re-ask. Onl
 ### 3. Cluster by suspected shared cause
 Per `references/clustering-and-diagnosis.md`: group defects whose evidence points at one underlying cause (same subsystem + same failure shape + overlapping evidence paths). **Clusters are hypotheses** - diagnosis splits a cluster on divergent causes and merges two on a proven single cause.
 
-### 4. Per cluster: diagnose + fix (one fresh agent)
-One fresh agent per cluster - remediation needs continuity: the agent that finds the cause authors the fix. Brief it with the finding **evidence** + repo access + the plan (context only) - **never** the implementer's or reviewer's transcripts, and the recommendation flagged **"hypothesis - do not trust."** It diagnoses to a confirmed root cause, then fixes **minimally at the cause**. Attempt cap: 2. Collaborative mode gates here: present diagnosis + proposed fix for approval **before applying** (see `references/execution-modes.md`).
+### 4. Per cluster: diagnose agent, then fix agent
+Two fresh agents per cluster, in sequence (`references/clustering-and-diagnosis.md`). The **diagnose agent** (read-only, on the `--max` level) is briefed with the finding **evidence** + repo access + the plan (context only) - **never** the implementer's or reviewer's transcripts, and the recommendation flagged **"hypothesis - do not trust."** It diagnoses to a confirmed root cause and writes `round-N/diagnosis-<CL-K>.md`: cause, cited chain, fix approach, files to touch. The **fix agent** (on the stage level) gets that file as its only cause input and fixes **minimally at the cause** - under `--reproduce` it writes the reproducing test first (red), then the fix (green); if it judges the diagnosis wrong it stops with `diagnosis-disputed`. Attempt cap: 2 attempts, each a diagnose agent plus a fix agent. Collaborative mode gates between the two: present the diagnosis + proposed fix for approval **before the fix agent runs** (see `references/execution-modes.md`).
 
 ### 5. Adversarial proof
-Per `references/proof-of-fix.md`: a **separate fresh agent** carries the burden of refuting "fixed." Default tier is the **static chain-trace** - walk the corrected chain hop-by-hop with a cited `path:line` per hop; a fix without a traced chain is rejected (`--reproduce` upgrades this tier to a dynamic red→green reproduction test). It must show **every finding in the cluster** resolved by the one fix, and returns a machine-readable verdict: `fixed | unproven | regressed`. **`regressed` ⇒ revert immediately. `unproven` ⇒ one more diagnose→fix attempt (cap 2 total), then revert + blocker report** (`templates/blocker-report.md`). Model tiers per `references/model-map.md`.
+Per `references/proof-of-fix.md`: a **separate fresh agent** carries the burden of refuting "fixed." Default tier is the **static chain-trace** - walk the corrected chain hop-by-hop with a cited `path:line` per hop; a fix without a traced chain is rejected (`--reproduce` upgrades this tier to a dynamic red→green reproduction test). It must show **every finding in the cluster** resolved by the one fix, and returns a machine-readable verdict: `fixed | unproven | regressed`. **`regressed` ⇒ revert immediately. `unproven` ⇒ one more attempt - a fresh diagnose agent (given the failed proof) + a fresh fix agent (cap 2 total), then revert + blocker report** (`templates/blocker-report.md`). Proof agent tier: the `--max` level when any defect is sev ≥5 (or unset), else the stage level - per `references/proof-of-fix.md` and `references/model-map.md`.
 
 ### 6. Containment (blast radius)
 Per `references/containment.md`: extract changed symbols from the diff → discover their direct dependents (1 hop; LSP/host index when present, degrade to grep/import-walk) → run the dependents' tests + a full typecheck. Block only on **new** failures. Exported/shared symbol ⇒ escalate to 2 hops. Commands discovered from the host project - never `.env`/secrets.
@@ -89,7 +91,7 @@ Per `references/containment.md`: extract changed symbols from the diff → disco
 Order per cluster, never reordered: **apply fix → proof verdict → containment → commit.** Collaborative: present fix + proof + containment; commit only if the user wants. Autonomous: on `fixed` + clean containment, commit the cluster - `fix(<scope>): <cause> - resolves CR-00X, CR-00Y` + host-aware attribution trailer (see `references/commit-and-handoff.md`). Nothing unproven ever ships.
 
 ### 8. Statuses & round artifacts
-On `fixed` (and only then): flip each of the cluster's findings `accepted → fixed` in `04-Code-Review/findings.json`, and append the cluster's record to `round-N/fix-summary.md` - confirmed cause explicitly compared against the review's hypothesis (under `--learn`, also append the cluster's `root-causes.json` record per `references/learn-record.md`). Skipped/blocked clusters get an entry too; their statuses stay untouched.
+On `fixed` (and only then): flip each of the cluster's findings `accepted → fixed` in `04-Code-Review/findings.json`, and append the cluster's record to `round-N/fix-summary.md` - confirmed cause (filled from the cluster's diagnosis file) explicitly compared against the review's hypothesis (under `--learn`, also append the cluster's `root-causes.json` record per `references/learn-record.md`). Skipped/blocked clusters get an entry too; their statuses stay untouched.
 
 ### 9. Finish & hand off to re-review
 Update the manifest's `06 Bug Fix` row (link: `[06-Bug-Fix/](../06-Bug-Fix/)`). Report the round: clusters fixed / skipped / blocked, statuses flipped, commits made. In autonomous mode, **notify** completion (see `references/notifications.md`). Close by pointing at the loop's next step:
@@ -100,12 +102,12 @@ Update the manifest's `06 Bug Fix` row (link: `[06-Bug-Fix/](../06-Bug-Fix/)`). 
 
 - **Fix code only.** Never make triage decisions (fix/defer/reject belongs to `/deep-code-review --triage`); never edit the plan document or the Deferreds ledger; never touch `deferred` or `rejected` findings. Scoping `open` findings is selection, not triage - unselected stay `open`.
 - **Prove before commit - no exceptions.** No commit without a `fixed` verdict and clean containment; `regressed` reverts immediately; nothing unproven ships. Statuses flip only on `fixed`.
-- **Don't anchor on the recommendation.** It enters the diagnose brief flagged "hypothesis - do not trust"; the agent must confirm the cause independently before touching code.
+- **Don't anchor on the recommendation.** It enters the diagnose brief flagged "hypothesis - do not trust"; the diagnose agent must confirm the cause independently before any fix is written. The fix agent never re-diagnoses - it implements the diagnosis file or disputes it.
 - **Minimal fix at the cause.** No drive-by refactors, no scope creep into feature work - a gap that needs re-planning goes back to `/deep-plan`, not into a fix commit.
 - Never commit on `main`/`develop`; branch first. Never read `.env` or secrets during host-command discovery (package.json / build configs / CLAUDE.md; else ask).
 - Never pass implementer or reviewer transcripts to any agent - evidence only, fresh eyes.
 - Notify sparingly: blockers and autonomous completion only.
-- Model routing is load-bearing: resolve every agent's model from `references/model-map.md` and set it explicitly per launch - never an alias, never a host default.
+- Model routing is load-bearing: resolve every agent's model from `references/model-map.md` + `references/model-map.json` (stage `bugfix`; per-agent tiers in `references/clustering-and-diagnosis.md`) and set it explicitly per launch - never an alias, never a host default, never a small model. Record the models used in the `fix-summary.md` header.
 
 <!-- Authoring note: this SKILL.md stays under 500 lines with detail in references/, per the
      skill-creator skill's authoring rules (the source of the <500-line limit). -->

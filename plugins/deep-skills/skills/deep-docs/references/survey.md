@@ -17,6 +17,7 @@ For whole-repo runs that still exceed the cap, fall back to interactive scoping 
 ## Fan-out - one fresh agent per boundary
 
 - **One fresh read-only agent per boundary**, **≤8 concurrent** (the agent-concurrency cap - *not* the ~12 boundary cap; boundaries beyond 8 run in successive batches). Read-only is what makes wide parallelism safe.
+- **Model: the `stage` tier** (`stages.<max>.docs` in `references/model-map.json` - `smart` under the shipped table at every `--max`; a repo override may move it), resolved per `references/model-map.md` and **set explicitly on every launch** - full ID, never an alias or host default, never a small model, including when the host's built-in agent type has its own default model.
 - **Each agent is blind to the others** - briefed only with its own slice (the boundary's file list + the resolved host conventions + the stated scope line), never the whole repo's docs, never another agent's output, never an implementation transcript.
 - **Each agent discovers, for its boundary:**
   - **entry points** - how code enters this subsystem (public functions, routes, CLI commands, exported API);

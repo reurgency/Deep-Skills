@@ -1,6 +1,6 @@
 # Containment - the blast radius of fixing working code
 
-Bug fixes modify **working** code; the risk is regressing the things that depended on it. Containment answers the question proof-of-fix doesn't: *did this fix break anything that was fine?* It runs after the proof verdict and before any commit (prove-before-commit ordering, `references/commit-and-handoff.md`). Containment is mechanical work - run it on the cheapest tier per `references/model-map.md`, or as plain scripted checks where no agent is needed.
+Bug fixes modify **working** code; the risk is regressing the things that depended on it. Containment answers the question proof-of-fix doesn't: *did this fix break anything that was fine?* It runs after the proof verdict and before any commit (prove-before-commit ordering, `references/commit-and-handoff.md`). Containment is mechanical work - run it as plain scripted checks where no agent is needed; when an agent runs it, launch it on the **`two down`** tier (two tiers below the `bugfix` stage tier, floor `smart`; fleet notation per `references/model-map.md`, model set explicitly - never a small model).
 
 ## The default: 1 hop + full typecheck
 

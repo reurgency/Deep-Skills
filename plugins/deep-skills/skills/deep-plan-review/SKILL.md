@@ -1,7 +1,7 @@
 ---
 name: deep-plan-review
 description: Independently review a finished plan with fresh, codebase-aware agents - catching misalignment with the user's taste/preferences/decisions and with codebase best-practices, patterns, duplicate or overlapping behavior, and conflicts. Use after /deep-plan and before /deep-implement, or whenever the user wants a plan reviewed. Triggers on /deep-plan-review and on requests to review/critique a plan. Replaces the long manual review pass after planning. Reviews the plan only - it does not implement.
-argument-hint: path to plan, or Enter for latest · --multi-agent
+argument-hint: path to plan, or Enter for latest · --multi-agent · --max=<smartest|smarter|smart>
 ---
 
 # DeepPlanReview
@@ -40,7 +40,14 @@ The planner and the user are too close to the plan to see its blind spots. So th
 | Command | Behavior |
 |---|---|
 | `/multi-agent` | Escalate the current review to **parallel** mode - fan out one fresh agent per dimension, then synthesize. Same effect as the `--multi-agent` flag. See `references/multi-agent.md`. |
-| `/columbo` | Optional fresh-agent completeness gut check (the existing repo command) - complements alignment review with "could a fresh agent execute this?". |
+| `/columbo` | Optional fresh-agent completeness gut check (the existing repo command) - complements alignment review with "could a fresh agent execute this?". Its agent (and any other helper agent this skill launches) runs on the review's `stage` tier, model set explicitly (`references/model-map.md`). |
+
+## Flags
+
+Per the cross-assistant **Portability** rule, every flag is **natural-language-first** - the plain-language trigger is the primary path (users on Copilot/Codex have no slash-commands or CLI flags); the `--flag` is a convenience layered on top. Always accept the natural-language form.
+
+- **Run a multi-agent review** (`--multi-agent` / `/multi-agent`) - say *"review it with multiple agents," "do the parallel review."* One fresh agent per review dimension (up to four), launched in parallel, then one synthesis pass that dedupes and ranks into a single list. Recommended for large or multi-phase plans. Mechanics, agent roster and each agent's model level: `references/multi-agent.md`.
+- **Choose the model level** (`--max=<smartest|smarter|smart>`) - say *"use the smartest models"* or *"keep it to smarter models"*. Sets the highest model level this skill's helper agents may use. If you don't choose, it uses your current model's level. Which model each helper gets is listed in references/model-map.md and this skill's agent table (`references/multi-agent.md`).
 
 ## Workflow
 
@@ -48,12 +55,12 @@ The planner and the user are too close to the plan to see its blind spots. So th
 Resolve the plan to review, in order: an explicit path argument → the plan referenced in the conversation → the most recent `.deep-skills/*/01-Plan/plan.md` (see `references/artifact-structure.md`; pre-retrofit plans remain reachable via explicit path). Confirm with the user which plan if ambiguous. Read it in full.
 
 ### 2. Choose mode
-If `--multi-agent` (or `/multi-agent`) was given, use parallel mode. Otherwise default to single-agent - but **recommend** `--multi-agent` when the plan is large or multi-phase.
+If `--multi-agent` (or `/multi-agent`, or its natural-language form - see Flags) was given, use parallel mode. Otherwise default to single-agent - but **recommend** `--multi-agent` when the plan is large or multi-phase.
 
 ### 3. Dispatch the review
 Brief each fresh agent with: the plan text, the two review lenses (`references/review-dimensions.md`), read access to the codebase, and pointers to the user's preference sources (the memory directory's `MEMORY.md` + `feedback_*` memories, root `CLAUDE.md`, and per-app `apps/*/CLAUDE.md` / `Claude.md`). **Do not** pass the planning transcript.
 
-- **Single-agent:** one `Agent` (type `Explore` for read-only sweeps; `general-purpose` if it must reason across both lenses) covers both lenses and returns findings in the format from `references/findings-format.md`.
+- **Single-agent:** one `Agent` (type `Explore` for read-only sweeps; `general-purpose` if it must reason across both lenses) covers both lenses and returns findings in the format from `references/findings-format.md`. It runs on the review's `stage` tier (`stages.<max>.plan-review`, resolved per `references/model-map.md` + `references/model-map.json`); **pass that model explicitly even for `Explore`**, whose host default is a small model.
 - **Multi-agent:** follow `references/multi-agent.md` - launch the dimension agents **in parallel (one message, multiple Agent calls)**, then run a synthesis pass to dedupe and rank.
 
 ### 4. Present findings
@@ -72,4 +79,5 @@ When the user is satisfied, the plan is ready for `/deep-implement`.
 - Review only. Never modify source files or run the implementation. If the user wants fixes built, point them to `/deep-implement`.
 - Findings must cite evidence - a path, a plan section, or a named existing function/pattern. No vague "consider improving."
 - Distinguish a real conflict from a stylistic nit; severity must reflect impact.
+- Model routing is load-bearing: every agent's model is resolved from `references/model-map.md` + `references/model-map.json` and set explicitly per launch - never an alias, never a host default, never a small model. Record the models used in the report header.
 - If you can't find a problem in a lens, say the plan is clean on that lens rather than inventing findings.

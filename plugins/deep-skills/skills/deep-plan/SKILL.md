@@ -1,7 +1,7 @@
 ---
 name: deep-plan
 description: Run an interactive, steerable feature-planning session that produces a self-contained, fresh-agent-resumable plan artifact. Use when the user wants to plan a feature, run a planning session, "deep plan" something, or before handing work to /deep-implement. Also runs unattended - "plan this autonomously" (--autonomous) self-answers every planning question and records each as an Assumption. Triggers on /deep-plan and on requests to plan a feature, design an approach, or scope work before building. Planning only - it does not implement.
-argument-hint: describe feature/task to plan · --autonomous · --effort=<slug> · --columbo · --rounds=<n>
+argument-hint: describe feature/task to plan · --autonomous · --effort=<slug> · --columbo · --rounds=<n> · --max=<smartest|smarter|smart>
 ---
 
 # DeepPlan
@@ -54,6 +54,7 @@ Per the cross-assistant **Portability** rule, every flag is **natural-language-f
 - **Include a columbo pass** (`--columbo`) - say *"include a columbo pass."* Self-run the existing `/columbo` completeness check at the end of the session and fix what it surfaces - meaningful primarily with `--autonomous` (interactively it pre-answers the step-8 offer as "yes"). See `references/autonomous-mode.md`.
 - **Name the effort up front** (`--effort=<slug>`) - say *"call the effort <name>."* Use the supplied kebab-case slug as the effort name, skipping the propose-and-confirm step. In autonomous mode with no `--effort`, the slug is self-derived and **stated, never asked**.
 - **Set the question depth** (`--rounds=<n>`) - say *"three rounds of questions."* Interactive sessions only: skip the cadence question and run exactly *n* front-loaded question rounds (each a batched round via the host's structured-question tool), then proceed; the user can still request extra gap rounds. Ignored under `--autonomous` (no rounds by definition).
+- **Choose the model level** (`--max=<smartest|smarter|smart>`) - say *"use the smartest models"* or *"keep it to smarter models"*. Sets the highest model level this skill's helper agents may use. If you don't choose, it uses your current model's level. Which model each helper gets is listed in references/model-map.md and this skill's agent tiers (Guardrails). The planning conversation itself always runs on your current model.
 
 ## Session workflow (interruptible state machine)
 
@@ -69,7 +70,7 @@ Everything below describes the default **interactive** session. Under `--autonom
 State scope, explicit **non-goals**, and the assumptions you're making. Get a quick confirmation.
 
 ### 3. Explore (read-only)
-Launch up to 3 `Explore` agents in parallel to find: reusable patterns/utilities, integration points, data models, and the files that will be touched. **Reuse before inventing** - prefer existing functions over new code, and name them with paths. Do not edit anything in this phase.
+Launch up to 3 `Explore` agents in parallel - each on the plan's `stage` tier (`stages.<max>.plan`, resolved per `references/model-map.md` + `references/model-map.json`), **model passed explicitly** because `Explore`'s host default is a small model - to find: reusable patterns/utilities, integration points, data models, and the files that will be touched. **Reuse before inventing** - prefer existing functions over new code, and name them with paths. Do not edit anything in this phase.
 
 ### 4. Question rounds
 Emit questions per the chosen cadence. Build each question from a `templates/questions/*.json` format and render via the host's structured-question tool (see `references/host-affordances.md`). Keep questions decision-relevant - skip anything you can answer yourself from exploration. Honor `/drill` and `/breakout` mid-round without losing your place.
@@ -105,4 +106,5 @@ Anything you decide to defer goes in the plan's **Deferreds** ledger with three 
 ## Guardrails
 - Planning only. If the user asks you to start building, point them to `/deep-implement` (or confirm they want to leave the planning skill).
 - Keep the plan scannable but executable. A fresh agent with only the plan doc + repo should succeed.
+- Model routing is load-bearing: every agent this skill launches (Explore agents, `/breakout`, the columbo agent) runs on the `stage` tier from `references/model-map.md` + `references/model-map.json`, set explicitly per launch - never an alias, never a host default, never a small model. Inline planning runs on the session model (base).
 - Convert relative dates to absolute when writing the plan.

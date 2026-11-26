@@ -7,6 +7,7 @@
 > **Scope:** `<verbatim stated-scope line, e.g. Diffing feat/x against develop (working tree included) - 14 files, +812/−214>`
 > **Reviewed:** <YYYY-MM-DD> · **Mode:** <single-agent, four lenses | multi-agent (N finder passes + adversarial verification)><; no plan - conformance degraded to PR-description/commit-message conformance, if applicable>
 > **Plan:** <[plan.md](../01-Plan/plan.md) | none (no-plan mode)>
+> **Base:** <session model id> · **Max:** <smartest | smarter | smart> · **Models:** <role> <model id>, … <e.g. `review agent <id>` (single-agent) or `heavy finders <id>, diff-scan/conformance/coherence <id>, quality <id>, sev-5 verifiers <id>, sev ≥6 verifiers <id>` (multi-agent); note any access fallback as `<id> (fallback from <id>)`>
 > **Pre-pass:** <lint: pass/fail/none found · typecheck: pass/fail · tests: pass/fail/skipped - one line each; pre-existing failures noted as such, not findings>
 > **Situational checks:** <comma-separated ids that matched the diff and ran, e.g. `file-upload-pipeline` · omit the line if none matched>
 

@@ -1,7 +1,7 @@
 ---
 name: deep-implement
 description: Execute a finished, reviewed plan phase-by-phase - implement → validate → fix → commit → hand-off - in collaborative or autonomous mode. Use after /deep-plan (and ideally /deep-plan-review), typically just before the user enables bypass-permissions. Triggers on /deep-implement and on requests to build/execute a plan. Consumes a deep-plan artifact; it is the only deep-* skill that writes source code as forward construction from a plan (/deep-bugfix writes source as remediation).
-argument-hint: plan path, or Enter for latest · --autonomous · --worktree
+argument-hint: plan path, or Enter for latest · --autonomous · --worktree · --max=<smartest|smarter|smart>
 ---
 
 # DeepImplement
@@ -39,6 +39,7 @@ Every flag is **natural-language-first** - the plain-language trigger is the pri
 - **Run autonomously / unattended** (`--autonomous`) or **check in with me at each phase** (`--collaborative`) - execution mode. If omitted on a multi-phase plan, **ask** (see `references/execution-modes.md`).
 - **Work in an isolated worktree** (`--worktree`) - isolate work in a git worktree (the host's worktree command if it has one, else plain `git worktree add`). Default: **work in the current branch** (see `references/commit-and-handoff.md`).
 - **Run independent phases in parallel** (`--parallel`) - opt-in parallel phase execution, **only** when phases are provably independent (see `references/phase-execution.md`). Never parallelize unless this is explicitly requested.
+- **Choose the model level** (`--max=<smartest|smarter|smart>`) - say *"use the smartest models"* or *"keep it to smarter models"*. Sets the highest model level this skill's helper agents may use. If you don't choose, it uses your current model's level. Which model each helper gets is listed in references/model-map.md and this skill's agent tiers (`references/phase-execution.md`).
 
 ## Reuse, don't reinvent
 
@@ -78,10 +79,11 @@ If validation fails, the phase agent fixes and re-validates. **Cap: 2 attempts.*
 After each phase: append a summary to the plan's **Phase Summaries** appendix and write a slim next-phase hand-off (`templates/phase-handoff.md`). Phase Summaries still live in the plan document - `03-Implementation/summary.md` does not replace them.
 
 ### 8. Finish
-Write/update the work summary at `.deep-skills/<effort>/03-Implementation/summary.md` - check off the plan's acceptance/validation criteria there (or maintain your own checklist if the plan lacks them); create `00-Manifest/manifest.md` if absent and update the Implementation stage status (see `references/artifact-structure.md` and `references/commit-and-handoff.md`). Reconcile the **Deferreds** ledger (which were addressed vs. still open) and report it. In autonomous mode, **notify** on full-run completion. Leave the plan doc as the durable record.
+Write/update the work summary at `.deep-skills/<effort>/03-Implementation/summary.md` - header line `Base · Max · Models` (the models the phase agents actually ran on), then check off the plan's acceptance/validation criteria there (or maintain your own checklist if the plan lacks them); create `00-Manifest/manifest.md` if absent and update the Implementation stage status (see `references/artifact-structure.md` and `references/commit-and-handoff.md`). Reconcile the **Deferreds** ledger (which were addressed vs. still open) and report it. In autonomous mode, **notify** on full-run completion. Leave the plan doc as the durable record.
 
 ## Guardrails
 - Only build what the plan specifies. Found a gap or conflict mid-execution? Stop and surface it - don't silently re-plan (that's `/deep-plan`'s job).
 - Never commit on `main`/`develop`; branch first. Never commit failing code.
 - Notify sparingly: blockers and autonomous completion only - not routine progress.
+- Model routing is load-bearing: every phase agent runs on the `implement` stage tier from `references/model-map.md` + `references/model-map.json`, set explicitly per launch - never an alias, never a host default, never a small model.
 - Autonomous mode assumes the user has enabled bypass-permissions; still behave conservatively (no destructive ops, no force-push).

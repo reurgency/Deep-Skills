@@ -5,6 +5,7 @@ Anchor-verify is the **stale-map defense** and it is **always on** - never sampl
 ## The model - one fresh verifier per card, exhaustive
 
 - **Fan-out per card:** launch **one fresh adversarial verifier per subsystem card** (tier-1) and per tier-2 ref, **≤8 concurrent** (the same concurrency cap as the survey fleet; cards beyond 8 run in successive batches).
+- **Model: the `stage` tier** (`stages.<max>.docs` in `references/model-map.json` - `smart` under the shipped table; a repo override may move it), resolved per `references/model-map.md` and **set explicitly on every launch** - full ID, never an alias or host default, never a small model.
 - **Fresh and read-only:** each verifier is briefed only with its card/ref + codebase access - never the survey agent's reasoning, never another verifier's output, never an implementation transcript. Its job is to **refute** the anchors, not to trust them.
 - **Exhaustive:** the verifier re-resolves **every** anchor in its card - no sampling, no budget. Symbol grep is cheap, so exhaustiveness is affordable, and the anchoring guarantee ("every claim is anchored or it's fiction") forbids leaving any anchor unchecked.
 

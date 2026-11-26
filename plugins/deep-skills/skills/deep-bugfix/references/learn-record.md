@@ -16,7 +16,7 @@
 
 | Field | Source of truth |
 |---|---|
-| `confirmed_cause`, `fix` | The **diagnose+fix agent's confirmed diagnosis** - never the review's recommendation, never the fixer's optimism pre-proof. |
+| `confirmed_cause`, `fix` | `confirmed_cause` comes from the cluster's **diagnosis file** (`round-N/diagnosis-<CL-K>.md`, written by the diagnose agent); `fix` summarizes the change the fix agent made from that file's fix approach, as proven. Never the review's recommendation, never the fixer's optimism pre-proof. |
 | `review_hypothesis_upheld` | Compare the confirmed cause against the cluster's `recommendation_hypothesis` (already compared, in prose, in the cluster's `fix-summary.md` entry): `true` if the review's cause-guess named the confirmed cause, `false` if diagnosis rejected or materially corrected it, `null` when the cluster carried no hypothesis at all. This is the field the Pattern Ledger wants most - across efforts it measures how often review-time cause-guesses survive independent diagnosis, exactly the overfitting signal. |
 | `taxonomy_class` | Classify the confirmed cause against the **shared directives registry's `taxonomy.md`** (`directives/taxonomy.md`, vendored alongside `skills/` - the same registry the card loader reads). Its class table is the authoritative slug list; use an exact slug, **never invent one**. A cause that fits no listed class records `null` - note the gap in the cluster's `fix-summary.md` entry so a human can judge whether it's promotable - because the taxonomy grows only through its own promotion rules, not from here. |
 | `findings_resolved` | Exactly the ids the proof verdict covered - the same ids whose statuses flipped `accepted → fixed` (plus any `BF-*` ids, which have no status to flip). |

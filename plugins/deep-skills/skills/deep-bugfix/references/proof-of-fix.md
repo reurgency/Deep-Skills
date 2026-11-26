@@ -4,9 +4,9 @@ The skill never ships a "claimed fix." Containment (`references/containment.md`)
 
 ## The proof agent - fresh, adversarial, severity-gated
 
-After the diagnose+fix agent applies its fix, launch a **fresh agent** whose burden of proof is inverted: it is briefed to **refute "fixed."** It receives the cluster's defects (evidence blocks), the confirmed-cause statement, and the diff - never the fixer's transcript or reasoning. It re-derives everything itself.
+After the fix agent applies its fix, launch a **fresh agent** whose burden of proof is inverted: it is briefed to **refute "fixed."** It receives the cluster's defects (evidence blocks), the confirmed-cause statement (the cluster's `round-N/diagnosis-<CL-K>.md`), and the diff - never the diagnose or fix agent's transcript or reasoning. It re-derives everything itself.
 
-- **Model tier** (per `references/model-map.md`, set explicitly at launch): clusters containing any defect at **severity ≥5** get the **high (main) tier**; below that, the **mid tier**. An unset severity (synthesized `BF-*` defects without a judgment) gates to the high tier - when in doubt, prove hard.
+- **Model tier** (fleet notation per `references/model-map.md`, set explicitly at launch): clusters containing any defect at **severity ≥5** get the **`max` tier** (the `--max` tier itself); when every defect is below 5, the **`stage` tier** (`stages.<max>.bugfix`). An unset severity (synthesized `BF-*` defects without a judgment) gates to `max` - when in doubt, prove hard.
 - The proof agent may **raise its hand on the cluster itself**: if the fix resolves some members but its trace cannot connect others to the confirmed cause, that is a false merge - verdict `unproven` with the unexplained members named, and the cluster splits.
 
 ## The static chain-trace tier (default)
@@ -37,10 +37,10 @@ While tracing, the prover also hunts the claimed-fix signatures: the symptom sil
 
 **The protocol - red is observed before the fix is applied:**
 
-1. **Write the reproducing test first.** Before applying its fix, the diagnose+fix agent writes a test that exercises the broken chain at the confirmed cause - asserting the correct *observable outcome* the defect's evidence says is missing, not merely the symptom's absence. The test goes in the host suite's **discovered test location**: discover the suite's conventions and runner the same way containment discovers commands (`package.json` / build configs / `CLAUDE.md` - never `.env`/secrets; see `references/containment.md`).
+1. **Write the reproducing test first.** Before applying its fix, the **fix agent** writes a test that exercises the broken chain at the confirmed cause - asserting the correct *observable outcome* the defect's evidence says is missing, not merely the symptom's absence. The test goes in the host suite's **discovered test location**: discover the suite's conventions and runner the same way containment discovers commands (`package.json` / build configs / `CLAUDE.md` - never `.env`/secrets; see `references/containment.md`).
 2. **Observe red, record it, pre-fix.** Run the test against the unfixed code and record the failure output in the proof record **before the fix lands**. A test that was never seen red proves nothing - it may pass vacuously. No recorded pre-fix red ⇒ the red→green claim is void for that defect.
 3. **Apply the fix; observe green.** The same test now passes; record the passing run.
-4. **The proof agent re-runs both directions itself.** The fresh adversarial agent does **not** trust the fixer's transcript or its recorded outputs - it re-derives the evidence: with the fix in place, run the test and observe **green**; temporarily revert the fix diff (e.g. `git stash` / `git apply -R` - the reproduction test stays in place), run the test and observe **red**; restore the fix. Both directions must hold. A test green in both directions is vacuous; a direction the prover could not re-run is an unevidenced hop - either way, verdict `unproven`.
+4. **The proof agent re-runs both directions itself.** The fresh adversarial agent does **not** trust the fix agent's transcript or its recorded outputs - it re-derives the evidence: with the fix in place, run the test and observe **green**; temporarily revert the fix diff (e.g. `git stash` / `git apply -R` - the reproduction test stays in place), run the test and observe **red**; restore the fix. Both directions must hold. A test green in both directions is vacuous; a direction the prover could not re-run is an unevidenced hop - either way, verdict `unproven`.
 5. **The test ships with the fix.** The reproduction test **rides the cluster's fix commit** - same commit, permanent regression guard. Post-run, the test exists in the fix branch's suite and fails if the fix is reverted; on merge, that guarantee transfers to mainline.
 
 The per-defect evidence bar carries over from the static tier: every defect in the cluster needs its own red→green observation (one test may assert several defects' observables; it may not hand-wave any).
@@ -63,6 +63,6 @@ rationale: <one paragraph - for unproven/regressed, exactly what could not be es
 
 ## Failed-proof policy
 
-- **`regressed` ⇒ revert immediately.** No retry from the regressed state; the diagnose+fix agent may re-attempt from clean (counts against the cap).
-- **`unproven` ⇒ one more diagnose→fix attempt** - the same cluster agent, given the prover's rationale (**cap: 2 attempts total per cluster**) - then re-prove with a fresh proof agent. Still not `fixed` at the cap ⇒ **revert + blocker report** (`templates/blocker-report.md`) + notify.
+- **`regressed` ⇒ revert immediately.** No retry from the regressed state; a fresh diagnose agent and fix agent may re-attempt from clean (counts against the cap).
+- **`unproven` ⇒ one more attempt** = a **fresh diagnose agent** (given the prover's rationale and the previous diagnosis file, which it rewrites) + a fresh fix agent (**cap: 2 attempts total per cluster**, each attempt a diagnose agent plus a fix agent; a `diagnosis-disputed` stop also consumes one - `references/clustering-and-diagnosis.md` § Attempt cap) - then re-prove with a fresh proof agent. Still not `fixed` at the cap ⇒ **revert + blocker report** (`templates/blocker-report.md`) + notify.
 - **Statuses flip only on `fixed`.** `unproven`/`regressed` never touch `findings.json`; nothing unproven is ever committed (prove-before-commit ordering in `references/commit-and-handoff.md`).

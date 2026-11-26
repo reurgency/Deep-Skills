@@ -7,6 +7,7 @@ All deep-* skills read and write their **artifacts** under the host project's `.
 ## Directory layout
 
 ```
+.deep-skills/model-map.json   optional repo-level model override (core; read by every skill - see below)
 .deep-skills/<effort-name>/
   00-Manifest/        manifest + summary + status for the effort
   01-Plan/            deep-plan output
@@ -25,8 +26,12 @@ Canonical file names per stage:
 - `02-Plan-Review/review.md` - the full review report (deep-plan-review).
 - `03-Implementation/summary.md` - work summary + acceptance check-off (deep-implement).
 - `04-Code-Review/report.md`, `findings.json`, `certificate.md` - code review artifacts (deep-code-review).
-- `06-Bug-Fix/round-N/scope.json`, `round-N/fix-summary.md`, `round-N/root-causes.json` (under `--learn`) - round scope + per-cluster fix records + root-cause records (deep-bugfix; rounds are append-only, next round = max existing + 1).
+- `06-Bug-Fix/round-N/scope.json`, `round-N/diagnosis-<CL-K>.md` (one per cluster), `round-N/fix-summary.md`, `round-N/root-causes.json` (under `--learn`) - round scope + per-cluster diagnosis records + per-cluster fix records + root-cause records (deep-bugfix; rounds are append-only, next round = max existing + 1).
 - `07-Docs/` - in effort mode, a **pointer** to the canonical in-repo `docs/ai-map/` (deep-docs writes the map to `docs/ai-map/`, not into the effort dir): `MAP.md`, `index.json`, `subsystems/`, `references/`, `coverage.md`, `learn-signal.json`.
+
+## Repo-level core file: `.deep-skills/model-map.json`
+
+`.deep-skills/model-map.json` (**repo level**, sibling of the effort dirs, not per-effort) is an optional, user-edited override of the shipped model map (`references/model-map.json`). It is a **core** file: **every** deep-* skill - and any orchestrator - reads it at launch, before launching any agent, merges it over the shipped map, and validates it (rules: `references/model-map.md` § Repo override). Skills only read it; the repo owner (or a future dashboard) writes it. It is distinct from the orchestrator-owned `rigor-map.json` below, which core skills never read.
 
 ## `00-Manifest/manifest.md` format
 
@@ -62,7 +67,7 @@ Each skill updates its own stage's status line (and the summary, if it changes t
 
 ## Add-on extensions
 
-Orchestrator add-ons that drive the deep-* series (dispatching the core skills over this same artifact tree) may extend the layout **without changing any core skill's behavior**:
+Orchestrator add-ons that drive the deep-* series (dispatching the core skills over this same artifact tree) may extend the layout without changing any core skill's behavior. They may rely on documented core flags (for example deep-plan's `--confirmed` and every skill's `--max`) and on the core files above; their own extensions are:
 
 - `00-Manifest/pipeline.md` - orchestrator-owned pipeline state (rigor level, resolved stage list, dispatch records, gates, blockers, spend). Written only by the orchestrator.
 - `00-Manifest/run-report.md` - orchestrator-owned final run report.

@@ -4,24 +4,27 @@ Parallel review: one fresh agent per dimension, then a synthesis pass. Trades to
 
 ## Fan-out
 
-Before fan-out, read `references/model-map.md` and bind each dimension agent's model to its concrete host ID, set explicitly at launch (never an alias or host default) - the model-routing correctness guarantee in `references/host-affordances.md` applies to every fleet.
+Before fan-out, read `references/model-map.md` (rules) and `references/model-map.json` (data, merged with any `.deep-skills/model-map.json` repo override) and bind each agent's tier (the **Tier** column below) to a concrete full model ID, set explicitly at launch (never an alias or host default) - the model-routing correctness guarantee in `references/host-affordances.md` applies to every fleet. Tiers use the map's fleet notation: **`stage`** = this review's stage tier (`stages.<max>.plan-review`, where `--max` defaults to base's tier - SKILL.md § Flags); **`one down`** = one tier below it, floor `smart`. These tiers are judgment calls, not yet benchmarked the way deep-code-review's finder tiers are.
 
 Launch the dimension agents **in parallel** - one message, multiple `Agent` tool calls - each with the plan text, its single dimension brief, codebase read access, and the user-preference pointers. None of them gets the planning transcript.
 
-| Agent | Dimension brief |
-|---|---|
-| **codebase-duplication** | Lens B #3-#5: duplicate behavior, overlapping behavior, conflicts. Heavy codebase exploration; name existing implementations with paths. |
-| **patterns-and-practices** | Lens B #1-#2: best-practices, conventions, off-pattern approaches vs how the repo already does similar things. |
-| **user-alignment** | Lens A: choice, taste, style, knowledge fit, coherence - against memory/`feedback_*`/CLAUDE.md and the plan. |
-| **coherence-conflicts** | Internal consistency: the plan contradicting itself, its stated goals, or earlier decisions; ordering/dependency conflicts across phases. |
+| Agent | Dimension brief | Tier |
+|---|---|---|
+| **codebase-duplication** | Lens B #3-#5: duplicate behavior, overlapping behavior, conflicts. Heavy codebase exploration; name existing implementations with paths. | one down |
+| **patterns-and-practices** | Lens B #1-#2: best-practices, conventions, off-pattern approaches vs how the repo already does similar things. | one down |
+| **user-alignment** | Lens A: choice, taste, style, knowledge fit, coherence - against memory/`feedback_*`/CLAUDE.md and the plan. | stage |
+| **coherence-conflicts** | Internal consistency: the plan contradicting itself, its stated goals, or earlier decisions; ordering/dependency conflicts across phases. | one down |
+| *synthesis (only when delegated to an agent)* | See § Synthesis. | stage |
 
-Use the `Explore` agent type for the codebase-heavy dimensions; `general-purpose` for user-alignment and coherence if they need to reason. Each returns findings in `findings-format.md` shape.
+**Why user-alignment stays on the stage tier:** it is the one dimension that judges taste and intent against the user's recorded preferences - the judgment the review exists for. The other three are codebase sweeps and internal-consistency checks, where one tier down is enough.
+
+Use the `Explore` agent type for the codebase-heavy dimensions; `general-purpose` for user-alignment and coherence if they need to reason. **Pass the tier's model explicitly on every launch, including `Explore`** - a built-in agent type that carries its own default model (Claude Code's `Explore` defaults to a small model) must still run on the resolved model (`references/model-map.md` § Binding rules). Each returns findings in `findings-format.md` shape.
 
 Scale sensibly: a small plan may only warrant two agents (codebase-duplication + user-alignment); a large multi-phase plan warrants all four. Don't spawn agents with nothing to chew on.
 
 ## Synthesis
 
-After the agents return, run one synthesis pass (the main session, or a final `general-purpose` agent) that:
+After the agents return, run one synthesis pass (the main session - which runs on base, the session model - or a final `general-purpose` agent on the `stage` tier, model set explicitly) that:
 
 1. **Dedupes** - collapse findings multiple agents raised into one, keeping the strongest evidence.
 2. **Resolves conflicts** - if two agents disagree (e.g. "reuse X" vs "X doesn't fit"), surface both sides and take a position.
