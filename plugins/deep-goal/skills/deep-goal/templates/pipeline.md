@@ -32,7 +32,7 @@ The resolved level's stages in dispatch order, with the invocation each renders 
 
 | # | Stage | Dispatch | Model | Invocation |
 |---|---|---|---|---|
-| 1 | plan | <inline (interactive) \| subagent (autonomous) \| adopted> | <your session: model-id (inline) \| tier: model-id (autonomous) \| adopted - not run> | `deep-plan <goal> --confirmed <…flags> --max=<x>` (inline) \| `deep-plan <goal> --autonomous <…flags> --max=<x>` \| - (adopted) |
+| 1 | plan | <inline (interactive) \| subagent (autonomous) \| adopted> | <your session: model-id (inline) \| tier: model-id (autonomous) \| adopted - not run> | `deep-plan <goal> --confirmed <…flags> --max=<x>` + frozen-map clause (inline) \| `deep-plan <goal> --autonomous <…flags> --max=<x>` \| - (adopted) |
 | 2 | <stage> | subagent | <tier: model-id[ (fallback from model-id)]> | `<skill> <…flags> --max=<x>` |
 
 ## Artifact baseline (recorded at launch)

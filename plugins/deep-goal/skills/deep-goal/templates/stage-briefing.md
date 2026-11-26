@@ -14,6 +14,10 @@
                          fallback-candidate ID, not an observation) - the conductor sets the
                          subagent's model to it explicitly, and re-renders the briefing for
                          every try-and-fall-back relaunch (conductor.md § 3 step 3)
+       {model_map_path} - ABSOLUTE path of the frozen map in the invocation repo:
+                         <invocation-repo root>/.deep-skills/{effort_name}/00-Manifest/model-map.resolved.json
+                         (never worktree-relative; .deep-skills/ is gitignored, so it is absent
+                         from a worktree)
        {worktree_path} - two renderings (references/loop-and-budget.md § 5):
                          · no --worktree: "none - work on the current branch per the skill's own
                            defaults"
@@ -35,7 +39,7 @@ You are running **one stage** of an autonomous deep-* pipeline (conducted by dee
 
 - On Claude Code its SKILL.md is at `{skill_path}` - a location shortcut only; the skill is invoked **by name**, and its own SKILL.md (directive cards, workflow, guardrails, artifacts) defines everything you do. Read and follow it completely.
 - **Effort:** `{effort_name}` - all artifacts for this run live under `.deep-skills/{effort_name}/`. If your skill asks which effort/plan/findings to use, it is this one; never propose a different effort name.
-- **Model:** you were launched for **`{stage_tier}`** (planned model `{stage_model}`). Your skill's run-report header records your own model as your system context gives it, never this planned ID; helper agents resolve from `--max` via your skill's own agent table over **this run's frozen model map, `.deep-skills/{effort_name}/00-Manifest/model-map.resolved.json`** - use it in place of the shipped `references/model-map.json` and any `.deep-skills/model-map.json` (`references/model-map.md` § Repo override, resolved-map snapshot exception); it was validated at launch, so do not re-read, re-merge or re-validate those, and never refuse over them. The rest of `references/model-map.md` applies as usual; set each helper's model explicitly.
+- **Model:** you were launched for **`{stage_tier}`** (planned model `{stage_model}`). Your skill's run-report header records your own model as your system context gives it, never this planned ID; helper agents resolve from `--max` via your skill's own agent table over **this run's frozen model map, `{model_map_path}`** - use it in place of the shipped `references/model-map.json` and any `.deep-skills/model-map.json` (`references/model-map.md` § Repo override, resolved-map snapshot exception); it was validated at launch, so do not re-read, re-merge or re-validate those, and never refuse over them. If that file is missing or unreadable, stop and report the missing path - through your skill's blocker report where it defines one, otherwise in your final message. Never fall back to the shipped map or the override. The rest of `references/model-map.md` applies as usual; set each helper's model explicitly.
 - **Working tree:** {worktree_path}
 
 Pipeline rules - these bind you on top of the skill's own guardrails, never instead of them:
