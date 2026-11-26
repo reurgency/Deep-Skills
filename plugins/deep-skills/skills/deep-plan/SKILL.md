@@ -130,5 +130,5 @@ Anything you decide to defer goes in the plan's **Deferreds** ledger with three 
 ## Guardrails
 - Planning only. If the user asks you to start building, point them to `/deep-implement` (or confirm they want to leave the planning skill).
 - Keep the plan scannable but executable. A fresh agent with only the plan doc + repo should succeed.
-- Model routing is load-bearing: every agent this skill launches (Explore agents, `/breakout`, the columbo agent) runs on the `stage` tier from `references/model-map.md` + `references/model-map.json`, set explicitly per launch - never an alias, never a host default, never a small model. Inline planning runs on the session model (base).
+- Model routing is load-bearing: every agent this skill launches (Explore agents, `/breakout`, the columbo agent) runs on the `stage` tier from `references/model-map.md` + `references/model-map.json`, resolved to its full model ID and set explicitly per launch with the host's launch value (`references/model-map.md` § Host binding) - never a host default or a guessed alias, never a small model. Inline planning runs on the session model (base).
 - Convert relative dates to absolute when writing the plan.

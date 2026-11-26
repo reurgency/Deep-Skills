@@ -85,5 +85,5 @@ Write/update the work summary at `.deep-skills/<effort>/03-Implementation/summar
 - Only build what the plan specifies. Found a gap or conflict mid-execution? Stop and surface it - don't silently re-plan (that's `/deep-plan`'s job).
 - Never commit on `main`/`develop`; branch first. Never commit failing code.
 - Notify sparingly: blockers and autonomous completion only - not routine progress.
-- Model routing is load-bearing: every phase agent runs on the `implement` stage tier from `references/model-map.md` + `references/model-map.json`, set explicitly per launch - never an alias, never a host default, never a small model.
+- Model routing is load-bearing: every phase agent runs on the `implement` stage tier from `references/model-map.md` + `references/model-map.json`, resolved to its full model ID and set explicitly per launch with the host's launch value (`references/model-map.md` § Host binding) - never a host default or a guessed alias, never a small model.
 - Autonomous mode assumes the user has enabled bypass-permissions; still behave conservatively (no destructive ops, no force-push).

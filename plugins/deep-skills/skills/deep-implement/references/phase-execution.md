@@ -8,7 +8,7 @@ The orchestrator (main session) spawns **one fresh sub-agent per phase**, in ord
 - the **Phase Summaries** appendix so far (what prior phases produced),
 - the latest next-phase hand-off.
 
-**Model: every phase agent runs on the `stage` tier** (`stages.<max>.implement` in `references/model-map.json`, merged with any `.deep-skills/model-map.json` repo override; `--max` defaults to base's tier), resolved per `references/model-map.md` and **set explicitly on every launch** - full ID, never an alias or host default, never a small model, including when the host's built-in agent type has its own default model. The same tier applies to phases launched in parallel under `--parallel`. The orchestrator itself runs on base, the session model.
+**Model: every phase agent runs on the `stage` tier** (`stages.<max>.implement` in `references/model-map.json`, merged with any `.deep-skills/model-map.json` repo override; `--max` defaults to base's tier), resolved per `references/model-map.md` to its full model ID and **set explicitly on every launch** with the host's launch value (`references/model-map.md` § Host binding) - never a host default or a guessed alias, never a small model, including when the host's built-in agent type has its own default model. The same tier applies to phases launched in parallel under `--parallel`. The orchestrator itself runs on base, the session model.
 
 A fresh agent per phase keeps context lean over long multi-phase runs and matches the plan's "any phase executable cold" design. The orchestrator never implements directly - it briefs, validates, commits, and hands off.
 

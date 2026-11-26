@@ -21,7 +21,7 @@ Three pieces of this mode are deterministic and MUST be scripted, never delegate
 
 ### Model tier resolution - read this before launching anything
 
-Every agent's model comes from the series-shared model map. **Before launching anything, read `references/model-map.md` (the rules) and `references/model-map.json` (the data), merged with the optional repo override `.deep-skills/model-map.json`, and bind every agent below to a concrete full model ID; set the model explicitly on every agent launch - never an alias, never a host default. The map is a required input.**
+Every agent's model comes from the series-shared model map. **Before launching anything, read `references/model-map.md` (the rules) and `references/model-map.json` (the data), merged with the optional repo override `.deep-skills/model-map.json`, and bind every agent below to a concrete full model ID; set the model explicitly on every agent launch with the host's launch value (`references/model-map.md` § Host binding) - never a host default or a guessed alias. The map is a required input.**
 
 Each agent's tier in the tables below uses the map's internal fleet notation: **`stage`** = this review's stage tier (`stages.<max>.code-review`, where `--max` defaults to base's tier - SKILL.md § Flags), **`one down`** / **`two down`** = one / two tiers below it, floor `smart`. Resolve the tier to a model ID from base's family column, then apply the map's access fallback.
 

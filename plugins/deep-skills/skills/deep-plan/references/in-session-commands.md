@@ -30,7 +30,7 @@ Split off an **isolated fresh subagent** so the investigation does **not** bloat
    - the user's `<instructions>` / commentary / angle.
 2. **Launch one `Agent`** with that briefing as its entire context:
    - use the `Explore` agent type for read-only investigation; `general-purpose` if it must reason or prototype.
-   - **Model: the `stage` tier** (`stages.<max>.plan` in `references/model-map.json`), resolved per `references/model-map.md` and **passed explicitly on the launch - including for `Explore`**, whose host default is a small model. Never an alias, never a host default.
+   - **Model: the `stage` tier** (`stages.<max>.plan` in `references/model-map.json`), resolved per `references/model-map.md` and **passed explicitly on the launch - including for `Explore`**, whose host default is a small model - with the host's launch value (`references/model-map.md` § Host binding) - never a host default or a guessed alias.
    - **Foreground (default):** wait for it and return its distilled answer.
    - **Background:** if the user says so (or the investigation is slow and other questions can proceed), pass `run_in_background: true` and keep the session moving; surface the answer when it lands.
 3. **Return only the pearl** - the subagent's distilled answer/recommendation - into the main session. The user accepts or refines; the question resolves; continue.

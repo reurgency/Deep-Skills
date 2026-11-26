@@ -107,7 +107,7 @@ Update the manifest's `06 Bug Fix` row (link: `[06-Bug-Fix/](../06-Bug-Fix/)`). 
 - Never commit on `main`/`develop`; branch first. Never read `.env` or secrets during host-command discovery (package.json / build configs / CLAUDE.md; else ask).
 - Never pass implementer or reviewer transcripts to any agent - evidence only, fresh eyes.
 - Notify sparingly: blockers and autonomous completion only.
-- Model routing is load-bearing: resolve every agent's model from `references/model-map.md` + `references/model-map.json` (stage `bugfix`; per-agent tiers in `references/clustering-and-diagnosis.md`) and set it explicitly per launch - never an alias, never a host default, never a small model. Record the models used in the `fix-summary.md` header.
+- Model routing is load-bearing: resolve every agent's model to its full ID from `references/model-map.md` + `references/model-map.json` (stage `bugfix`; per-agent tiers in `references/clustering-and-diagnosis.md`) and set it explicitly per launch with the host's launch value (`references/model-map.md` § Host binding) - never a host default or a guessed alias, never a small model. Record the models used in the `fix-summary.md` header.
 
 <!-- Authoring note: this SKILL.md stays under 500 lines with detail in references/, per the
      skill-creator skill's authoring rules (the source of the <500-line limit). -->

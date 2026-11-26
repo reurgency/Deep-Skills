@@ -79,5 +79,5 @@ When the user is satisfied, the plan is ready for `/deep-implement`.
 - Review only. Never modify source files or run the implementation. If the user wants fixes built, point them to `/deep-implement`.
 - Findings must cite evidence - a path, a plan section, or a named existing function/pattern. No vague "consider improving."
 - Distinguish a real conflict from a stylistic nit; severity must reflect impact.
-- Model routing is load-bearing: every agent's model is resolved from `references/model-map.md` + `references/model-map.json` and set explicitly per launch - never an alias, never a host default, never a small model. Record the models used in the report header.
+- Model routing is load-bearing: every agent's model is resolved from `references/model-map.md` + `references/model-map.json` to its full model ID and set explicitly per launch with the host's launch value (`references/model-map.md` § Host binding) - never a host default or a guessed alias, never a small model. Record the models used in the report header.
 - If you can't find a problem in a lens, say the plan is clean on that lens rather than inventing findings.
