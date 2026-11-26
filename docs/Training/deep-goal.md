@@ -140,12 +140,13 @@ Below-threshold findings are **auto-deferred** (Deferreds-ledger row, reported l
 **never auto-rejected**. A repo override can add or reshape levels at level granularity;
 it is validated **at launch, never mid-run** (`references/rigor-levels.md`).
 
-### Module 2 — Launch: handshake, questions, the launch card, dry-run
-At launch the conductor: checks for a prior `pipeline.md` (re-entry — Module 8) → runs the
-**version handshake** (deep-skills ≥ 0.3.0; refuses politely when absent/below; a version-less
-dev install passes with a logged warning) → if rigor and/or `--max` are missing, asks them as
-**one batched question set** (rigor recommends mvp; max recommends your current model's level,
-each choice previewing the model every stage would run on) → shows the **launch card**:
+### Module 2 — Launch: questions, handshake, the launch card, dry-run
+At launch the conductor: checks for a prior `pipeline.md` (re-entry — Module 8) → if rigor
+and/or `--max` are missing, asks them as **one batched question set** (rigor recommends mvp;
+max recommends your current model's level, each choice previewing the model every stage would
+run on) → resolves each stage's model (`--dry-run` stops here) → runs the **version handshake**
+(deep-skills ≥ 0.3.0; refuses politely when absent/below; a version-less dev install passes
+with a logged warning) → derives the effort name → shows the **launch card**:
 
 ```
 Goal: <one sentence>

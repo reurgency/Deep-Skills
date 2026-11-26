@@ -56,9 +56,10 @@ recent `.deep-skills/*/01-Plan/plan.md`. Confirm with the user if ambiguous. **R
   (`references/multi-agent.md`)
 - **`--max=<smartest|smarter|smart>`** (say *"use the smartest models"*): the highest model
   level the review agents use. The single reviewer — and, under `--multi-agent`, the
-  user-alignment reviewer and the synthesis — run at it (smartest: Fable 5.2 · smarter: Opus 5.5
-  · smart: Sonnet 5.5); the other dimension reviewers run one level lower, never below
-  Sonnet 5.5. Default: your current model's level.
+  user-alignment reviewer — run at it (smartest: Fable 5.2 · smarter: Opus 5.5 · smart:
+  Sonnet 5.5); the other dimension reviewers run one level lower, never below Sonnet 5.5. The
+  synthesis pass runs in your session on your current model, unless it is handed to an agent,
+  which then runs at the `--max` level. Default: your current model's level.
 
 ### Module 3 — The two review lenses
 The reviewer hunts on exactly two lenses (`references/review-dimensions.md`):
