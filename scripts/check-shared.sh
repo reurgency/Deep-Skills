@@ -246,7 +246,7 @@ do_sync() {
 
 # ---------------------------------------------------------------- --stale
 STALE_PATTERNS=(
-  '\b(main|mid|cheap)[ -]tier'
+  '\b(main|mid|cheap)`?[ -]tier'
   'tier `?(main|mid|cheap)'
   'Sonnet[ -]4[.-]6'
   'sonnet-4-6'
