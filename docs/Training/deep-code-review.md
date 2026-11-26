@@ -166,15 +166,19 @@ level `--max` picks (default: your current model's level), and each agent runs a
 | Default single-agent review | Fable 5.2 | Opus 5.5 |
 
 With `--max=smart` every agent runs on Sonnet 5.5 — the floor. `--mega` puts every agent on the
-top model. The model is **set explicitly on every agent launch as a pinned full ID**
-(`claude-fable-5-2` / `claude-opus-5-5` / `claude-sonnet-5-5`) — never a bare alias, **never
+top model. The model is **resolved to a full model ID** (`claude-fable-5-2` / `claude-opus-5-5` /
+`claude-sonnet-5-5`) **and set explicitly on every agent launch** with the host's launch value:
+the full ID on Codex/Cursor/Copilot, the family alias (`fable`/`opus`/`sonnet`) on Claude Code,
+where each agent's `MODEL:` report verifies what ran - **never
 Haiku, any level, any stage.** If a model isn't available to you, the agent falls back to the
 same level's previous generation (Fable 5 / Opus 5 / Sonnet 5), then one level down, never below
 the smart level — and the report header records the models that actually ran. Adversarial
 verification is **severity-gated**: sev ≥5 candidates get a fresh verifier briefed to **refute**
 them. *Model routing is load-bearing — a run whose heavy finders silently fell to Haiku produced
 zero Blockers and zero Majors on a diff with two known Criticals.* If any agent ran on a model
-other than the one chosen for it (beyond a recorded fallback), discard and relaunch it.
+other than the one chosen for it (beyond a recorded fallback), discard its output and relaunch it once (never on Claude Code,
+where the same alias resolves the same way). A repeat mismatch is classified and the run falls
+back to the next model instead of relaunching again.
 
 ---
 
@@ -213,7 +217,8 @@ itself load cards at runtime the way the first three do.) See the
 - **Reading `.env` for commands/ports** — never. Use package.json / angular.json / CLAUDE.md, else ask.
 - **Relaxing token discipline** mid-run because the diff "feels important" — escalating to
   `--mega` is the user's call, before launch.
-- **A bare model alias** (or Haiku) in the multi-agent pipeline — pin the full ID per launch.
+- **An unverified model alias** (or Haiku) in the multi-agent pipeline - set the model on every
+  launch and check each agent's `MODEL:` report.
 - **Saying "max" when you mean the model level** — a bare *"max review"* is `--mega` (depth).
   For the model level, name it: *"use the smartest models"* (`--max=smartest`).
 

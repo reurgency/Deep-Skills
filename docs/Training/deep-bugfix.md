@@ -125,8 +125,11 @@ builder implements it:
    judges the diagnosis wrong it stops with `diagnosis-disputed` (its edits reverted).
 
 Continuity moves from "same agent" to "written record". Attempt cap: **2** — an attempt is one
-diagnose + fix *pair*; a dispute uses one up. Resuming after a crash reuses an existing
-diagnosis file and runs only the fix agent. Collaborative mode gates here: present the diagnosis
+diagnose + fix *pair*; a dispute uses one up. Resume after a crash is guarded: a cluster already
+recorded in `fix-summary.md` is closed; a `Superseded by` file is never reused; a `Refuted:` line
+means that attempt failed - run the next attempt (fresh diagnose agent), or block at the cap;
+only an un-refuted file is reused, running just the fix agent (collaborative mode re-shows Gate 1
+first). Collaborative mode gates here: present the diagnosis
 + proposed fix for approval **before the fix agent runs** (a redirect sends your note to a fresh
 diagnose agent).
 

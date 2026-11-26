@@ -257,8 +257,16 @@ STALE_PATTERNS=(
   'templates/model-map\.json'
   '--mix\b'
   'ignores the (session|model you)'
+  'pinned (FULL |full )(model )?ID'
+  'never (to )?an? bare( model)? alias'
+  'bare model alias'
+  'discard and relaunch'
+  'resumes at the fix'
+  'crash reuses an existing'
 )
 TIER_WORD_PATTERNS='"tier-[012]"|tier-[012]:'
+# Stale model-binding wording (pre host-binding); exempt from the alias allowlist.
+BINDING_PATTERNS='pinned (FULL |full )(model )?ID|never (to )?an? bare( model)? alias|bare model alias|discard and relaunch|resumes at the fix|crash reuses an existing'
 
 check_stale() {
   local combined p
@@ -296,8 +304,8 @@ PY
       ./docs/benchmarks/*|./docs/ai-map/*|./docs/Retrospectives/*|./docs/Skill-Review/*|./docs/roadmap/*|./.deep-skills/*|./.git/*|./scripts/check-shared.sh) continue ;;
     esac
     hits=$((hits + 1))
-    # Allowlist: the alias story.
-    if printf '%s\n' "$text" | grep -qE 'alias'; then continue; fi
+    # Allowlist: the alias story (but not stale model-binding wording).
+    if printf '%s\n' "$text" | grep -qE 'alias' && ! printf '%s\n' "$text" | grep -qE -- "$BINDING_PATTERNS"; then continue; fi
     # Allowlist: previous-generation ladder column.
     if [[ -n "$prev_re" ]] && printf '%s\n' "$text" | grep -qE "$prev_re"; then continue; fi
     # Allowlist: deep-docs documentation tiers (tier-0/1/2 only, no other stale hit).

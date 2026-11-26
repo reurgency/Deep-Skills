@@ -149,8 +149,10 @@ files to touch — to a per-cluster file `06-Bug-Fix/round-N/diagnosis-<CL-K>.md
 level (Opus 5.5 at smartest or smarter) implements exactly that file and never re-diagnoses
 (`clustering-and-diagnosis.md:65-79`). If the fix agent judges the diagnosis wrong it stops with
 `diagnosis-disputed`. The 2-attempt cap now counts diagnose + fix *pairs*; an `unproven` proof or a
-dispute sends a fresh diagnose agent; a crashed cluster with a diagnosis file resumes at the fix
-agent; split/merge gives new clusters new files and marks the old one superseded
+dispute sends a fresh diagnose agent; crash-resume is guarded - a cluster recorded in
+`fix-summary.md` is closed, a `Superseded by` file is never reused, a `Refuted:` line runs the next
+attempt (or blocks at the cap), and only an un-refuted file is reused, running just the fix agent
+(`clustering-and-diagnosis.md:90-93`); split/merge gives new clusters new files and marks the old one superseded
 (`clustering-and-diagnosis.md:84-89`, `:43`). The file is also the fix-summary "Confirmed cause" line
 and, under `--learn`, the `root-causes.json` cause.
 **Alternatives considered / rejected.** (a) Keep the fused agent (decision 7) — it forces one model
