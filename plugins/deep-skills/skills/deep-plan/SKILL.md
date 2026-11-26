@@ -1,7 +1,7 @@
 ---
 name: deep-plan
 description: Run an interactive, steerable feature-planning session that produces a self-contained, fresh-agent-resumable plan artifact. Use when the user wants to plan a feature, run a planning session, "deep plan" something, or before handing work to /deep-implement. Also runs unattended - "plan this autonomously" (--autonomous) self-answers every planning question and records each as an Assumption. Triggers on /deep-plan and on requests to plan a feature, design an approach, or scope work before building. Planning only - it does not implement.
-argument-hint: describe feature/task to plan · --autonomous · --effort=<slug> · --columbo · --rounds=<n> · --max=<smartest|smarter|smart>
+argument-hint: describe feature/task to plan · --autonomous · --effort=<slug> · --confirmed · --columbo · --rounds=<n> · --max=<smartest|smarter|smart>
 ---
 
 # DeepPlan
@@ -53,6 +53,7 @@ Per the cross-assistant **Portability** rule, every flag is **natural-language-f
 - **Plan autonomously** (`--autonomous`) - say *"plan this autonomously," "plan it unattended, no questions."* Run the same workflow with **zero questions to the user**: skip the cadence question, self-answer every planning question with best judgment, and record each as a row in the plan's **Assumptions** section (question · chosen answer · why). Full mode spec: `references/autonomous-mode.md`.
 - **Include a columbo pass** (`--columbo`) - say *"include a columbo pass."* Self-run the existing `/columbo` completeness check at the end of the session and fix what it surfaces - meaningful primarily with `--autonomous` (interactively it pre-answers the step-8 offer as "yes"). See `references/autonomous-mode.md`.
 - **Name the effort up front** (`--effort=<slug>`) - say *"call the effort <name>."* Use the supplied kebab-case slug as the effort name, skipping the propose-and-confirm step. In autonomous mode with no `--effort`, the slug is self-derived and **stated, never asked**.
+- **Skip the goal confirmation** (`--confirmed`) - say *"the goal is already confirmed."* Meant for orchestrators that have already confirmed the goal with the user before calling this skill. It does exactly two things: skips the Setup restate question (step 1) and suppresses the Hand-off offer (step 9). Nothing else changes - naming is still governed by `--effort` (which already skips the name question), and **Frame (step 2) still runs**, because scope and non-goals are planning content, not a launch confirmation.
 - **Set the question depth** (`--rounds=<n>`) - say *"three rounds of questions."* Interactive sessions only: skip the cadence question and run exactly *n* front-loaded question rounds (each a batched round via the host's structured-question tool), then proceed; the user can still request extra gap rounds. Ignored under `--autonomous` (no rounds by definition).
 - **Choose the model level** (`--max=<smartest|smarter|smart>`) - say *"use the smartest models"* or *"keep it to smarter models"*. Sets the highest model level this skill's helper agents may use. If you don't choose, it uses your current model's level. Which model each helper gets is listed in references/model-map.md and this skill's agent tiers (Guardrails). The planning conversation itself always runs on your current model.
 
@@ -61,9 +62,15 @@ Per the cross-assistant **Portability** rule, every flag is **natural-language-f
 Everything below describes the default **interactive** session. Under `--autonomous` the same state machine runs unattended with the per-step deltas in `references/autonomous-mode.md`.
 
 ### 1. Setup
-- Restate the feature in one sentence; confirm with the user.
+- **Restate and name - one structured question** (via the host's structured-question tool, see `references/host-affordances.md`). Its preview (≤15 lines) shows, so the user confirms something concrete:
+  - **Goal** - one sentence.
+  - **In scope** - 3-5 bullets.
+  - **Out of scope** - what this plan won't cover.
+  - **Proposed effort name** - a kebab-case slug derived from the feature.
+
+  Options: confirm as shown · adjust (free text - revise and re-ask). Confirming the preview also confirms the effort name. (When `--effort=<slug>` was supplied, show it as the effort name, stated, not up for change. When `--confirmed` was supplied, skip this question entirely - state the one-sentence goal and continue; the effort name is then handled as below.)
 - Ask **question cadence** - 1-at-a-time · 3-at-a-time · all-at-once. Recommend **all-at-once** for small features. See `references/question-cadence.md`. (Skipped when `--rounds=<n>` was given - run exactly *n* front-loaded rounds instead, per § Flags.)
-- Propose an **effort name** - a kebab-case slug derived from the feature - and get the user's confirmation. (When `--effort=<slug>` was supplied, use it as-is and state it instead of asking.) The plan is written to `.deep-skills/<effort-name>/01-Plan/plan.md` (see `references/artifact-structure.md`). An explicit path argument overrides this default.
+- **Effort name:** confirmed through the restate question above. (When `--effort=<slug>` was supplied, use it as-is and state it instead of asking. When `--confirmed` is given without `--effort`, the restate question is skipped but naming is not: propose the slug and get the user's confirmation as a short question of its own.) The plan is written to `.deep-skills/<effort-name>/01-Plan/plan.md` (see `references/artifact-structure.md`). An explicit path argument overrides this default.
 - Form an initial **multi-phase?** judgment (you'll revisit before writing).
 
 ### 2. Frame
@@ -97,7 +104,23 @@ Write to `.deep-skills/<effort-name>/01-Plan/plan.md` (or the explicit path over
 Present the plan, fold in feedback, update the doc.
 
 ### 8. Columbo (offered last)
-Offer `/columbo` as the final completeness check. Fix anything it surfaces. This is the hand-off point to `/deep-plan-review` / `/deep-implement`.
+Offer `/columbo` as the final completeness check. Fix anything it surfaces. This is the hand-off point to `/deep-plan-review` / `/deep-implement` (and, when step 9 applies, the deep-goal offer).
+
+### 9. Hand-off (optional deep-goal offer)
+**Interactive, standalone runs only.** Skip this step entirely - offer nothing - when any of `--autonomous`, `--confirmed`, `--rounds`, or `--effort` was given (these are orchestrator-style flags, so this also covers being called from inside a deep-goal run, including older deep-goal versions that don't pass `--confirmed`).
+
+Otherwise, **only if a `deep-goal` skill is available in this session** (it is listed among the session's available skills - do not probe install files; deep-goal is a separate, optional plugin and this skill never requires it), ask one structured question:
+> *Run the remaining stages autonomously with deep-goal? It continues from this plan; the rigor you pick decides which stages run.*
+
+Options, each with a preview listing the stages that rigor would run after this plan:
+- **yolo** - implement.
+- **poc** - implement, code-review, bugfix.
+- **mvp** / **prod** - plan-review, implement, code-review, bugfix, docs.
+- **No, I'll continue myself** - close with the usual `/deep-plan-review` / `/deep-implement` pointers.
+
+On a rigor choice: invoke `/deep-goal --from-plan=<plan path> --rigor=<chosen level>` (on hosts without slash commands, ask for it in natural language: *"run deep-goal at <level> rigor and continue from my plan at <plan path>"*). deep-goal then asks whatever is still missing (rigor, model level) and shows its launch card. This skill's job ends at the invocation.
+
+If no `deep-goal` skill is available, say nothing about deep-goal - just close with the usual `/deep-plan-review` / `/deep-implement` pointers.
 
 ## Deferreds - nothing gets forgotten by phase 4
 

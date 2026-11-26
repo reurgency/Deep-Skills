@@ -2,7 +2,7 @@
 
 *Natural-language trigger: say 'plan this autonomously' / 'plan it unattended, no questions.'*
 
-Run the **same session workflow** as an interactive plan - Setup → Frame → Explore → Questions → Design & write → Review → Columbo - but with **zero questions to the user**. Every decision the interactive session would have asked about is **self-answered with best judgment and recorded as an Assumption row** in the plan's Assumptions section (`templates/plan-template.md`). Nothing else changes: same plan template, same artifact paths, same manifest behavior, same planning-only guardrails.
+Run the **same session workflow** as an interactive plan - Setup → Frame → Explore → Questions → Design & write → Review → Columbo → Hand-off - but with **zero questions to the user**. Every decision the interactive session would have asked about is **self-answered with best judgment and recorded as an Assumption row** in the plan's Assumptions section (`templates/plan-template.md`). Nothing else changes: same plan template, same artifact paths, same manifest behavior, same planning-only guardrails.
 
 This mode is a free-standing feature: useful whenever a user wants a first-draft plan without a Q&A session, and equally usable by a script or orchestrator that dispatches planning unattended. It requires nothing beyond this skill.
 
@@ -16,7 +16,7 @@ An Assumption row is for *decisions a user would plausibly have steered* - archi
 
 | Step | Interactive behavior | Autonomous behavior |
 |---|---|---|
-| **1. Setup** | Confirm restatement; ask cadence; propose effort name and get confirmation. | State the one-sentence restatement (no wait). **Skip the cadence question entirely** - there are no question rounds to pace. Effort name: use `--effort=<slug>` verbatim when supplied; otherwise **derive the kebab-case slug yourself and STATE it** ("Effort: `<slug>`") - never ask. |
+| **1. Setup** | One structured restate question (goal · in scope · out of scope · proposed effort name) - confirming it confirms the name; ask cadence. | State the one-sentence restatement (no wait). **Skip the cadence question entirely** - there are no question rounds to pace. Effort name: use `--effort=<slug>` verbatim when supplied; otherwise **derive the kebab-case slug yourself and STATE it** ("Effort: `<slug>`") - never ask. |
 | **2. Frame** | Get a quick confirmation of scope/non-goals/assumptions. | State scope and non-goals; any judgment call in the framing becomes an Assumption row. |
 | **3. Explore** | Read-only Explore agents. | Unchanged - exploration is what makes self-answers defensible. |
 | **4. Question rounds** | Emit questions to the user per cadence. | Formulate the same decision-relevant questions, then **self-answer each with best judgment** - prefer the answer supported by exploration evidence, repo convention, or the least-surprise default. One Assumption row per question. |
@@ -24,6 +24,7 @@ An Assumption row is for *decisions a user would plausibly have steered* - archi
 | **6. Design & write** | Write plan per template. | Unchanged - plus the populated **Assumptions** section (include it only when it has rows, i.e. always in practice for this mode). |
 | **7. Review** | Present the plan, fold in feedback. | No user feedback to fold in - skip the pause; the written plan is the deliverable. |
 | **8. Columbo** | Offer `/columbo` last. | With `--columbo`: **self-run the columbo check now** (below). Without it: don't ask - mention in the closing summary that a columbo pass is available. |
+| **9. Hand-off** | Offer the deep-goal hand-off, if a deep-goal skill is available. | Skipped (never offered). |
 
 ## `--columbo` - self-run the completeness check
 
