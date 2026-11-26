@@ -1,54 +1,51 @@
-<!-- GENERATED — do not hand-edit; regenerate overwrites. Source: deep-docs. -->
+<!-- GENERATED - do not hand-edit; regenerate overwrites. Source: deep-docs. -->
 <!-- tier-1 subsystem card: loaded on touch. One per boundary. Every claim carries a path:line (symbol) anchor. -->
 
 # deep-docs
 
-> **Load when:** generating/refreshing the AI map (`/deep-docs`, "map this codebase") · **~tokens:** ~600 est
+> **Load when:** editing the deep-docs skill, its map pipeline (survey, anchor-verify, place, refresh), or its templates · **~tokens:** ~1.3k est
 > **Deep ref:** [references/deep-docs.md](../references/deep-docs.md)
 
 ## Purpose
 
-Context-window-aware, machine-readable documentation generator producing a standing, queryable, tier-layered orientation map of what a codebase has built — every claim anchored to file:line (symbol) and adversarially verified by fresh agents. — `plugins/deep-skills/skills/deep-docs/SKILL.md:3 (machine-readable documentation of what a codebase has built)`
+Skill that writes a standing, tiered (MAP.md + index.json / subsystem cards / deep refs), anchor-verified orientation map `docs/ai-map/`; documents only, never edits application source. - `plugins/deep-skills/skills/deep-docs/SKILL.md:7 (# DeepDocs)`
 
 ## Entry points
 
-- `/deep-docs`; NL "map this codebase / document what's built / generate the AI map / refresh the docs" — `plugins/deep-skills/skills/deep-docs/SKILL.md:3 (Triggers on /deep-docs and on requests to map, document)`
-- Default-mode six-stage pipeline: intake/scope → survey → layering → anchor-verify → index → place — `plugins/deep-skills/skills/deep-docs/SKILL.md:45 (Default-mode workflow)`
+- `/deep-docs`, args: path scope, `--refresh`, `--max=<smartest|smarter|smart>`; natural language is primary - `plugins/deep-skills/skills/deep-docs/SKILL.md:4 (argument-hint)`, `plugins/deep-skills/skills/deep-docs/SKILL.md:71 (## Flags)`
+- Six-stage pipeline: intake, survey, layering, anchor-verify, index+coverage, place+report - `plugins/deep-skills/skills/deep-docs/SKILL.md:45 (## Default-mode workflow)`
+- Directive-card consumer; run first: `scripts/load-active-cards.sh deep-docs` (exact-token match on `owner_phases`) - `plugins/deep-skills/skills/deep-docs/SKILL.md:29 (## Directive cards (Deep-Learn))`, `plugins/deep-skills/skills/deep-docs/scripts/load-active-cards.sh:34 (# exact-token match so)`
+- `--refresh` regenerates only stale + new subsystems - `plugins/deep-skills/skills/deep-docs/references/refresh.md:7 (## The dual git-free signal)`
 
-## Key components
+## Key types
 
-- Intake & scope (three input modes + quarantine) — `plugins/deep-skills/skills/deep-docs/references/intake-and-scope.md:1 (Intake & scope)`
-- Survey (directory-primary boundary discovery + fan-out) — `plugins/deep-skills/skills/deep-docs/references/survey.md:1 (Survey)`
-- Layering & anchors (three tiers + anchor format) — `plugins/deep-skills/skills/deep-docs/references/layering-and-anchors.md:1 (Layering & anchors)`
-- Anchor-verify (always-on per-card verification + verdict) — `plugins/deep-skills/skills/deep-docs/references/anchor-verify.md:1 (Anchor-verify)`
-- Index & coverage (index.json schema + coverage.md) — `plugins/deep-skills/skills/deep-docs/references/index-and-coverage.md:1 (Index & coverage)`
-- Place & report (staging + atomic-mv + crash safety) — `plugins/deep-skills/skills/deep-docs/references/place-and-report.md:1 (Place & report)`
+- Anchor `path:line (symbol)`; symbol primary, nearest preceding declaration, else trimmed-line landmark - `plugins/deep-skills/skills/deep-docs/references/layering-and-anchors.md:28 (### Symbol identification without LSP)`
+- `index.json` entries (concept, doc, anchor, token_est, load_when, trust) plus `alignment_fingerprint` (indexed_against_commit, file_set, per_subsystem_anchor_state) - `plugins/deep-skills/skills/deep-docs/templates/index.json:4 ("entries")`, `plugins/deep-skills/skills/deep-docs/templates/index.json:14 ("alignment_fingerprint")`
+- `learn-signal.json` (drift, undocumented, churn arrays, always present) - `plugins/deep-skills/skills/deep-docs/templates/learn-signal.json:7 ("drift")`
+- Anchor-verify verdict `accurate | drifted | over-budget` - `plugins/deep-skills/skills/deep-docs/references/anchor-verify.md:29 (VERDICT: accurate | drifted | over-budget)`
 
 ## Invariants
 
-- Documents-never-decides: changes no code in target repo (writes only docs/ai-map/** + manifest line + 07-Docs pointer) — `plugins/deep-skills/skills/deep-docs/SKILL.md:10 (Documents, never decides)`
-- Every claim anchored or it's fiction; existing-docs quarantine (external-unverified pointers, never ingested) — `plugins/deep-skills/skills/deep-docs/SKILL.md:19 (Every claim is anchored or it's fiction)`
-- Never half-write the map: staging + .in-progress marker + atomic mv; refuse-if-marker — `plugins/deep-skills/skills/deep-docs/references/place-and-report.md:1 (Place & report)`
-- Always-on anchor-verify per card; drift blocks publish — `plugins/deep-skills/skills/deep-docs/references/anchor-verify.md:1 (Anchor-verify)`
+- Writes only `docs/ai-map/**`, effort manifest line and `07-Docs/` pointer; owns `docs/ai-map/` exclusively - `plugins/deep-skills/skills/deep-docs/SKILL.md:80 (## Guardrails)`
+- A card with any drifted/over-budget anchor blocks publish - `plugins/deep-skills/skills/deep-docs/references/anchor-verify.md:47 (## Publish gate)`
+- Anchor-verify is exhaustive per card, no sampling, fresh read-only verifier, <=8 concurrent - `plugins/deep-skills/skills/deep-docs/references/anchor-verify.md:10 (## The model - one fresh verifier per card, exhaustive)`
+- Survey/verify/refresh agents run on the `docs` stage tier, model ID set explicitly per launch, never small - `plugins/deep-skills/skills/deep-docs/SKILL.md:78 (## Guardrails)`
+- Tier-0 hard ceiling ~2,000 est; overflow is grouped, never truncated - `plugins/deep-skills/skills/deep-docs/references/token-budget.md:35 (## The tier-0 hard ceiling - ~2,000 est)`
+- Existing human docs indexed `external-unverified`, prose never ingested - `plugins/deep-skills/skills/deep-docs/references/intake-and-scope.md:36 (## Existing-docs quarantine policy)`
+- Never read `.env`/secrets - `plugins/deep-skills/skills/deep-docs/SKILL.md:83 (## Guardrails)`
+- Boundaries capped ~12; split >50 files, merge siblings <3 files; decisions logged to coverage.md - `plugins/deep-skills/skills/deep-docs/references/survey.md:10 (## Boundary discovery - directory-primary + heuristic refine)`
+- A leftover `.in-progress` marker makes the next run refuse - `plugins/deep-skills/skills/deep-docs/references/place-and-report.md:14 (### Refuse-if-marker (double-run safety))`
 
 ## Data-flow summary
 
-- Consumes host conventions + directive cards + existing human docs (as pointers) → intake → survey fan-out → layering → verify fan-out → index → staging → atomic mv; produces `docs/ai-map/{MAP.md,index.json,subsystems/*,references/*,coverage.md}` + 07-Docs pointer + manifest line — `plugins/deep-skills/skills/deep-docs/references/survey.md:1 (Survey)` → `plugins/deep-skills/skills/deep-docs/references/anchor-verify.md:1 (Anchor-verify)` → `plugins/deep-skills/skills/deep-docs/references/place-and-report.md:1 (Place & report)`
+- Generation: scope, boundary survey, tiers + anchors, verify gate, index/fingerprint, staging then atomic `mv` - `plugins/deep-skills/skills/deep-docs/references/survey.md:19 (## Fan-out - one fresh agent per boundary)` → `plugins/deep-skills/skills/deep-docs/references/anchor-verify.md:47 (## Publish gate)` → `plugins/deep-skills/skills/deep-docs/references/place-and-report.md:10 (## The staging + atomic-mv mechanism)`
+- Refresh: reads fingerprint written by the prior run; git fast path only when aligned, else file-set diff + anchor re-resolve - `plugins/deep-skills/skills/deep-docs/references/refresh.md:40 (## Fingerprint lifecycle - written every run, read on the next)`
+- learn-signal.json: Display-only, no reader exists yet - `plugins/deep-skills/skills/deep-docs/references/learn-signal.md:1 (# Learn-signal - the doc-coverage / drift feed (Display-only today))`
 
 ## Anchors
 
-<!-- Every anchor above is re-resolved by anchor-verify (symbol-primary, ±5-line re-snap).
-     A drifted/over-budget anchor blocks publish. This list is the card's full anchor set. -->
 | Claim | Anchor |
 |---|---|
-| purpose: tiered, anchored, verified | `plugins/deep-skills/skills/deep-docs/SKILL.md:3 (machine-readable documentation of what a codebase has built)` |
-| changes no code in target repo | `plugins/deep-skills/skills/deep-docs/SKILL.md:10 (Documents, never decides)` |
-| anchored-or-fiction + quarantine | `plugins/deep-skills/skills/deep-docs/SKILL.md:19 (Every claim is anchored or it's fiction)` |
-| six-stage pipeline | `plugins/deep-skills/skills/deep-docs/SKILL.md:45 (Default-mode workflow)` |
-| three input modes + quarantine | `plugins/deep-skills/skills/deep-docs/references/intake-and-scope.md:1 (Intake & scope)` |
-| directory-primary boundary discovery + fan-out | `plugins/deep-skills/skills/deep-docs/references/survey.md:1 (Survey)` |
-| three tiers + anchor format | `plugins/deep-skills/skills/deep-docs/references/layering-and-anchors.md:1 (Layering & anchors)` |
-| always-on per-card verification + verdict | `plugins/deep-skills/skills/deep-docs/references/anchor-verify.md:1 (Anchor-verify)` |
-| index.json schema + coverage.md | `plugins/deep-skills/skills/deep-docs/references/index-and-coverage.md:1 (Index & coverage)` |
-| staging + atomic-mv + crash safety | `plugins/deep-skills/skills/deep-docs/references/place-and-report.md:1 (Place & report)` |
-| machine index schema | `plugins/deep-skills/skills/deep-docs/templates/index.json:1` |
+| purpose | `plugins/deep-skills/skills/deep-docs/SKILL.md:7 (# DeepDocs)` |
+| flags | `plugins/deep-skills/skills/deep-docs/SKILL.md:71 (## Flags)` |
+| fingerprint | `plugins/deep-skills/skills/deep-docs/references/refresh.md:40 (## Fingerprint lifecycle - written every run, read on the next)` |

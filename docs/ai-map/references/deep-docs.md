@@ -1,29 +1,23 @@
-<!-- GENERATED — do not hand-edit; regenerate overwrites. Source: deep-docs. -->
-<!-- tier-2 reference: loaded on demand. Deep cross-layer data-flow trace for one subsystem. Every hop anchored. -->
+<!-- GENERATED - do not hand-edit; regenerate overwrites. Source: deep-docs. -->
+<!-- tier-2 deep reference: loaded on demand. -->
 
-# deep-docs — generate pipeline
+# deep-docs - generation and refresh flows
 
-> **Load when:** tracing the map-generation pipeline (intake → survey fan-out → layering → verify fan-out → index → staging → atomic mv) or the crash-safety/double-run invariant.
-> Card: [subsystems/deep-docs.md](../subsystems/deep-docs.md)
+## Flow 1: generate and publish (never half-write the map)
 
-## The flow it traces
+1. Intake resolves scope and quarantines human docs - `plugins/deep-skills/skills/deep-docs/references/intake-and-scope.md:36 (## Existing-docs quarantine policy)`
+2. Survey: one fresh read-only agent per boundary, <=8 concurrent, `docs` stage tier - `plugins/deep-skills/skills/deep-docs/references/survey.md:19 (## Fan-out - one fresh agent per boundary)`
+3. Layering: unanchored claims are dropped - `plugins/deep-skills/skills/deep-docs/references/survey.md:17 (## Fan-out - one fresh agent per boundary)`; tier-2 only if earned - `plugins/deep-skills/skills/deep-docs/references/layering-and-anchors.md:15 (## When a subsystem earns a tier-2 ref)`
+4. Anchor-verify per card: symbol grep, +-5 line tolerance, re-snap or drifted - `plugins/deep-skills/skills/deep-docs/references/anchor-verify.md:14 (## Per-anchor re-resolution (the procedure))`
+5. Publish gate: drifted/over-budget blocks the swap; blocked cards are regenerated first - `plugins/deep-skills/skills/deep-docs/references/anchor-verify.md:47 (## Publish gate)`
+6. Index: `index.json` fingerprint rewritten after verify, before the mv - `plugins/deep-skills/skills/deep-docs/references/index-and-coverage.md:22 (## The alignment-fingerprint schema)`
+7. Place: output to `docs/.ai-map.staging/` with `.in-progress`, then atomic rename over `docs/ai-map/` - `plugins/deep-skills/skills/deep-docs/references/place-and-report.md:10 (## The staging + atomic-mv mechanism)`
 
-The default-mode pipeline turns a target repo into a tier-layered, anchored, verified orientation map. It is a cross-stage data flow where each stage's output is the next stage's input, ending in a crash-safe atomic placement.
+## Flow 2: refresh (dual signal, git as accelerator)
 
-## Hop-by-hop
-
-1. **Intake & scope** — three input modes; existing human docs are quarantined as external-unverified pointers, never ingested into a trusted tier. — `plugins/deep-skills/skills/deep-docs/references/intake-and-scope.md:1 (Intake & scope)` · `plugins/deep-skills/skills/deep-docs/SKILL.md:10 (Documents, never decides)`
-
-2. **Survey (fan-out per boundary)** — directory-primary boundary discovery; a survey agent fans out per boundary, returning purpose/entry/invariants + anchor candidates. — `plugins/deep-skills/skills/deep-docs/references/survey.md:1 (Survey)`
-
-3. **Layering with anchors** — three tiers built (tier-0 MAP+index, tier-1 cards, tier-2 refs); **load-bearing invariant:** every claim carries a file:line (symbol) anchor or it is fiction. — `plugins/deep-skills/skills/deep-docs/references/layering-and-anchors.md:1 (Layering & anchors)` · `plugins/deep-skills/skills/deep-docs/SKILL.md:19 (Every claim is anchored or it's fiction)`
-
-4. **Anchor-verify (fan-out per card)** — always-on; a fresh agent re-resolves every anchor (symbol-primary, ±5-line re-snap) and returns a verdict. A drifted/over-budget anchor blocks publish. — `plugins/deep-skills/skills/deep-docs/references/anchor-verify.md:1 (Anchor-verify)`
-
-5. **Index** — emit `index.json` (machine index) + `coverage.md` (honesty artifact) from the verified card set. — `plugins/deep-skills/skills/deep-docs/references/index-and-coverage.md:1 (Index & coverage)`
-
-6. **Place & report (staging → atomic mv)** — **crash-safety invariant:** never half-write the map. Write to a staging dir under a `.in-progress` marker, then atomically `mv` into place; a present marker makes a re-run refuse rather than corrupt. — `plugins/deep-skills/skills/deep-docs/references/place-and-report.md:1 (Place & report)`
-
-## Outputs
-
-`docs/ai-map/{MAP.md,index.json,subsystems/*,references/*,coverage.md}` + (effort mode) `07-Docs/` pointer + manifest line. Changes no code in the target repo. — `plugins/deep-skills/skills/deep-docs/SKILL.md:10 (Documents, never decides)`
+1. Probe git alignment (clean, non-shallow, reachable `indexed_against_commit`); any failure means not aligned - `plugins/deep-skills/skills/deep-docs/references/refresh.md:22 (## The git-index alignment check)`
+2. Aligned: `git diff --name-only <sha>..HEAD` maps to stale subsystems - `plugins/deep-skills/skills/deep-docs/references/refresh.md:22 (## The git-index alignment check)`
+3. Not aligned: signal 1 re-runs anchor-verify (drifted marks subsystem stale) - `plugins/deep-skills/skills/deep-docs/references/refresh.md:11 (## The dual git-free signal)`
+4. Signal 2 diffs current files against `file_set` (additions, deletions, new boundaries) - `plugins/deep-skills/skills/deep-docs/references/refresh.md:7 (## The dual git-free signal)`
+5. Regenerate only the stale/new union, carry the rest forward verbatim - `plugins/deep-skills/skills/deep-docs/references/refresh.md:7 (## The dual git-free signal)`
+6. Rewrite fingerprint every run; promote to fast path after consecutive clean rounds, re-derived each run - `plugins/deep-skills/skills/deep-docs/references/refresh.md:50 (## The convergence model (operational rule))`

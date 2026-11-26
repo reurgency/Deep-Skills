@@ -1,161 +1,454 @@
 {
   "_doc": "deep-docs machine index; see references/index-and-coverage.md",
-  "generated": { "indexed_against_commit": "3be12547cb941ab398fce82963104439f9e759a4", "tool_version": "deep-docs/0.1.0" },
+  "generated": {
+    "indexed_against_commit": "d575719d93a069e32b281857f6727579083eaae4",
+    "tool_version": "deep-docs/0.3.0"
+  },
   "entries": [
     {
       "concept": "deep-plan",
       "doc": "subsystems/deep-plan.md",
-      "anchor": { "path": "plugins/deep-skills/skills/deep-plan/SKILL.md", "line": 6, "symbol": "DeepPlan" },
-      "token_est": 994,
-      "load_when": "running or modifying a feature-planning session",
+      "anchor": {
+        "path": "plugins/deep-skills/skills/deep-plan/SKILL.md",
+        "line": 9,
+        "symbol": "# DeepPlan"
+      },
+      "token_est": 2447,
+      "load_when": "editing or invoking the /deep-plan planning skill, its flags, in-session commands, or plan template",
       "trust": "anchored"
     },
     {
       "concept": "deep-plan-review",
       "doc": "subsystems/deep-plan-review.md",
-      "anchor": { "path": "plugins/deep-skills/skills/deep-plan-review/SKILL.md", "line": 6, "symbol": "DeepPlanReview" },
-      "token_est": 968,
-      "load_when": "reviewing or critiquing a finished plan",
+      "anchor": {
+        "path": "plugins/deep-skills/skills/deep-plan-review/SKILL.md",
+        "line": 9,
+        "symbol": "# DeepPlanReview"
+      },
+      "token_est": 1764,
+      "load_when": "editing or invoking /deep-plan-review (plan critique by fresh agents, multi-agent fan-out, review report format)",
       "trust": "anchored"
     },
     {
       "concept": "deep-implement",
       "doc": "subsystems/deep-implement.md",
-      "anchor": { "path": "plugins/deep-skills/skills/deep-implement/SKILL.md", "line": 6, "symbol": "DeepImplement" },
-      "token_est": 1168,
-      "load_when": "executing a plan phase-by-phase",
+      "anchor": {
+        "path": "plugins/deep-skills/skills/deep-implement/SKILL.md",
+        "line": 11,
+        "symbol": "# DeepImplement"
+      },
+      "token_est": 1757,
+      "load_when": "editing or invoking /deep-implement (phase loop, validation, commit/hand-off, modes)",
       "trust": "anchored"
     },
     {
-      "concept": "deep-implement — cross-phase execution flow",
+      "concept": "deep-implement (deep reference)",
       "doc": "references/deep-implement.md",
-      "anchor": { "path": "plugins/deep-skills/skills/deep-implement/references/validation.md", "line": 34, "symbol": "Green ≠ verified for external shapes" },
-      "token_est": 866,
-      "load_when": "tracing plan→commit phase flow or the DLC-001 contract probe",
+      "anchor": {
+        "path": "plugins/deep-skills/skills/deep-implement/references/phase-execution.md",
+        "line": 5,
+        "symbol": "Default"
+      },
+      "token_est": 705,
+      "load_when": "tracing deep-implement flows hop by hop",
       "trust": "anchored"
     },
     {
       "concept": "deep-code-review",
       "doc": "subsystems/deep-code-review.md",
-      "anchor": { "path": "plugins/deep-skills/skills/deep-code-review/SKILL.md", "line": 10, "symbol": "This is the fourth skill of the `deep-*` series" },
-      "token_est": 1233,
-      "load_when": "reviewing implemented code, diffs, or PRs",
+      "anchor": {
+        "path": "plugins/deep-skills/skills/deep-code-review/SKILL.md",
+        "line": 9,
+        "symbol": "# DeepCodeReview"
+      },
+      "token_est": 1600,
+      "load_when": "editing or invoking /deep-code-review (review, --multi-agent, --mega, --triage, --fix), finding/severity shape, or its artifacts",
       "trust": "anchored"
     },
     {
-      "concept": "deep-code-review — multi-agent review pipeline",
+      "concept": "deep-code-review (deep reference)",
       "doc": "references/deep-code-review.md",
-      "anchor": { "path": "plugins/deep-skills/skills/deep-code-review/references/multi-agent.md", "line": 36, "symbol": "Haiku is NEVER used in this pipeline — any tier, any stage, any agent" },
-      "token_est": 758,
-      "load_when": "tracing the multi-agent review pipeline or last-mile chain-trace",
+      "anchor": {
+        "path": "plugins/deep-skills/skills/deep-code-review/references/scope-resolution.md",
+        "line": 30,
+        "symbol": "## The always-state-resolved-scope rule"
+      },
+      "token_est": 970,
+      "load_when": "tracing deep-code-review flows hop by hop",
+      "trust": "anchored"
+    },
+    {
+      "concept": "deep-bugfix",
+      "doc": "subsystems/deep-bugfix.md",
+      "anchor": {
+        "path": "plugins/deep-skills/skills/deep-bugfix/SKILL.md",
+        "line": 3,
+        "symbol": "description"
+      },
+      "token_est": 2079,
+      "load_when": "editing or debugging the /deep-bugfix skill (clustering, diagnose/fix/proof agents, containment, resume rules, round artifacts)",
+      "trust": "anchored"
+    },
+    {
+      "concept": "deep-bugfix (deep reference)",
+      "doc": "references/deep-bugfix.md",
+      "anchor": {
+        "path": "plugins/deep-skills/skills/deep-bugfix/references/intake.md",
+        "line": 13,
+        "symbol": "## The normalized defect shape"
+      },
+      "token_est": 1216,
+      "load_when": "tracing deep-bugfix flows hop by hop",
       "trust": "anchored"
     },
     {
       "concept": "deep-docs",
       "doc": "subsystems/deep-docs.md",
-      "anchor": { "path": "plugins/deep-skills/skills/deep-docs/SKILL.md", "line": 10, "symbol": "Documents, never decides" },
-      "token_est": 1229,
-      "load_when": "generating or refreshing the AI map",
+      "anchor": {
+        "path": "plugins/deep-skills/skills/deep-docs/SKILL.md",
+        "line": 7,
+        "symbol": "# DeepDocs"
+      },
+      "token_est": 1334,
+      "load_when": "editing the deep-docs skill, its map pipeline (survey, anchor-verify, place, refresh), or its templates",
       "trust": "anchored"
     },
     {
-      "concept": "deep-docs — generate pipeline",
+      "concept": "deep-docs (deep reference)",
       "doc": "references/deep-docs.md",
-      "anchor": { "path": "plugins/deep-skills/skills/deep-docs/references/place-and-report.md", "line": 1, "symbol": "Place & report" },
-      "token_est": 707,
-      "load_when": "tracing the map-generation pipeline or the crash-safety/double-run invariant",
+      "anchor": {
+        "path": "plugins/deep-skills/skills/deep-docs/references/intake-and-scope.md",
+        "line": 36,
+        "symbol": "## Existing-docs quarantine policy"
+      },
+      "token_est": 715,
+      "load_when": "tracing deep-docs flows hop by hop",
+      "trust": "anchored"
+    },
+    {
+      "concept": "deep-goal",
+      "doc": "subsystems/deep-goal.md",
+      "anchor": {
+        "path": "plugins/deep-goal/skills/deep-goal/SKILL.md",
+        "line": 9,
+        "symbol": "# DeepGoal"
+      },
+      "token_est": 2921,
+      "load_when": "changing the /deep-goal conductor: launch/rigor/model resolution, stage dispatch, advance tests, review-fix loop, resume, run report",
+      "trust": "anchored"
+    },
+    {
+      "concept": "deep-goal (deep reference)",
+      "doc": "references/deep-goal.md",
+      "anchor": {
+        "path": "plugins/deep-goal/skills/deep-goal/references/conductor.md",
+        "line": 14,
+        "symbol": "## 1. Launch sequence"
+      },
+      "token_est": 1509,
+      "load_when": "tracing deep-goal flows hop by hop",
+      "trust": "anchored"
+    },
+    {
+      "concept": "shared-references",
+      "doc": "subsystems/shared-references.md",
+      "anchor": {
+        "path": "scripts/check-shared.sh",
+        "line": 4,
+        "symbol": "# Enforces the series-shared-file rule: every shar"
+      },
+      "token_est": 1875,
+      "load_when": "editing model-map.json/.md, host-affordances.md, artifact-structure.md, load-active-cards.sh or check-shared.sh, or tracing how an agent's model is resolved",
+      "trust": "anchored"
+    },
+    {
+      "concept": "shared-references (deep reference)",
+      "doc": "references/shared-references.md",
+      "anchor": {
+        "path": "plugins/deep-skills/skills/deep-code-review/references/model-map.md",
+        "line": 52,
+        "symbol": "Base-tier lookup"
+      },
+      "token_est": 931,
+      "load_when": "tracing shared-references flows hop by hop",
       "trust": "anchored"
     },
     {
       "concept": "directives",
       "doc": "subsystems/directives.md",
-      "anchor": { "path": "plugins/deep-skills/directives/README.md", "line": 1, "symbol": "Directives Registry (Deep-Learn)" },
-      "token_est": 881,
-      "load_when": "working with Deep-Learn directive cards",
+      "anchor": {
+        "path": "plugins/deep-skills/directives/README.md",
+        "line": 3,
+        "symbol": "# Directives Registry (Deep-Learn)"
+      },
+      "token_est": 1333,
+      "load_when": "adding, toggling, or debugging Deep-Learn directive cards, the card registries, or the category taxonomy",
       "trust": "anchored"
     },
     {
-      "concept": "docs/roadmap/DESIGN-OUTLINE.md (Deep-Learn design)",
-      "doc": "docs/roadmap/DESIGN-OUTLINE.md",
-      "anchor": { "path": "docs/roadmap/DESIGN-OUTLINE.md", "line": 1 },
+      "concept": "packaging",
+      "doc": "subsystems/packaging.md",
+      "anchor": {
+        "path": "plugins/deep-skills/HOSTS.md",
+        "line": 3,
+        "symbol": "# Hosts & distribution"
+      },
+      "token_est": 1351,
+      "load_when": "changing install/marketplace manifests, plugin versions, host support, or the shared-file sweep",
+      "trust": "anchored"
+    },
+    {
+      "concept": "README.md",
+      "doc": "../../docs/Training/README.md",
+      "anchor": {
+        "path": "docs/Training/README.md",
+        "line": 1
+      },
+      "token_est": 3384,
+      "load_when": "need the series curriculum / training entry point",
+      "trust": "external-unverified"
+    },
+    {
+      "concept": "index.md",
+      "doc": "../../docs/Training/design-rationale/index.md",
+      "anchor": {
+        "path": "docs/Training/design-rationale/index.md",
+        "line": 1
+      },
+      "token_est": 2174,
+      "load_when": "need per-skill design rationale",
+      "trust": "external-unverified"
+    },
+    {
+      "concept": "DESIGN-OUTLINE.md",
+      "doc": "../../docs/roadmap/DESIGN-OUTLINE.md",
+      "anchor": {
+        "path": "docs/roadmap/DESIGN-OUTLINE.md",
+        "line": 1
+      },
       "token_est": 3254,
-      "load_when": "need Deep-Learn design background (human-authored · not anchor-verified)",
+      "load_when": "need Deep-Learn design background",
       "trust": "external-unverified"
     },
     {
-      "concept": "docs/roadmap/DEEP-DOCS-DESIGN.md (deep-docs design source)",
-      "doc": "docs/roadmap/DEEP-DOCS-DESIGN.md",
-      "anchor": { "path": "docs/roadmap/DEEP-DOCS-DESIGN.md", "line": 1 },
+      "concept": "DEEP-DOCS-DESIGN.md",
+      "doc": "../../docs/roadmap/DEEP-DOCS-DESIGN.md",
+      "anchor": {
+        "path": "docs/roadmap/DEEP-DOCS-DESIGN.md",
+        "line": 1
+      },
       "token_est": 2897,
-      "load_when": "need deep-docs design source (human-authored · not anchor-verified)",
+      "load_when": "need deep-docs design source",
       "trust": "external-unverified"
     },
     {
-      "concept": "docs/roadmap/DEEP-BUG-FIX-DESIGN.md (planned deep-bug-fix design)",
-      "doc": "docs/roadmap/DEEP-BUG-FIX-DESIGN.md",
-      "anchor": { "path": "docs/roadmap/DEEP-BUG-FIX-DESIGN.md", "line": 1 },
-      "token_est": 2917,
-      "load_when": "need planned deep-bug-fix design (human-authored · not anchor-verified)",
-      "trust": "external-unverified"
-    },
-    {
-      "concept": "docs/roadmap/DATA-FLOW-CONTRACT.md (DLC-001 seed directive)",
-      "doc": "docs/roadmap/DATA-FLOW-CONTRACT.md",
-      "anchor": { "path": "docs/roadmap/DATA-FLOW-CONTRACT.md", "line": 1 },
+      "concept": "DATA-FLOW-CONTRACT.md",
+      "doc": "../../docs/roadmap/DATA-FLOW-CONTRACT.md",
+      "anchor": {
+        "path": "docs/roadmap/DATA-FLOW-CONTRACT.md",
+        "line": 1
+      },
       "token_est": 813,
-      "load_when": "need DLC-001 seed directive background (human-authored · not anchor-verified)",
+      "load_when": "need DLC-001 seed directive background",
       "trust": "external-unverified"
     },
     {
-      "concept": "docs/Training/README.md (series curriculum entry point)",
-      "doc": "docs/Training/README.md",
-      "anchor": { "path": "docs/Training/README.md", "line": 1 },
-      "token_est": 2085,
-      "load_when": "need the series curriculum entry point (human-authored · not anchor-verified)",
-      "trust": "external-unverified"
-    },
-    {
-      "concept": "docs/Training/design-rationale/index.md (per-skill design rationale index)",
-      "doc": "docs/Training/design-rationale/index.md",
-      "anchor": { "path": "docs/Training/design-rationale/index.md", "line": 1 },
-      "token_est": 2017,
-      "load_when": "need per-skill design rationale (human-authored · not anchor-verified)",
-      "trust": "external-unverified"
-    },
-    {
-      "concept": "docs/benchmarks/pr65-v4-findings/04-Code-Review/findings.json (PR#65 seed corpus)",
-      "doc": "docs/benchmarks/pr65-v4-findings/04-Code-Review/findings.json",
-      "anchor": { "path": "docs/benchmarks/pr65-v4-findings/04-Code-Review/findings.json", "line": 1 },
-      "token_est": 9176,
-      "load_when": "need the PR#65 seed corpus (human-authored · not anchor-verified)",
-      "trust": "external-unverified"
-    },
-    {
-      "concept": "docs/benchmarks/README.md (benchmark corpus overview)",
-      "doc": "docs/benchmarks/README.md",
-      "anchor": { "path": "docs/benchmarks/README.md", "line": 1 },
+      "concept": "README.md",
+      "doc": "../../docs/benchmarks/README.md",
+      "anchor": {
+        "path": "docs/benchmarks/README.md",
+        "line": 1
+      },
       "token_est": 415,
-      "load_when": "need the benchmark corpus overview (human-authored · not anchor-verified)",
+      "load_when": "need the benchmark corpus overview",
+      "trust": "external-unverified"
+    },
+    {
+      "concept": "README.md",
+      "doc": "../../website/_shared/README.md",
+      "anchor": {
+        "path": "website/_shared/README.md",
+        "line": 1
+      },
+      "token_est": 1971,
+      "load_when": "editing the marketing site (static pages; shared nav/footer source)",
       "trust": "external-unverified"
     }
   ],
   "alignment_fingerprint": {
-    "indexed_against_commit": null,
+    "indexed_against_commit": "d575719d93a069e32b281857f6727579083eaae4",
     "file_set": [
-      "plugins/deep-skills/skills/deep-plan/",
-      "plugins/deep-skills/skills/deep-plan-review/",
-      "plugins/deep-skills/skills/deep-implement/",
-      "plugins/deep-skills/skills/deep-code-review/",
-      "plugins/deep-skills/skills/deep-docs/",
-      "plugins/deep-skills/directives/"
+      ".claude-plugin/marketplace.json",
+      "plugins/deep-goal/.claude-plugin/plugin.json",
+      "plugins/deep-goal/.codex-plugin/plugin.json",
+      "plugins/deep-goal/.cursor-plugin/plugin.json",
+      "plugins/deep-goal/HOSTS.md",
+      "plugins/deep-goal/README.md",
+      "plugins/deep-goal/directives/README.md",
+      "plugins/deep-goal/directives/taxonomy.md",
+      "plugins/deep-goal/directives/toggle.sh",
+      "plugins/deep-goal/skills/deep-goal/SKILL.md",
+      "plugins/deep-goal/skills/deep-goal/references/artifact-structure.md",
+      "plugins/deep-goal/skills/deep-goal/references/conductor.md",
+      "plugins/deep-goal/skills/deep-goal/references/host-affordances.md",
+      "plugins/deep-goal/skills/deep-goal/references/loop-and-budget.md",
+      "plugins/deep-goal/skills/deep-goal/references/model-map.json",
+      "plugins/deep-goal/skills/deep-goal/references/model-map.md",
+      "plugins/deep-goal/skills/deep-goal/references/resume-and-report.md",
+      "plugins/deep-goal/skills/deep-goal/references/rigor-levels.md",
+      "plugins/deep-goal/skills/deep-goal/scripts/load-active-cards.sh",
+      "plugins/deep-goal/skills/deep-goal/templates/pipeline.md",
+      "plugins/deep-goal/skills/deep-goal/templates/rigor-map.json",
+      "plugins/deep-goal/skills/deep-goal/templates/run-report.md",
+      "plugins/deep-goal/skills/deep-goal/templates/stage-briefing.md",
+      "plugins/deep-skills/.claude-plugin/plugin.json",
+      "plugins/deep-skills/.codex-plugin/plugin.json",
+      "plugins/deep-skills/.cursor-plugin/plugin.json",
+      "plugins/deep-skills/HOSTS.md",
+      "plugins/deep-skills/README.md",
+      "plugins/deep-skills/directives/README.md",
+      "plugins/deep-skills/directives/cards/active/DLC-001.md",
+      "plugins/deep-skills/directives/taxonomy.md",
+      "plugins/deep-skills/directives/toggle.sh",
+      "plugins/deep-skills/skills/deep-bugfix/SKILL.md",
+      "plugins/deep-skills/skills/deep-bugfix/references/artifact-structure.md",
+      "plugins/deep-skills/skills/deep-bugfix/references/clustering-and-diagnosis.md",
+      "plugins/deep-skills/skills/deep-bugfix/references/commit-and-handoff.md",
+      "plugins/deep-skills/skills/deep-bugfix/references/containment.md",
+      "plugins/deep-skills/skills/deep-bugfix/references/execution-modes.md",
+      "plugins/deep-skills/skills/deep-bugfix/references/host-affordances.md",
+      "plugins/deep-skills/skills/deep-bugfix/references/intake.md",
+      "plugins/deep-skills/skills/deep-bugfix/references/learn-record.md",
+      "plugins/deep-skills/skills/deep-bugfix/references/model-map.json",
+      "plugins/deep-skills/skills/deep-bugfix/references/model-map.md",
+      "plugins/deep-skills/skills/deep-bugfix/references/notifications.md",
+      "plugins/deep-skills/skills/deep-bugfix/references/proof-of-fix.md",
+      "plugins/deep-skills/skills/deep-bugfix/scripts/load-active-cards.sh",
+      "plugins/deep-skills/skills/deep-bugfix/templates/blocker-report.md",
+      "plugins/deep-skills/skills/deep-bugfix/templates/diagnosis.md",
+      "plugins/deep-skills/skills/deep-bugfix/templates/fix-summary.md",
+      "plugins/deep-skills/skills/deep-bugfix/templates/root-causes.json",
+      "plugins/deep-skills/skills/deep-code-review/SKILL.md",
+      "plugins/deep-skills/skills/deep-code-review/references/artifact-structure.md",
+      "plugins/deep-skills/skills/deep-code-review/references/browser-verification.md",
+      "plugins/deep-skills/skills/deep-code-review/references/deterministic-prepass.md",
+      "plugins/deep-skills/skills/deep-code-review/references/dimensions.md",
+      "plugins/deep-skills/skills/deep-code-review/references/findings-and-severity.md",
+      "plugins/deep-skills/skills/deep-code-review/references/host-affordances.md",
+      "plugins/deep-skills/skills/deep-code-review/references/last-mile.md",
+      "plugins/deep-skills/skills/deep-code-review/references/model-map.json",
+      "plugins/deep-skills/skills/deep-code-review/references/model-map.md",
+      "plugins/deep-skills/skills/deep-code-review/references/multi-agent.md",
+      "plugins/deep-skills/skills/deep-code-review/references/review-lenses.md",
+      "plugins/deep-skills/skills/deep-code-review/references/scope-resolution.md",
+      "plugins/deep-skills/skills/deep-code-review/references/situational-checks.md",
+      "plugins/deep-skills/skills/deep-code-review/references/situational/file-upload-pipeline.md",
+      "plugins/deep-skills/skills/deep-code-review/references/situational/index.md",
+      "plugins/deep-skills/skills/deep-code-review/scripts/load-active-cards.sh",
+      "plugins/deep-skills/skills/deep-code-review/templates/certificate.md",
+      "plugins/deep-skills/skills/deep-code-review/templates/finding.json",
+      "plugins/deep-skills/skills/deep-code-review/templates/report.md",
+      "plugins/deep-skills/skills/deep-docs/SKILL.md",
+      "plugins/deep-skills/skills/deep-docs/references/anchor-verify.md",
+      "plugins/deep-skills/skills/deep-docs/references/artifact-structure.md",
+      "plugins/deep-skills/skills/deep-docs/references/host-affordances.md",
+      "plugins/deep-skills/skills/deep-docs/references/index-and-coverage.md",
+      "plugins/deep-skills/skills/deep-docs/references/intake-and-scope.md",
+      "plugins/deep-skills/skills/deep-docs/references/layering-and-anchors.md",
+      "plugins/deep-skills/skills/deep-docs/references/learn-signal.md",
+      "plugins/deep-skills/skills/deep-docs/references/model-map.json",
+      "plugins/deep-skills/skills/deep-docs/references/model-map.md",
+      "plugins/deep-skills/skills/deep-docs/references/place-and-report.md",
+      "plugins/deep-skills/skills/deep-docs/references/refresh.md",
+      "plugins/deep-skills/skills/deep-docs/references/survey.md",
+      "plugins/deep-skills/skills/deep-docs/references/token-budget.md",
+      "plugins/deep-skills/skills/deep-docs/scripts/load-active-cards.sh",
+      "plugins/deep-skills/skills/deep-docs/templates/MAP.md",
+      "plugins/deep-skills/skills/deep-docs/templates/coverage.md",
+      "plugins/deep-skills/skills/deep-docs/templates/index.json",
+      "plugins/deep-skills/skills/deep-docs/templates/learn-signal.json",
+      "plugins/deep-skills/skills/deep-docs/templates/subsystem-card.md",
+      "plugins/deep-skills/skills/deep-implement/SKILL.md",
+      "plugins/deep-skills/skills/deep-implement/references/artifact-structure.md",
+      "plugins/deep-skills/skills/deep-implement/references/commit-and-handoff.md",
+      "plugins/deep-skills/skills/deep-implement/references/execution-modes.md",
+      "plugins/deep-skills/skills/deep-implement/references/host-affordances.md",
+      "plugins/deep-skills/skills/deep-implement/references/model-map.json",
+      "plugins/deep-skills/skills/deep-implement/references/model-map.md",
+      "plugins/deep-skills/skills/deep-implement/references/notifications.md",
+      "plugins/deep-skills/skills/deep-implement/references/phase-execution.md",
+      "plugins/deep-skills/skills/deep-implement/references/validation.md",
+      "plugins/deep-skills/skills/deep-implement/scripts/load-active-cards.sh",
+      "plugins/deep-skills/skills/deep-implement/templates/blocker-report.md",
+      "plugins/deep-skills/skills/deep-implement/templates/phase-handoff.md",
+      "plugins/deep-skills/skills/deep-plan-review/SKILL.md",
+      "plugins/deep-skills/skills/deep-plan-review/references/artifact-structure.md",
+      "plugins/deep-skills/skills/deep-plan-review/references/findings-format.md",
+      "plugins/deep-skills/skills/deep-plan-review/references/host-affordances.md",
+      "plugins/deep-skills/skills/deep-plan-review/references/model-map.json",
+      "plugins/deep-skills/skills/deep-plan-review/references/model-map.md",
+      "plugins/deep-skills/skills/deep-plan-review/references/multi-agent.md",
+      "plugins/deep-skills/skills/deep-plan-review/references/review-dimensions.md",
+      "plugins/deep-skills/skills/deep-plan-review/scripts/load-active-cards.sh",
+      "plugins/deep-skills/skills/deep-plan-review/templates/review-report.md",
+      "plugins/deep-skills/skills/deep-plan/SKILL.md",
+      "plugins/deep-skills/skills/deep-plan/references/artifact-structure.md",
+      "plugins/deep-skills/skills/deep-plan/references/autonomous-mode.md",
+      "plugins/deep-skills/skills/deep-plan/references/host-affordances.md",
+      "plugins/deep-skills/skills/deep-plan/references/in-session-commands.md",
+      "plugins/deep-skills/skills/deep-plan/references/model-map.json",
+      "plugins/deep-skills/skills/deep-plan/references/model-map.md",
+      "plugins/deep-skills/skills/deep-plan/references/phase-structuring.md",
+      "plugins/deep-skills/skills/deep-plan/references/question-cadence.md",
+      "plugins/deep-skills/skills/deep-plan/scripts/load-active-cards.sh",
+      "plugins/deep-skills/skills/deep-plan/templates/plan-template.md",
+      "plugins/deep-skills/skills/deep-plan/templates/questions/_README.md",
+      "plugins/deep-skills/skills/deep-plan/templates/questions/multiple-choice.json",
+      "plugins/deep-skills/skills/deep-plan/templates/questions/open-ended.json",
+      "plugins/deep-skills/skills/deep-plan/templates/questions/yes-no-explain.json",
+      "scripts/check-shared.sh"
     ],
     "per_subsystem_anchor_state": {
-      "deep-plan": { "anchor_count": 0, "drifted": 0 },
-      "deep-plan-review": { "anchor_count": 0, "drifted": 0 },
-      "deep-implement": { "anchor_count": 0, "drifted": 0 },
-      "deep-code-review": { "anchor_count": 0, "drifted": 0 },
-      "deep-docs": { "anchor_count": 0, "drifted": 0 },
-      "directives": { "anchor_count": 0, "drifted": 0 }
+      "deep-plan": {
+        "anchor_count": 29,
+        "drifted": 0
+      },
+      "deep-plan-review": {
+        "anchor_count": 22,
+        "drifted": 0
+      },
+      "deep-implement": {
+        "anchor_count": 43,
+        "drifted": 0
+      },
+      "deep-code-review": {
+        "anchor_count": 37,
+        "drifted": 0
+      },
+      "deep-bugfix": {
+        "anchor_count": 43,
+        "drifted": 0
+      },
+      "deep-docs": {
+        "anchor_count": 37,
+        "drifted": 0
+      },
+      "deep-goal": {
+        "anchor_count": 62,
+        "drifted": 0
+      },
+      "shared-references": {
+        "anchor_count": 45,
+        "drifted": 0
+      },
+      "directives": {
+        "anchor_count": 23,
+        "drifted": 0
+      },
+      "packaging": {
+        "anchor_count": 34,
+        "drifted": 0
+      }
     }
   }
 }

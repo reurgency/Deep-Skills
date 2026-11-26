@@ -1,35 +1,22 @@
-<!-- GENERATED — do not hand-edit; regenerate overwrites. Source: deep-docs. -->
-<!-- tier-2 reference: loaded on demand. Deep cross-layer data-flow trace for one subsystem. Every hop anchored. -->
+# deep-implement: phase loop trace
 
-# deep-implement — cross-phase execution flow
+<!-- GENERATED - do not hand-edit; regenerate overwrites. Source: deep-docs. -->
 
-> **Load when:** tracing how a plan becomes committed code phase-by-phase, or debugging the DLC-001 contract probe.
-> Card: [subsystems/deep-implement.md](../subsystems/deep-implement.md)
+## Flow 1: one phase, autonomous mode
 
-## The flow it traces
+1. Orchestrator spawns a fresh agent briefed with plan, its phase, prior summaries, hand-off, MODEL line - `plugins/deep-skills/skills/deep-implement/references/phase-execution.md:5 (Default)`
+2. Agent runs on the stage tier from the model map, explicit per launch - `plugins/deep-skills/skills/deep-implement/references/phase-execution.md:3 (Default)`
+3. Agent returns files plus summary and does not commit; orchestrator strips the trailing MODEL line - `plugins/deep-skills/skills/deep-implement/references/phase-execution.md:34 (Briefing a phase agent)`
+4. Orchestrator discovers host commands (manifest, CLAUDE.md, tool configs) - `plugins/deep-skills/skills/deep-implement/references/validation.md:7 (Host-command discovery)`
+5. Runs targeted and a combined suite run, judged by exit code - `plugins/deep-skills/skills/deep-implement/references/validation.md:26 (Per-phase checks)`, `plugins/deep-skills/skills/deep-implement/references/validation.md:41 (Test output capture)`
+6. Verdict names the commands actually run; green is not proof for external shapes - `plugins/deep-skills/skills/deep-implement/references/validation.md:45 (Verdict)`, `plugins/deep-skills/skills/deep-implement/references/validation.md:47 (Verdict)`
+7. On failure the agent fixes; cap of 2, then stop, blocker report, notify, no commit - `plugins/deep-skills/skills/deep-implement/SKILL.md:72 (5. Fix loop)`, `plugins/deep-skills/skills/deep-implement/references/execution-modes.md:17 (Autonomous)`
+8. On green, checkpoint commit with host-aware trailer - `plugins/deep-skills/skills/deep-implement/references/commit-and-handoff.md:26 (Commits)`
+9. Append Phase Summary and write hand-off to the plan - `plugins/deep-skills/skills/deep-implement/SKILL.md:79 (7. Summarize)`, `plugins/deep-skills/skills/deep-implement/references/commit-and-handoff.md:54 (Next-phase hand-off)`
+10. Finish: summary.md header records models the agents actually ran on - `plugins/deep-skills/skills/deep-implement/references/commit-and-handoff.md:45 (Implementation summary)`
 
-The orchestrator turns a finished plan into committed code one phase at a time. The orchestrator never writes code itself — it spawns a fresh sub-agent per phase, validates the result, runs a bounded fix loop, commits a checkpoint, and hands off to the next phase.
+Collaborative differs only at step 8: present diff and gate; mode switches take effect at the next phase boundary - `plugins/deep-skills/skills/deep-implement/references/execution-modes.md:32 (Switching mid-run)`
 
-## Hop-by-hop
+## Flow 2: external-shape construction rules
 
-1. **Resolve inputs** — `plan=<path>` or auto-discover `.deep-skills/*/01-Plan/plan.md`; flags `--autonomous/--collaborative/--worktree/--parallel`. Cards loaded as hard requirements. — `plugins/deep-skills/skills/deep-implement/SKILL.md:22 (Inputs & flags)` · `plugins/deep-skills/skills/deep-implement/SKILL.md:12 (Directive cards (Deep-Learn))`
-
-2. **Choose mode** — collaborative inserts an approval gate per phase; autonomous commits on green and stops on blocker. Asked if omitted on a multi-phase plan. — `plugins/deep-skills/skills/deep-implement/references/execution-modes.md:5 (Collaborative)` · `plugins/deep-skills/skills/deep-implement/references/execution-modes.md:17 (Autonomous)`
-
-3. **Spawn fresh phase agent** — orchestrator dispatches a fresh sub-agent carrying the full plan (incl. Phase Summaries + Deferreds), not its own transcript. — `plugins/deep-skills/skills/deep-implement/SKILL.md:6 (DeepImplement)` · `plugins/deep-skills/skills/deep-implement/SKILL.md:46 (3. Execute phases)`
-
-4. **Validate (scoped)** — typecheck/test scoped to changed files + imports; verdict rules applied. **Load-bearing invariant:** for external shapes, green ≠ verified — a DLC-001 contract probe must confirm the actual data-flow contract. — `plugins/deep-skills/skills/deep-implement/references/validation.md:34 (Green ≠ verified for external shapes)`
-
-5. **Fix loop (cap 2)** — on failure, bounded re-attempt; exceeding the cap raises a blocker report rather than looping. — `plugins/deep-skills/skills/deep-implement/SKILL.md:46 (3. Execute phases)`
-
-6. **Commit checkpoint** — never on main/develop (branch first); never commit failing code. — `plugins/deep-skills/skills/deep-implement/references/commit-and-handoff.md:3 (Branch policy)`
-
-7. **Summarize + hand off** — write the Phase Summary into the plan appendix and a next-phase hand-off; the following phase agent reads only this, preserving fresh-agent isolation. — `plugins/deep-skills/skills/deep-implement/templates/phase-handoff.md:1` · `plugins/deep-skills/skills/deep-implement/references/commit-and-handoff.md:3 (Branch policy)`
-
-8. **Parallel exception** — phases run sequentially by default; concurrent execution only under `--parallel` with provable independence. — `plugins/deep-skills/skills/deep-implement/references/phase-execution.md:13 (--parallel)`
-
-9. **Notify sparingly** — only on blocker or autonomous completion. — `plugins/deep-skills/skills/deep-implement/references/notifications.md:1 (Notifications)`
-
-## Outputs
-
-Phase Summaries appendix in plan + manifest update + `03-Implementation/summary.md` + per-phase hand-offs + git commits + blocker reports + notifications.
+Briefing appends rules when a phase emits a payload an external consumer reads: verify the shape against ground truth, and do not write tautological contract tests - `plugins/deep-skills/skills/deep-implement/references/phase-execution.md:42 (Construction rules)`, `plugins/deep-skills/skills/deep-implement/references/phase-execution.md:43 (Construction rules)`

@@ -1,54 +1,64 @@
-<!-- GENERATED — do not hand-edit; regenerate overwrites. Source: deep-docs. -->
+<!-- GENERATED - do not hand-edit; regenerate overwrites. Source: deep-docs. -->
 <!-- tier-1 subsystem card: loaded on touch. One per boundary. Every claim carries a path:line (symbol) anchor. -->
 
 # deep-code-review
 
-> **Load when:** reviewing implemented code/diffs/PRs (`/deep-code-review`, "review the diff") · **~tokens:** ~560 est
+> **Load when:** editing or invoking /deep-code-review (review, --multi-agent, --mega, --triage, --fix), finding/severity shape, or its artifacts · **~tokens:** ~1.6k est
 > **Deep ref:** [references/deep-code-review.md](../references/deep-code-review.md)
 
 ## Purpose
 
-Independently review implemented code with fresh agents, evidence-gated findings, and a clean report covering correctness / last-mile / plan-conformance / coherence — with triage as a separate opt-in step. — `plugins/deep-skills/skills/deep-code-review/SKILL.md:10 (This is the fourth skill of the `deep-*` series)`
+Independent review of implemented code by fresh agents (never given the implementation transcript); emits evidence-backed findings, all left `open`, and never edits source or the plan. - `plugins/deep-skills/skills/deep-code-review/SKILL.md:9 (# DeepCodeReview)`
 
 ## Entry points
 
-- `/deep-code-review` (branch vs base); `#65` (PR); explicit paths; `--triage`; NL "review the diff / review this PR" — `plugins/deep-skills/skills/deep-code-review/SKILL.md:10 (This is the fourth skill of the `deep-*` series)`
-- Resolve scope → print it, ask on ambiguity (golden rule) — `plugins/deep-skills/skills/deep-code-review/SKILL.md:24 (1. Resolve scope — and state it)`
+- `/deep-code-review [branch/PR/diff/folder] --multi-agent --mega --max=<level> --triage [--auto-accept-min=<sev>] --fix` - `plugins/deep-skills/skills/deep-code-review/SKILL.md:4 (argument-hint)`
+- `--triage` is a separate step run over the latest `open` findings - `plugins/deep-skills/skills/deep-code-review/SKILL.md:93 (### 7. Triage & fix routing)`
 
-## Key components
+## Key types
 
-- Default one-agent-four-lenses (Correctness, Last-Mile, Plan-Conformance, Coherence) — `plugins/deep-skills/skills/deep-code-review/references/review-lenses.md:1 (Review lenses)`
-- Last-mile hop-by-hop chain trace — `plugins/deep-skills/skills/deep-code-review/references/last-mile.md:69 (synthesis rule)`
-- Multi-agent 5-stage pipeline + model tiers (reasoning tiers only) — `plugins/deep-skills/skills/deep-code-review/references/multi-agent.md:29 (All three tiers are reasoning tiers — the host's small/utility models never appear here)`
-- Findings record (evidence-required) — `plugins/deep-skills/skills/deep-code-review/templates/finding.json:1`
+- Finding (id CR-NNN, lens, dimension, severity 1-10, tier, evidence, status, verification) - `plugins/deep-skills/skills/deep-code-review/references/findings-and-severity.md:7 (## Finding shape)`
+- `findings.json` (`effort`, `scope`, `reviewed`, `mode`, `findings[]`) - `plugins/deep-skills/skills/deep-code-review/templates/finding.json:7 ("findings")`
+- Tiers 9-10 Blocker, 7-8 Major, 5-6 Minor, 1-4 Nit; numeric is canonical - `plugins/deep-skills/skills/deep-code-review/references/findings-and-severity.md:24 (## Severity scale and tier mapping)`
 
 ## Invariants
 
-- Review-only, never edit source; writes only `04-Code-Review/` (+ manifest), never the plan (that's `--triage`) — `plugins/deep-skills/skills/deep-code-review/SKILL.md:10 (This is the fourth skill of the `deep-*` series)`
-- Fresh eyes: no implementation transcript (the last-mile problem) — `plugins/deep-skills/skills/deep-code-review/SKILL.md:12 (Core principle)`
-- Print resolved scope, ask on ambiguity — `plugins/deep-skills/skills/deep-code-review/SKILL.md:24 (1. Resolve scope — and state it)`
-- Evidence required on every finding — `plugins/deep-skills/skills/deep-code-review/references/findings-and-severity.md:15 (REQUIRED, no exceptions)`
-- No cited chain ⇒ no finding (last-mile synthesis rule) — `plugins/deep-skills/skills/deep-code-review/references/last-mile.md:69 (synthesis rule)`
-- Small/utility models never used (all reasoning tiers) — `plugins/deep-skills/skills/deep-code-review/references/multi-agent.md:29 (All three tiers are reasoning tiers — the host's small/utility models never appear here)`
-- Never read .env/secrets — `plugins/deep-skills/skills/deep-code-review/references/deterministic-prepass.md:25 (NEVER read `.env`)`
+- Review run writes only `.deep-skills/<effort>/04-Code-Review/` plus manifest; never plan or Deferreds - `plugins/deep-skills/skills/deep-code-review/SKILL.md:128 (## Guardrails)`
+- Every finding needs evidence (path:line, symbol, or observed) - `plugins/deep-skills/skills/deep-code-review/references/findings-and-severity.md:5 (## Finding shape)`
+- Ask the user on any scope ambiguity; state resolved scope before launching agents - `plugins/deep-skills/skills/deep-code-review/references/scope-resolution.md:1 (# Scope resolution - what are we diffing?)`
+- Lint/typecheck/tests are scripts, never agents - `plugins/deep-skills/skills/deep-code-review/references/deterministic-prepass.md:1 (# Deterministic pre-pass - tools, not agents)`; never read `.env` - `plugins/deep-skills/skills/deep-code-review/references/deterministic-prepass.md:17 (## Discovering the host project's commands)`
+- Set model explicitly per agent launch from the model map; no small models - `plugins/deep-skills/skills/deep-code-review/SKILL.md:126 (## Guardrails)`
+- Verification floor sev >=5; refuted go to an appendix, not dropped - `plugins/deep-skills/skills/deep-code-review/references/multi-agent.md:73 (## Stage C)`
+- Blockers always auto-accept at triage; nothing is auto-rejected - `plugins/deep-skills/skills/deep-code-review/references/findings-and-severity.md:64 (## Auto-policy triage)`
+- Re-review appends fresh CR ids and preserves prior statuses - `plugins/deep-skills/skills/deep-code-review/references/findings-and-severity.md:85 (## Re-review rounds)`
 
 ## Data-flow summary
 
-- Consumes diff/PR/paths + plan + codebase + situational catalog → deterministic pre-pass → situational-check match → finder(s) over budget → evidence-gated findings → report; produces `04-Code-Review/report.md` + `findings.json` + `certificate.md` + manifest — `plugins/deep-skills/skills/deep-code-review/SKILL.md:24 (1. Resolve scope — and state it)` → `plugins/deep-skills/skills/deep-code-review/references/dimensions.md:17 (Overgenerate — within budget, above the nit floor)` → `plugins/deep-skills/skills/deep-code-review/references/findings-and-severity.md:15 (REQUIRED, no exceptions)`
+- Default: scope -> effort home -> pre-pass -> situational match -> one 4-lens agent -> report/findings/certificate - `plugins/deep-skills/skills/deep-code-review/SKILL.md:46 (### 1. Resolve scope - and state it)` -> `plugins/deep-skills/skills/deep-code-review/SKILL.md:80 (### 6. Findings & report)`
+- `--multi-agent`: Stage 0 script -> A eight finders -> B dedup -> C verifiers -> D synthesis - `plugins/deep-skills/skills/deep-code-review/references/multi-agent.md:11 (## Stage 0)` -> `plugins/deep-skills/skills/deep-code-review/references/multi-agent.md:106 (## Stage D)`
+- Triage: accepted set -> `/deep-bugfix` (fallback: fix-phase in plan for `/deep-implement`) - `plugins/deep-skills/skills/deep-code-review/SKILL.md:97 (### 7. Triage & fix routing)`
 
 ## Anchors
 
-<!-- Every anchor above is re-resolved by anchor-verify (symbol-primary, ±5-line re-snap).
-     A drifted/over-budget anchor blocks publish. This list is the card's full anchor set. -->
 | Claim | Anchor |
 |---|---|
-| closes the loop; gate between claimed-done and actually-done | `plugins/deep-skills/skills/deep-code-review/SKILL.md:10 (This is the fourth skill of the `deep-*` series)` |
-| fresh agents, never the implementation transcript | `plugins/deep-skills/skills/deep-code-review/SKILL.md:12 (Core principle)` |
-| print resolved scope, ask on ambiguity | `plugins/deep-skills/skills/deep-code-review/SKILL.md:24 (1. Resolve scope — and state it)` |
-| four default lenses | `plugins/deep-skills/skills/deep-code-review/references/review-lenses.md:1 (Review lenses)` |
-| no cited chain ⇒ no finding | `plugins/deep-skills/skills/deep-code-review/references/last-mile.md:69 (synthesis rule)` |
-| tiers + reasoning-only | `plugins/deep-skills/skills/deep-code-review/references/multi-agent.md:29 (All three tiers are reasoning tiers — the host's small/utility models never appear here)` |
-| finder budget + severity floor | `plugins/deep-skills/skills/deep-code-review/references/dimensions.md:17 (Overgenerate — within budget, above the nit floor)` |
-| evidence on every finding | `plugins/deep-skills/skills/deep-code-review/references/findings-and-severity.md:15 (REQUIRED, no exceptions)` |
-| secrets rule | `plugins/deep-skills/skills/deep-code-review/references/deterministic-prepass.md:25 (NEVER read `.env`)` |
-| machine findings record | `plugins/deep-skills/skills/deep-code-review/templates/finding.json:1` |
+| purpose | `plugins/deep-skills/skills/deep-code-review/SKILL.md:9 (# DeepCodeReview)` |
+| entry flags | `plugins/deep-skills/skills/deep-code-review/SKILL.md:4 (argument-hint)` |
+| triage entry | `plugins/deep-skills/skills/deep-code-review/SKILL.md:93 (### 7. Triage & fix routing)` |
+| finding shape | `plugins/deep-skills/skills/deep-code-review/references/findings-and-severity.md:7 (## Finding shape)` |
+| findings.json | `plugins/deep-skills/skills/deep-code-review/templates/finding.json:7 ("findings")` |
+| tiers | `plugins/deep-skills/skills/deep-code-review/references/findings-and-severity.md:24 (## Severity scale and tier mapping)` |
+| write boundary | `plugins/deep-skills/skills/deep-code-review/SKILL.md:128 (## Guardrails)` |
+| evidence rule | `plugins/deep-skills/skills/deep-code-review/references/findings-and-severity.md:5 (## Finding shape)` |
+| scope ask | `plugins/deep-skills/skills/deep-code-review/references/scope-resolution.md:1 (# Scope resolution - what are we diffing?)` |
+| prepass tools | `plugins/deep-skills/skills/deep-code-review/references/deterministic-prepass.md:1 (# Deterministic pre-pass - tools, not agents)` |
+| prepass never reads .env | `plugins/deep-skills/skills/deep-code-review/references/deterministic-prepass.md:17 (## Discovering the host project's commands)` |
+| model explicit | `plugins/deep-skills/skills/deep-code-review/SKILL.md:126 (## Guardrails)` |
+| verify floor | `plugins/deep-skills/skills/deep-code-review/references/multi-agent.md:73 (## Stage C)` |
+| blockers auto-accept | `plugins/deep-skills/skills/deep-code-review/references/findings-and-severity.md:64 (## Auto-policy triage)` |
+| re-review | `plugins/deep-skills/skills/deep-code-review/references/findings-and-severity.md:85 (## Re-review rounds)` |
+| default flow | `plugins/deep-skills/skills/deep-code-review/SKILL.md:46 (### 1. Resolve scope - and state it)` |
+| report step | `plugins/deep-skills/skills/deep-code-review/SKILL.md:80 (### 6. Findings & report)` |
+| stage 0 | `plugins/deep-skills/skills/deep-code-review/references/multi-agent.md:11 (## Stage 0)` |
+| stage D | `plugins/deep-skills/skills/deep-code-review/references/multi-agent.md:106 (## Stage D)` |
+| triage routing | `plugins/deep-skills/skills/deep-code-review/SKILL.md:97 (### 7. Triage & fix routing)` |

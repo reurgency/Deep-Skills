@@ -1,7 +1,103 @@
 {
-  "_doc": "deep-docs Deep-Learn signal; forward-dependent reader (Distiller/Pattern Ledger) — Display-only today; see references/learn-signal.md",
-  "generated": { "indexed_against_commit": "3be12547cb941ab398fce82963104439f9e759a4", "round": 1 },
-  "drift": [],
-  "undocumented": [],
-  "churn": []
+  "_doc": "deep-docs Deep-Learn signal; forward-dependent reader (Distiller/Pattern Ledger) - Display-only today; see references/learn-signal.md",
+  "generated": {
+    "indexed_against_commit": "d575719d93a069e32b281857f6727579083eaae4",
+    "round": 2
+  },
+  "drift": [
+    {
+      "subsystem": "deep-plan-review",
+      "anchor": "plugins/deep-skills/skills/deep-plan-review/references/multi-agent.md:38 (## Caution)",
+      "verdict": "drifted",
+      "round": 2
+    },
+    {
+      "subsystem": "deep-docs",
+      "anchor": "plugins/deep-skills/skills/deep-docs/references/survey.md:17 (## Fan-out - one fresh agent per boundary)",
+      "verdict": "drifted",
+      "round": 2
+    },
+    {
+      "subsystem": "deep-code-review",
+      "anchor": "plugins/deep-skills/skills/deep-code-review/references/deterministic-prepass.md:25 (## Discovering the host project's commands)",
+      "verdict": "drifted",
+      "round": 2
+    },
+    {
+      "subsystem": "packaging",
+      "anchor": ".claude-plugin/marketplace.json:7 (\"version\")",
+      "verdict": "drifted",
+      "round": 2
+    },
+    {
+      "subsystem": "deep-bugfix",
+      "anchor": "plugins/deep-skills/skills/deep-bugfix/references/clustering-and-diagnosis.md:92 (## Attempt cap)",
+      "verdict": "drifted",
+      "round": 2
+    }
+  ],
+  "undocumented": [
+    {
+      "subsystem": "deep-bugfix",
+      "path": "plugins/deep-skills/skills/deep-bugfix/",
+      "first_seen_round": 2
+    },
+    {
+      "subsystem": "deep-goal",
+      "path": "plugins/deep-goal/",
+      "first_seen_round": 2
+    },
+    {
+      "subsystem": "shared-references",
+      "path": "scripts/check-shared.sh",
+      "first_seen_round": 2
+    },
+    {
+      "subsystem": "packaging",
+      "path": ".claude-plugin/marketplace.json",
+      "first_seen_round": 2
+    }
+  ],
+  "churn": [
+    {
+      "subsystem": "deep-plan",
+      "rounds_touched": 2
+    },
+    {
+      "subsystem": "deep-plan-review",
+      "rounds_touched": 2
+    },
+    {
+      "subsystem": "deep-implement",
+      "rounds_touched": 2
+    },
+    {
+      "subsystem": "deep-code-review",
+      "rounds_touched": 2
+    },
+    {
+      "subsystem": "deep-bugfix",
+      "rounds_touched": 1
+    },
+    {
+      "subsystem": "deep-docs",
+      "rounds_touched": 2
+    },
+    {
+      "subsystem": "deep-goal",
+      "rounds_touched": 1
+    },
+    {
+      "subsystem": "shared-references",
+      "rounds_touched": 1
+    },
+    {
+      "subsystem": "directives",
+      "rounds_touched": 2
+    },
+    {
+      "subsystem": "packaging",
+      "rounds_touched": 1
+    }
+  ]
 }
