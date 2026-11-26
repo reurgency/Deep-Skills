@@ -1,6 +1,7 @@
 # <Feature Name>
 
 > **Status:** ready to review · **Risk:** <low|medium|high> · **Mode:** <single-phase|multi-phase> · **Primary file(s):** <path(s)>
+> **Base:** <session model id> · **Max:** <smartest | smarter | smart> · **Models:** <role> <model id>, … <roles actually launched this run, e.g. `explore <id>, breakout <id>, columbo <id>`; inline planning = base; note any access fallback as `<id> (fallback from <id>)`>
 
 ## Context
 

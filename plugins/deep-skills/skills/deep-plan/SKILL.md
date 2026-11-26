@@ -93,6 +93,7 @@ Honor any, all, or none - and repeatably (e.g. two gap rounds). Only proceed to 
 ### 6. Design & write the plan
 Write to `.deep-skills/<effort-name>/01-Plan/plan.md` (or the explicit path override) using `templates/plan-template.md`. On first write to the effort directory, create `00-Manifest/manifest.md` if absent (per `references/artifact-structure.md`) and set the Plan stage status. Include:
 - Self-contained **Context / Approach / Steps / Files / Verification**.
+- The header's **Base · Max · Models** line: the session model, the resolved `--max`, and the model each helper agent (Explore, `/breakout`, columbo) actually ran on, with any fallback noted (per `references/model-map.md` § Access fallback). Update it if columbo (step 8) or a later breakout runs after the first write.
 - Reference reused functions/utilities with their paths.
 - A **Deferreds** ledger (see `templates/plan-template.md` and below).
 - In autonomous runs only: the populated **Assumptions** section - one row per self-answered question (see `references/autonomous-mode.md`); interactive sessions omit it.
