@@ -40,7 +40,7 @@ Each cluster gets **two agents in sequence**: a **diagnose agent** that confirms
 
 The diagnose agent writes `.deep-skills/<effort>/06-Bug-Fix/round-N/diagnosis-<CL-K>.md` (shape: `templates/diagnosis.md`), one file per cluster. Its `## Diagnosis` record holds the confirmed cause, the cited `path:line` chain, the comparison against the review's hypothesis, the fix approach, and the files to touch. It is the **only** cause input the fix agent receives, the confirmed-cause statement the proof agent receives, and the source of the cluster's `fix-summary.md` "Confirmed cause" line (and, under `--learn`, its `root-causes.json` record) when the cluster closes.
 
-**Split/merge naming.** When diagnosis splits a cluster, each new cluster id gets its own file (`diagnosis-<CL-Ka>.md`, `diagnosis-<CL-Kb>.md`, …) and the original file gains a first line `Superseded by <ids>`. A merge writes one file under the surviving cluster id; the absorbed cluster's file gains `Superseded by <id>`.
+**Split/merge naming.** When diagnosis splits a cluster, each new cluster id gets its own file (`diagnosis-<CL-Ka>.md`, `diagnosis-<CL-Kb>.md`, …) and the original file gains a first line `Superseded by <ids>`. A merge writes one file under the surviving cluster id; the absorbed cluster's file gains `Superseded by <id>` (if the absorbed cluster has no diagnosis file yet, create one holding only that line).
 
 ### Diagnose agent - briefing
 
@@ -51,7 +51,7 @@ Each diagnose agent receives - and only receives:
 - **Repo access** - read the code; diagnosis is code-reading, not recollection. **Read-only**: it edits nothing except its own diagnosis file.
 - **The plan** (when the effort has one) - for conformance *context* only: what the behavior was supposed to be.
 - **The recommendation, flagged**: every `recommendation_hypothesis` is passed under the header **"hypothesis - do not trust"**. The review (or reporter) guessed at the cause; the agent must confirm or reject that guess with its own trace.
-- **On a retry or redirect only:** the failed proof's rationale (attempt 2 after `unproven`), the fix agent's `diagnosis-disputed` reason, or the user's redirect note (collaborative) - and the previous diagnosis file, which it rewrites.
+- **On a retry or redirect only:** the failed proof's rationale (attempt 2 after `unproven`), the fix agent's `diagnosis-disputed` reason, or the user's redirect note (collaborative) - and the previous diagnosis file, which it rewrites - the rewrite's header reads `Attempt: <N>` (this attempt's number, from the orchestrator) and carries no `> **Refuted:**` line.
 - **The model-report line** - end the brief with it (`references/model-map.md` § Host binding).
 
 It never receives the implementer's transcript, the reviewer's transcript or reasoning, or any prior attempt's chat history - evidence only, fresh eyes.
