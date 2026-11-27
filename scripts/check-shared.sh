@@ -88,7 +88,7 @@ TIERS = ["smartest", "smarter", "smart"]          # strongest first
 RANK = {t: i for i, t in enumerate(TIERS)}        # lower = stronger
 STAGES = ["plan", "plan-review", "implement", "code-review", "bugfix", "docs"]
 TOP = {"map_version", "ladder", "stages"}
-SMALL = re.compile(r"(?i)haiku|(?<![a-z])(mini|nano)(?![a-z])")
+SMALL = re.compile(r"(?i)haiku|luna|(?<![a-z])(mini|nano)(?![a-z])")
 errors = []
 
 def err(path, key, msg):

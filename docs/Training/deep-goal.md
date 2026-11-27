@@ -81,12 +81,12 @@ don't shift with the model you happen to be chatting in:
 
 | Level | Claude | GPT |
 |---|---|---|
-| **smartest** | Fable 5.2 (then Fable 5) | Astra-6 (then GPT-5.6 Sol) |
-| **smarter** | Opus 5.5 (then Opus 5) | GPT-6-Sol (then GPT-5.6 Terra) |
-| **smart** | Sonnet 5.5 (then Sonnet 5) | GPT-6.1-Terra (then GPT-5.6 Luna) |
+| **smartest** | Fable 5.2 (then Fable 5) | GPT-6.2 Astra (then GPT-6 Astra, GPT-5.6 Sol) |
+| **smarter** | Opus 5.5 (then Opus 5) | GPT-6.2 Sol (then GPT-6 Sol, GPT-5.6 Terra) |
+| **smart** | Sonnet 5.5 (then Sonnet 5) | GPT-6.2 Terra (then GPT-6.1 Terra) |
 
 A run stays in your session's model family. Smart is the floor — small models (Haiku,
-GPT-mini/nano) never run. What each stage runs on, by `--max` (Claude models shown):
+GPT Luna/mini/nano) never run. What each stage runs on, by `--max` (Claude models shown):
 
 | Stage | `--max=smartest` | `--max=smarter` | `--max=smart` |
 |---|---|---|---|

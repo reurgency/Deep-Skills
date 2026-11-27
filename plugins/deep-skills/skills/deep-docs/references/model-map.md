@@ -24,7 +24,7 @@ Three tiers, named by intelligence only, from strongest down:
 
 `ladder.<tier>.<family>` in `model-map.json` is a list of model IDs for that tier in that model family (`claude`, `gpt`). The **first** entry is the current generation, the next is the previous generation - the list is also the access-fallback order for that tier (§ Access fallback).
 
-GPT entries are display names until the host IDs are confirmed (RE-VERIFY); Claude entries are host model IDs. Matching against the ladder uses the normalization in § Base-tier lookup.
+Claude entries are host model IDs; GPT entries are Codex model IDs (as `codex debug models` lists them). A list may hold more than two entries - for example the newest GPT generation first for accounts that have it - and is always tried in order. Matching against the ladder uses the normalization in § Base-tier lookup.
 
 ## Column = base's family
 

@@ -1,14 +1,14 @@
 {
   "_shared": "Series-shared reference. Copied byte-identically into every deep-* skill's and deep-goal's references/ directory (the series standalone rule forbids cross-skill references). All copies must stay byte-identical; the series consistency sweep (scripts/check-shared.sh, maintainers only) verifies this. Rules for reading this file live in references/model-map.md. Keys starting with _ are documentation and are ignored.",
-  "_re_verify": "Claude ids are host model ids. GPT strings are display names until the host ids are confirmed (RE-VERIFY).",
+  "_re_verify": "Claude ids are host model ids. GPT ids are Codex model ids (codex debug models). The gpt-6.2-* ids are listed first for accounts that have them (RE-VERIFY per account); other accounts fall back to the next id.",
   "map_version": 2,
   "ladder": {
     "_order": "Each list is the access-fallback order for that tier and family: current generation first, then previous generation.",
-    "smartest": { "claude": ["claude-fable-5-2", "claude-fable-5"], "gpt": ["Astra-6", "GPT-5.6 Sol"] },
-    "smarter": { "claude": ["claude-opus-5-5", "claude-opus-5"], "gpt": ["GPT-6-Sol", "GPT-5.6 Terra"] },
-    "smart": { "claude": ["claude-sonnet-5-5", "claude-sonnet-5"], "gpt": ["GPT-6.1-Terra", "GPT-5.6 Luna"] }
+    "smartest": { "claude": ["claude-fable-5-2", "claude-fable-5"], "gpt": ["gpt-6.2-astra", "gpt-6-astra", "gpt-5.6-sol"] },
+    "smarter": { "claude": ["claude-opus-5-5", "claude-opus-5"], "gpt": ["gpt-6.2-sol", "gpt-6-sol", "gpt-5.6-terra"] },
+    "smart": { "claude": ["claude-sonnet-5-5", "claude-sonnet-5"], "gpt": ["gpt-6.2-terra", "gpt-6.1-terra"] }
   },
-  "_utility_unused": { "claude": "claude-haiku-5-5", "gpt": "GPT-6-Luna" },
+  "_utility_unused": { "claude": "claude-haiku-5-5", "gpt": "gpt-6-luna" },
   "stages": {
     "_order": "stages.<max>.<stage> = the tier a stage's lead runs at when --max=<max>.",
     "smartest": { "plan": "smartest", "plan-review": "smartest", "implement": "smarter", "code-review": "smartest", "bugfix": "smarter", "docs": "smart" },
